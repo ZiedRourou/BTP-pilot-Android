@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +53,7 @@ import com.example.btppilot.ui.theme.BtpPilotTheme
 @Composable
 fun RegisterStepOnePreview() {
     BtpPilotTheme {
+//        RegisterFirstStep()
         RegisterFirstStep()
     }
 }
@@ -64,7 +67,7 @@ fun StepRegister(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        Row (){
+        Row() {
             for (i in 1..3) {
                 val color = if (i <= step)
                     MaterialTheme.colorScheme.primary
@@ -135,12 +138,15 @@ fun RoleCard(
 ) {
     val borderColor =
         if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+    val contentColor =
+        if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
 
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(2.dp, borderColor),
-        color = Color.White,
+//        modifier = Modifier.background(contentColor),
+        color = contentColor
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -148,19 +154,21 @@ fun RoleCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.padding(5.dp),
-                    tint = Color.Black
-                )
-
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.padding(5.dp),
+                tint = Color.Black
+            )
+            Spacer(modifier = Modifier.width(5.dp))
             Column() {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
                 )
+                Spacer(modifier = Modifier.height(5.dp))
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
@@ -173,85 +181,183 @@ fun RoleCard(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = " ",
                     tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(100.dp)
                 )
             }
         }
     }
 }
 
+//@Composable
+//fun RegisterFirstStep() {
+//
+//    var selectedRole by remember { mutableStateOf("Owner") }
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(24.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.SpaceEvenly
+//    ) {
+//
+//        HeaderRegister()
+//
+//        StepRegister(1)
+//
+//        Text(
+//            text = "Sélectionner votre role",
+//            style = MaterialTheme.typography.headlineMedium,
+//            color = MaterialTheme.colorScheme.secondary,
+//            fontWeight = FontWeight.Bold
+//        )
+//        Text(
+//            text = "Sélectionnez votre role au seins de votre entreprise.",
+//            style = MaterialTheme.typography.bodyLarge,
+//            color = MaterialTheme.colorScheme.onSurfaceVariant,
+//            textAlign = TextAlign.Center,
+//            modifier = Modifier.padding(top = 16.dp)
+//        )
+//
+//
+//        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+//            RoleCard(
+//                title = "Chef d'entreprise",
+//                description = "Gérer les projets, et superviser vos équipes",
+//                icon = Icons.Default.Build,
+//                isSelected = selectedRole == "Owner",
+//                onClick = { selectedRole = "Owner" }
+//            )
+//            RoleCard(
+//                title = "Employé",
+//                description = "Suivez vos tâches et mettez à jour l'avancement du projet en deux clics",
+//                icon = Icons.Default.Email,
+//                isSelected = selectedRole == "Employee",
+//                onClick = { selectedRole = "Employee" }
+//            )
+//            RoleCard(
+//                title = "Client",
+//                description = "Suivez l'avancement de vos prestataire en un coup d'oeil",
+//                icon = Icons.Default.Person,
+//                isSelected = selectedRole == "Client",
+//                onClick = { selectedRole = "Client" }
+//            )
+//        }
+//
+//        Button(
+//            onClick = {
+//
+//            },
+//            shape = RoundedCornerShape(14.dp),
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(50.dp)
+//                .shadow(10.dp)
+//        ) {
+//            Text(
+//                "Suivant",
+//                style = MaterialTheme.typography.labelLarge,
+//                color = MaterialTheme.colorScheme.background
+//            )
+//        }
+//    }
+//}
+
+
 @Composable
 fun RegisterFirstStep() {
-
     var selectedRole by remember { mutableStateOf("Owner") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly
-    ) {
-
-        HeaderRegister()
-
-        StepRegister(1)
-
-        Text(
-            text = "Sélectionner votre role",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.secondary,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "Sélectionnez votre role au seins de votre entreprise.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 16.dp)
-        )
+    Scaffold(
+        topBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+                    .height(150.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                HeaderRegister()
+                StepRegister(1)
+            }
+        },
 
 
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            RoleCard(
-                title = "Chef d'entreprise",
-                description = "Gérer les projets, et superviser vos équipes",
-                icon = Icons.Default.Build,
-                isSelected = selectedRole == "Owner",
-                onClick = { selectedRole = "Owner" }
-            )
-            RoleCard(
-                title = "Employé",
-                description = "Suivez vos tâches et mettez à jour l'avancement du projet en deux clics",
-                icon = Icons.Default.Email,
-                isSelected = selectedRole == "Employee",
-                onClick = { selectedRole = "Employee" }
-            )
-            RoleCard(
-                title = "Client",
-                description = "Suivez l'avancement de vos prestataire en un coup d'oeil",
-                icon = Icons.Default.Person,
-                isSelected = selectedRole == "Client",
-                onClick = { selectedRole = "Client" }
-            )
-        }
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
 
-        Button(
-            onClick = {
+                Text(
+                    text = "Sélectionner votre role",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Sélectionnez votre role au seins de votre entreprise.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
 
-            },
-            shape = RoundedCornerShape(14.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .shadow(10.dp)
-        ) {
-            Text(
-                "Suivant",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.background
-            )
-        }
-    }
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    RoleCard(
+                        title = "Chef d'entreprise",
+                        description = "Gérer les projets, et superviser vos équipes",
+                        icon = Icons.Default.Build,
+                        isSelected = selectedRole == "Owner",
+                        onClick = { selectedRole = "Owner" }
+                    )
+                    RoleCard(
+                        title = "Employé",
+                        description = "Suivez vos tâches et mettez à jour l'avancement du projet en deux clics",
+                        icon = Icons.Default.Email,
+                        isSelected = selectedRole == "Employee",
+                        onClick = { selectedRole = "Employee" }
+                    )
+                    RoleCard(
+                        title = "Client",
+                        description = "Suivez l'avancement de vos prestataire en un coup d'oeil",
+                        icon = Icons.Default.Person,
+                        isSelected = selectedRole == "Client",
+                        onClick = { selectedRole = "Client" }
+                    )
+                }
+            }
+        },
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+            ) {
+                Button(
+                    onClick = {
+
+                    },
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .shadow(10.dp)
+                ) {
+                    Text(
+                        "Suivant",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.background
+                    )
+                }
+            }
+        },
+    )
 }
 
 

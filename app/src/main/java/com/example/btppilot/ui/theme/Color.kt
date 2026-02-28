@@ -14,7 +14,7 @@ val YellowLight = Color(0xFFFFE082)
 val Primary = Color(0xFFFFC100)
 val Secondary = Color(0xFF0F172A)
 val Tertiary =  Color(0xFF6B7280)
-val surface = Color((0xFFE7E0EC))
+val surface = Color(0xFFF3F9FE)
 
 
 val Success = Color(0xFF22C55E)

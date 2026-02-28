@@ -90,4 +90,10 @@ dependencies {
     val hiltVersion = "2.55"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+
+
+    //navigation avec compose et hilt pour injecter les viewModel dans les screens
+    implementation("androidx.navigation:navigation-compose:2.8.8")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
 }
