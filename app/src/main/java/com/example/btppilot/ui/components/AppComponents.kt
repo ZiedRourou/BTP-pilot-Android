@@ -3,14 +3,17 @@ package com.example.btppilot.ui.components
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -23,7 +26,7 @@ fun AppTextField(
     label: String,
     isError: Boolean = false,
     supportingText: String? = null,
-    leadingIcon: Painter? = null,
+    leadingIcon: ImageVector? = null,
     isPassword: Boolean = false
 ) {
 
@@ -40,7 +43,7 @@ fun AppTextField(
         leadingIcon = {
             leadingIcon?.let {
                 Icon(
-                    painter = it,
+                    imageVector = it,
                     contentDescription = null
                 )
             }
@@ -58,7 +61,7 @@ fun AppTextField(
 
 
 @Composable
-fun PrimaryButton(
+fun AppPrimaryButton(
     text: String,
     onClick: () -> Unit
 ) {
@@ -71,6 +74,43 @@ fun PrimaryButton(
             .height(50.dp)
             .shadow(10.dp)
     ) {
-        Text(text)
+        Text(text, color = MaterialTheme.colorScheme.background, style = MaterialTheme.typography.labelLarge)
     }
 }
+
+@Composable
+fun AppPrimaryTitle(
+    text: String,
+) {
+
+    Text(
+        text = text,
+        style = MaterialTheme.typography.headlineLarge,
+        color = MaterialTheme.colorScheme.primary
+    )
+}
+
+@Composable
+fun AppSecondaryTitle(
+    text: String,
+) {
+
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.tertiary
+    )
+}
+
+@Composable
+fun AppLabelTitle(
+    text: String,
+) {
+
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.tertiary
+    )
+}
+

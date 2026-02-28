@@ -10,51 +10,63 @@ import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.dto.request.AuthRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.Dispatcher
 import javax.inject.Inject
-
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val apiService: ApiInterface
 ) : ViewModel() {
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
+    sealed class LoginEvent {
+        data class ShowError(val message: String) : LoginEvent()
+    }
+    data class LoginUiState(
+        val isLoading: Boolean = false
+    )
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState = _uiState.asStateFlow()
 
-    private val _errorMessage = MutableStateFlow("")
-    val errorMessage = _errorMessage.asStateFlow()
-
+    private val _event =  MutableSharedFlow<LoginEvent>(extraBufferCapacity = 1)
+    val event = _event.asSharedFlow()
 
     fun login(email: String, password: String) {
 
-        viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.value = true
+        viewModelScope.launch {
+
+            _uiState.value = LoginUiState(isLoading = true)
 
             try {
-                val response = apiService.authLogin(
-                    AuthRequestDto(email, password)
-                )
 
-                if (response?.isSuccessful == true) {
-                    Log.e("ici", "la je t'ai dis ")
-                    val body = response.body()
+                val response = withContext(Dispatchers.IO) {
+                    apiService.authLogin(
+                        AuthRequestDto(email, password)
+                    )
+                }
 
-                } else {
-                    Log.e("ici2", "la je t'ai dis ")
-
-                    _errorMessage.value = "Login failed"
+                if (response?.isSuccessful != true) {
+                    _event.emit(
+                        LoginEvent.ShowError(
+                            "Email ou mot de passe incorrect"
+                        )
+                    )
                 }
 
             } catch (e: Exception) {
-                Log.e("ici3", "la je t'ai dis ")
 
-                _errorMessage.value = "erreur"
+                _event.emit(
+                    LoginEvent.ShowError("Erreur réseau")
+                )
+
+            } finally {
+                _uiState.value =
+                    _uiState.value.copy(isLoading = false)
             }
-
-            _isLoading.value = false
         }
     }
 }
