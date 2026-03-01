@@ -132,6 +132,7 @@ fun AppLabelTitle(
 
 @Composable
 fun AppButtonRegisterScaffold(
+    text: String? = "Suivant",
     onClick: () -> Unit
 ) {
     Box(
@@ -149,11 +150,13 @@ fun AppButtonRegisterScaffold(
                 .height(50.dp)
                 .shadow(10.dp)
         ) {
-            Text(
-                "Suivant",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.background
-            )
+            if (text != null) {
+                Text(
+                    text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.background
+                )
+            }
         }
     }
 }

@@ -1,11 +1,9 @@
-package com.example.btppilot.presentation.screens.register
+package com.example.btppilot.presentation.screens.register.stepOneAndTwo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.requ.RegisterRequestDto
-import com.example.btppilot.data.dto.request.LoginRequestDto
 import com.example.btppilot.data.repository.AuthRepository
-import com.example.btppilot.presentation.screens.login.LoginViewModel
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.Resource
 import com.example.btppilot.util.UserRole

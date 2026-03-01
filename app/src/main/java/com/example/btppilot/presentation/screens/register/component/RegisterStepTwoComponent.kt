@@ -11,19 +11,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.btppilot.presentation.component.AppButtonRegisterScaffold
 import com.example.btppilot.presentation.component.AppPrimaryTitleBlue
 import com.example.btppilot.presentation.component.AppTextField
-import com.example.btppilot.presentation.screens.register.RegisterViewModel
+import com.example.btppilot.presentation.screens.register.stepOneAndTwo.RegisterViewModel
 
 
 @Preview(showBackground = true, apiLevel = 33)

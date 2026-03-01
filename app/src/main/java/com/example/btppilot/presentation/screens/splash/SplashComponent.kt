@@ -21,7 +21,7 @@ import com.example.btppilot.ui.theme.BtpPilotTheme
 
 @Preview(showBackground = true, apiLevel = 33)
 @Composable
-fun SplashPreview() {
+private fun SplashPreview() {
     BtpPilotTheme {
         SplashContent()
     }
