@@ -22,25 +22,44 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
+
     @Provides
     @Singleton
-    fun providesApi(): Retrofit {
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
+    fun provideRetrofit(moshi: Moshi): Retrofit {
 
-        val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
-        val moshi = Moshi.Builder().apply { add(KotlinJsonAdapterFactory()) }.build()
+        val interceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(interceptor)
+            .build()
 
         return Retrofit.Builder()
             .baseUrl(ApiRoutes.BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
-            .client(client).build()
+            .addConverterFactory(
+                MoshiConverterFactory.create(moshi)
+            )
+            .client(client)
+            .build()
     }
-
     @Provides
     @Singleton
-    fun getApi(): ApiInterface {
-        return providesApi().create(ApiInterface::class.java)
+    fun getApiService(retrofit: Retrofit): ApiInterface {
+        return retrofit.create(ApiInterface::class.java)
+    }
+
+    //    @Provides
+//    @Singleton
+//    fun getApi(): ApiInterface {
+//        return providesApi().create(ApiInterface::class.java)
+//    }
+    @Provides
+    @Singleton
+    fun provideMoshi(): Moshi {
+        return Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
     }
 
     @Singleton
@@ -50,3 +69,7 @@ class AppModule {
     }
 
 }
+
+
+
+

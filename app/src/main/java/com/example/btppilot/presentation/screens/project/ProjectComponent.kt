@@ -1,4 +1,4 @@
-package com.example.btppilot.presentation.project
+package com.example.btppilot.presentation.screens.project
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -37,11 +37,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.btppilot.R
-import com.example.btppilot.presentation.home.ContentHome
-import com.example.btppilot.presentation.home.FilterButtons
-import com.example.btppilot.presentation.home.GenericProgressBar
-import com.example.btppilot.presentation.home.HeaderScaffoldHome
-import com.example.btppilot.presentation.home.ItemHome
+//import com.example.btppilot.presentation.screens.home.ContentHome
+//import com.example.btppilot.presentation.screens.home.FilterButtons
+//import com.example.btppilot.presentation.screens.home.GenericProgressBar
+//import com.example.btppilot.presentation.screens.home.HeaderScaffoldHome
+//import com.example.btppilot.presentation.screens.home.ItemHome
 import com.example.btppilot.ui.theme.BtpPilotTheme
 import com.example.btppilot.ui.theme.Primary
 import com.example.btppilot.ui.theme.Secondary
@@ -74,7 +74,7 @@ fun ProjectScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                HeaderScaffoldHome()
+//                HeaderScaffoldHome()
             }
         },
 
@@ -180,7 +180,7 @@ fun contentTask() {
                 .fillMaxWidth(),
             color = Color.Black
         )
-        ItemHome()
+//        ItemHome()
         ItemProject()
     }
 }

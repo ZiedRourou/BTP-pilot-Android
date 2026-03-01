@@ -1,4 +1,4 @@
-package com.example.btppilot.presentation.splash
+package com.example.btppilot.presentation.screens.home
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -6,8 +6,5 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-
-class SplashViewModel @Inject constructor(): ViewModel() {
-
-
+class HomeViewModel @Inject constructor() :ViewModel() {
 }
