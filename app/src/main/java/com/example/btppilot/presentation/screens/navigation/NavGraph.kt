@@ -10,8 +10,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.btppilot.presentation.screens.home.HomeScreen
 import com.example.btppilot.presentation.screens.home.HomeViewModel
@@ -20,7 +22,9 @@ import com.example.btppilot.presentation.screens.login.LoginViewModel
 import com.example.btppilot.presentation.screens.register.stepOneAndTwo.RegisterStepOneScreen
 import com.example.btppilot.presentation.screens.register.stepOneAndTwo.RegisterSecondStepScreen
 import com.example.btppilot.presentation.screens.register.stepOneAndTwo.RegisterViewModel
-import com.example.btppilot.presentation.screens.register.stepThree.linkUserToCompany.RegisterLinkUserToCompany
+import com.example.btppilot.presentation.screens.register.stepThree.company.RegisterCompanyScreen
+import com.example.btppilot.presentation.screens.register.stepThree.company.RegisterCompanyViewModel
+import com.example.btppilot.presentation.screens.register.stepThree.linkUserToCompany.RegisterLinkUserToCompanyViewModel
 import com.example.btppilot.presentation.screens.register.stepThree.linkUserToCompany.RegisterLinkUserToCompanyScreen
 import com.example.btppilot.presentation.screens.splash.SplashScreen
 import com.example.btppilot.presentation.screens.splash.SplashViewModel
@@ -99,31 +103,52 @@ fun NavGraphApp(
                 )
             }
 
-            composable(Screen.RegisterOwnerCompany.route) { backStackEntry ->
+            composable(Screen.RegisterInviteCompany.route + "/{roleLinkCompany}",
+                arguments = listOf(
+                    navArgument(name = "roleLinkCompany"){
+                        type = NavType.StringType
+                    }
+                )) { backStackEntry ->
 
-                val registerViewModel: RegisterLinkUserToCompany = hiltViewModel()
+                val role = backStackEntry.arguments?.getString("roleLinkCompany")?: ""
+
+                val registerViewModel: RegisterLinkUserToCompanyViewModel = hiltViewModel()
 
                 RegisterLinkUserToCompanyScreen(
                     navController = navController,
-                    registerLinkUserToCompany =  registerViewModel
+                    registerLinkUserToCompany = registerViewModel,
+                    userRole = role
                 )
             }
+
+            composable(Screen.RegisterOwnerCompany.route + "/{roleLinkCompany}",
+                arguments = listOf(
+                    navArgument(name = "roleLinkCompany"){
+                        type = NavType.StringType
+                    }
+                )) { backStackEntry ->
+
+                val role = backStackEntry.arguments?.getString("roleLinkCompany")?: ""
+
+                val registerViewModel: RegisterCompanyViewModel = hiltViewModel()
+
+                RegisterCompanyScreen(
+                    navController = navController,
+                    registerViewModel = registerViewModel,
+                    userRole = role
+                )
+            }
+        }
+        //            composable(Screen.RegisterOwnerCompany.route) { backStackEntry ->
 //
-//            composable(Screen.RegisterInviteCompany.route) { backStackEntry ->
+//                val registerViewModel: RegisterLinkUserToCompanyViewModel = hiltViewModel()
 //
-//                val parentEntry = remember(backStackEntry) {
-//                    navController.getBackStackEntry(Screen.RegisterGraph.route)
-//                }
-//
-//                val registerViewModel: RegisterViewModel =
-//                    hiltViewModel(parentEntry)
-//
-//                RegisterThirdStepNotOwnerScreen(
+//                RegisterLinkUserToCompanyScreen(
 //                    navController = navController,
-//                    registerViewModel = registerViewModel
+//                    registerLinkUserToCompany = registerViewModel
 //                )
 //            }
-        }
+
 
         composable(Screen.Home.route) {
             val homeViewModel: HomeViewModel = hiltViewModel()

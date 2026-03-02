@@ -27,27 +27,25 @@ fun RegisterSecondStepScreen(
     val userInfo by registerViewModel.registerInfo.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
 
+    val userRole = userInfo.selectedRole.toString()
+
     LaunchedEffect(Unit) {
         registerViewModel.registerEvent.collect { event ->
-
             when (event) {
 
                 is RegisterViewModel.RegisterEvent.ShowError ->
                     snackBarHostState.showSnackbar(event.message)
 
                 RegisterViewModel.RegisterEvent.NavigateToOwnerCompany ->
-                    navController.navigate(Screen.RegisterOwnerCompany.route)
+                    navController.navigate("${Screen.RegisterOwnerCompany.route}/$userRole")
 
                 RegisterViewModel.RegisterEvent.NavigateToInviteCompany ->
-                    navController.navigate(Screen.RegisterInviteCompany.route)
+                    navController.navigate("${Screen.RegisterInviteCompany.route}/$userRole")
 
                 else -> {}
             }
-
-
         }
     }
-
 
     Box(Modifier.fillMaxSize()) {
 

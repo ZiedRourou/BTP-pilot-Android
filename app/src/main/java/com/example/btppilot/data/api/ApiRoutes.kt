@@ -6,6 +6,6 @@ object ApiRoutes {
 
     const val AUTH_LOGIN = "auth/login/"
     const val AUTH_REGISTER = "auth/register/"
-
-
+    const val INVITE_USER_TO_COMPANY =  "/companies/inviteUser"
+    const val COMPANY = "/companies"
 }

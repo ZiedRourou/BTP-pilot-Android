@@ -17,7 +17,7 @@ sealed class Resource<T> (
 //    ) : Resource<T>(data,message)
 
      class Error<T>(
-        message : String,
+        message : String? = "",
         val code: Int? = null
     ) : Resource<T>()
 }

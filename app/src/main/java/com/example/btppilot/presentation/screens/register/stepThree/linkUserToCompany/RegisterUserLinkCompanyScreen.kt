@@ -2,6 +2,7 @@ package com.example.btppilot.presentation.screens.register.stepThree.linkUserToC
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,11 +15,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BusinessCenter
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,104 +37,65 @@ import com.example.btppilot.presentation.component.AppButtonRegisterScaffold
 import com.example.btppilot.presentation.component.AppPrimaryTitleBlue
 import com.example.btppilot.presentation.component.AppSecondaryTitle
 import com.example.btppilot.presentation.component.AppTextField
+import com.example.btppilot.presentation.screens.navigation.Screen
 import com.example.btppilot.presentation.screens.register.component.HeaderRegister
+import com.example.btppilot.presentation.screens.register.component.RegisterLinkUserToCompanyContent
+import com.example.btppilot.presentation.screens.register.component.RegisterSecondStepContent
+import com.example.btppilot.presentation.screens.register.stepOneAndTwo.RegisterViewModel
 import com.example.btppilot.ui.theme.BtpPilotTheme
+import com.example.btppilot.util.UserRole
 
 
 @Preview(showBackground = true, apiLevel = 33)
 @Composable
 private fun RegisterLinkUserToCompanyPreview() {
     BtpPilotTheme {
-        RegisterLinkUserToCompanyContent(
-            companyEmail = "state.companyEmail",
-            onEmailChange = {},
-            onSubmit = {}
-        )
+
     }
 }
 
 @Composable
 fun RegisterLinkUserToCompanyScreen(
     navController: NavController,
-    registerLinkUserToCompany: RegisterLinkUserToCompany
+    registerLinkUserToCompany: RegisterLinkUserToCompanyViewModel,
+    userRole: String
 ) {
 
-    RegisterLinkUserToCompanyContent(
-        companyEmail = "state.companyEmail",
-        onEmailChange = {},
-        onSubmit = {}
-    )
-}
+    val companyInfo by registerLinkUserToCompany.companyInfo.collectAsState()
+    val snackBarHostState = remember { SnackbarHostState() }
 
-@Composable
-fun RegisterLinkUserToCompanyContent(
-    companyEmail: String,
-    onEmailChange: (String) -> Unit,
-    onSubmit: () -> Unit,
-) {
+    registerLinkUserToCompany.setUserRoleCompanyLink(userRole)
 
-    Scaffold(
-        topBar = { HeaderRegister(3) },
+    LaunchedEffect(Unit) {
+        registerLinkUserToCompany.inviteEvent.collect { event ->
+            when (event) {
+                is  RegisterLinkUserToCompanyViewModel.InviteEvent.ShowError ->
+                    snackBarHostState.showSnackbar(event.message)
 
-        bottomBar = {
-            AppButtonRegisterScaffold(
-                text = "Valider",
-                onClick = {onSubmit()}
-            )
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it)
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceAround
-            ) {
-
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(2.dp, Color.Gray),
-                    color = Color.White,
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceEvenly
-                    ) {
-
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-
-                            Icon(
-                                imageVector = Icons.Filled.BusinessCenter,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(5.dp))
-                            AppPrimaryTitleBlue(text = "Rejoignner votre entreprise")
-
-                        }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        AppSecondaryTitle(
-                            text = "Entrez l'email de votre entreprise afin de faire une demande d'invitation")
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        AppTextField(
-                            value = companyEmail,
-                            onValueChange = onEmailChange,
-                            label = "Email de votre entreprise",
-                            leadingIcon = Icons.Filled.Email
-                        )
-                    }
+                RegisterLinkUserToCompanyViewModel.InviteEvent.NavigateToHome -> {
+                    navController.navigate(Screen.Home.route)
                 }
+
+                else -> {}
             }
-        },
-    )
+        }
+    }
+
+
+    Box(Modifier.fillMaxSize()) {
+
+        RegisterLinkUserToCompanyContent(
+            companyInfo = companyInfo,
+            onEmailChange = registerLinkUserToCompany::onEmailChange,
+            onSubmit = registerLinkUserToCompany::inviteUserToCompany,
+            snackBarHostState = snackBarHostState
+        )
+
+        if (companyInfo.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
 }
+
