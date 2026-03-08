@@ -49,11 +49,6 @@ class AppModule {
         return retrofit.create(ApiInterface::class.java)
     }
 
-    //    @Provides
-//    @Singleton
-//    fun getApi(): ApiInterface {
-//        return providesApi().create(ApiInterface::class.java)
-//    }
     @Provides
     @Singleton
     fun provideMoshi(): Moshi {

@@ -11,8 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.btppilot.presentation.screens.navigation.NavGraphApp
-import com.example.btppilot.presentation.screens.navigation.Screen
+import com.example.btppilot.presentation.navigation.NavGraphApp
+import com.example.btppilot.presentation.navigation.Screen
 
 import com.example.btppilot.ui.theme.BtpPilotTheme
 import dagger.hilt.android.AndroidEntryPoint

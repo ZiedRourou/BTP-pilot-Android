@@ -30,79 +30,49 @@ class AuthRepository @Inject constructor(
         login: LoginRequestDto
     ): Resource<AuthResponseDto> {
 
-        return try {
 
-            val response = api.loginUser(login)
+        val response = api.loginUser(login)
 
-            if (response.isSuccessful) {
-
-                response.body()?.let { body ->
-                    Resource.Success(body)
-                } ?: Resource.Error("Réponse vide du serveur")
-
-            } else {
-
-                val errorCode = response.code()
-
-                val errorJson = response.errorBody()?.string()
-
-                val adapter = moshi.adapter(ApiError::class.java)
-                val apiError = adapter.fromJson(errorJson ?: "")
-
-                val message = when (val msg = apiError?.message) {
-                    is String -> msg
-                    is List<*> -> msg.joinToString("\n")
-                    else -> "Erreur serveur"
-                }
-
-                Resource.Error(
-                    message = message,
-                    code = errorCode
+        if (response.isSuccessful) {
+            response.body()?.let { userCredential ->
+                return Resource.Success(
+                    data = userCredential,
+                    code = response.code()
                 )
             }
-
-        } catch (e: Exception) {
-            Resource.Error("Erreur de connexion au serveur")
-        }
+        } else
+            return Resource.Error(
+                code = response.code(),
+                message = when (response.code()) {
+                    401 -> "Utilisateur inconnu"
+                    else -> "erreur serveur"
+                }
+            )
+        return Resource.Error(400, "Erreur serveur ")
     }
 
     suspend fun registerUser(
         registerInfo: RegisterRequestDto
     ): Resource<AuthResponseDto> {
 
-        return try {
+        val response = api.registerUser(registerInfo)
 
-            val response = api.registerUser(registerInfo)
-
-            if (response.isSuccessful) {
-
-                response.body()?.let { body ->
-                    Resource.Success(body)
-                } ?: Resource.Error("Réponse vide du serveur")
-
-            }else {
-
-                val errorCode = response.code()
-
-                val errorJson = response.errorBody()?.string()
-
-                val adapter = moshi.adapter(ApiError::class.java)
-                val apiError = adapter.fromJson(errorJson ?: "")
-
-                val message = when (val msg = apiError?.message) {
-                    is String -> msg
-                    is List<*> -> msg.joinToString("\n")
-                    else -> "Erreur serveur"
-                }
-
-                Resource.Error(
-                    message = message,
-                    code = errorCode
+        if (response.isSuccessful) {
+            response.body()?.let { userCredential ->
+                return Resource.Success(
+                    data = userCredential,
+                    code = response.code()
                 )
             }
-        } catch (e: Exception) {
-            Resource.Error("Erreur de connexion au serveur")
-        }
+        } else
+            return Resource.Error(
+                code = response.code() ?: 400,
+                message = when (response.code()) {
+                    401 -> "Email déjà utilisé"
+                    else -> "erreur"
+                }
+            )
+        return Resource.Error(400, "Erreur serveur ")
     }
 
 
@@ -110,40 +80,25 @@ class AuthRepository @Inject constructor(
         invitationInfo: InviteUserCompanyRequestDto,
     ): Resource<InviteUserCompanyResponseDto> {
 
-        return try {
-             val token = authSharedPref.getToken()
-            val bearerToken = "Bearer $token"
-            val response =
-                api.inviteUserToCompany(bearerToken ,invitationInfo)
-
-            if (response.isSuccessful) {
-
-                response.body()?.let { body ->
-                    Resource.Success(body)
-                } ?: Resource.Error("Réponse vide du serveur")
-
-            }else {
-
-                val errorCode = response.code()
-
-                val errorJson = response.errorBody()?.string()
-
-                val adapter = moshi.adapter(ApiError::class.java)
-                val apiError = adapter.fromJson(errorJson ?: "")
-
-                val message = when (val msg = apiError?.message) {
-                    is String -> msg
-                    is List<*> -> msg.joinToString("\n")
-                    else -> "Erreur serveur"
-                }
-
-                Resource.Error(
-                    message = message,
-                    code = errorCode
+        val token = authSharedPref.getToken()
+        val bearerToken = "Bearer $token"
+        val response =
+            api.inviteUserToCompany(bearerToken, invitationInfo)
+        if (response.isSuccessful) {
+            response.body()?.let { userCredential ->
+                return Resource.Success(
+                    data = userCredential,
+                    code = response.code()
                 )
             }
-        } catch (e: Exception) {
-            Resource.Error("Erreur de connexion au serveur")
-        }
+        } else
+            return Resource.Error(
+                code = response.code(),
+                message = when (response.code()) {
+                    401 -> "déjà lié a cet entreprise"
+                    else -> "erreur"
+                }
+            )
+        return Resource.Error(400, "Erreur serveur ")
     }
 }

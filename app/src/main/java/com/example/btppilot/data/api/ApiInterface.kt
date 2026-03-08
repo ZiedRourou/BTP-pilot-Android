@@ -8,11 +8,14 @@ import com.example.btppilot.data.dto.request.NewCompanyRequestDto
 import com.example.btppilot.data.dto.response.AuthResponseDto
 import com.example.btppilot.data.dto.response.InviteUserCompanyResponseDto
 import com.example.btppilot.data.dto.response.NewCompanyResponseDto
-import com.example.btppilot.presentation.screens.register.stepThree.company.RegisterCompanyViewModel
+import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDto
+import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDtoItem
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ApiInterface {
 
@@ -28,11 +31,16 @@ interface ApiInterface {
         @Body invitationInfo: InviteUserCompanyRequestDto,
     ): Response<InviteUserCompanyResponseDto>
 
-    @POST(ApiRoutes.COMPANY)
+    @POST(ApiRoutes.CREATE_COMPANY)
     suspend fun createNewUserCompany(
         @Header("Authorization") authorization: String,
         @Body companyData: NewCompanyRequestDto,
     ): Response<NewCompanyResponseDto>
 
+    @GET(ApiRoutes.GET_PROJECTS_COMPANY)
+    suspend fun getProjectByUserCompany(
+        @Header("Authorization") authorization: String,
+        @Path("id") companyId: Int,
+    ): Response<ProjectResponseByUserCompanyDto>
 
 }

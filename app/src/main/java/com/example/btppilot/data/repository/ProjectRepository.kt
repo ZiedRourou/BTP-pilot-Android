@@ -3,30 +3,32 @@ package com.example.btppilot.data.repository
 import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.dto.request.NewCompanyRequestDto
 import com.example.btppilot.data.dto.response.NewCompanyResponseDto
+import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDto
+import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDtoItem
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.Resource
 import javax.inject.Inject
 
-
-class CompanyRepository @Inject constructor(
+class ProjectRepository  @Inject constructor(
     private val api: ApiInterface,
     private val authSharedPref: AuthSharedPref
 ) {
 
 
-    suspend fun createCompanyUser(
-        companyData: NewCompanyRequestDto,
-    ): Resource<NewCompanyResponseDto> {
+    suspend fun fetchProjectsByUser(
+        companyId: Int,
+    ): Resource<ProjectResponseByUserCompanyDto> {
 
-            val token = authSharedPref.getToken()
-            val bearerToken = "Bearer $token"
-            val response =
-                api.createNewUserCompany(bearerToken ,companyData)
+        val token = authSharedPref.getToken()
+        val bearerToken = "Bearer $token"
+
+        val response =
+            api.getProjectByUserCompany(bearerToken ,companyId)
 
         if (response.isSuccessful) {
-            response.body()?.let { userCredential ->
+            response.body()?.let { projectsData ->
                 return Resource.Success(
-                    data = userCredential,
+                    data = projectsData,
                     code = response.code()
                 )
             }

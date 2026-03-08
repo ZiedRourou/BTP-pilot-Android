@@ -10,6 +10,8 @@ class AuthSharedPref(context: Context) {
 
     fun isLogin(): Boolean = sharedPreference.getBoolean(KEY_IS_LOGIN, false)
 
+    fun isAttachedToCompany(): Boolean = sharedPreference.getBoolean(KEY_IS_ATTACHED_TO_COMPANY, false)
+
     fun saveUserInfo(
         token: String,
         userId: Int,
@@ -26,14 +28,31 @@ class AuthSharedPref(context: Context) {
             .putString(KEY_EMAIL, email)
             .apply()
     }
+    fun saveCompanyInfo(
+        companyId: Int,
+        role: String,
+    ) {
+        sharedPreference.edit()
+            .putBoolean(KEY_IS_ATTACHED_TO_COMPANY, true)
+            .putString(KEY__USER_ROLE_COMPANY, role.toString())
+            .putInt(KEY_COMPANY_Id, companyId)
+            .apply()
+    }
     fun getToken(): String = sharedPreference.getString(KEY_TOKEN, "")!!
 
     fun getUserId() = sharedPreference.getInt(KEY_USERID, 0)
+    fun getUserName() = sharedPreference.getString(KEY_FIRSTNAME, "")
+
+    fun getCompanyId() = sharedPreference.getInt(KEY_COMPANY_Id, 0)
 
     fun clearLogin() {
         sharedPreference.edit()
-            .clear()
-            .apply()
+            .remove(KEY_IS_LOGIN)
+            .remove(KEY_TOKEN)
+            .remove(KEY_USERID)
+            .remove(KEY_ROLE_ID)
+            .remove(KEY_FIRSTNAME)
+            .remove(KEY_EMAIL).apply()
     }
 
 }

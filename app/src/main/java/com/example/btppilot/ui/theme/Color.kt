@@ -24,6 +24,7 @@ val Error = Color(0xFFEF4444)
 val TextPrimary = Color(0xFF111827)
 val TextSecondary = Color(0xFF6B7280)
 
+val StatusAll = Color(0xff509eff)
 val StatusTodo = Color(0xFF94A3B8)
 val StatusInProgress = Color(0xFF3B82F6)
 val StatusDone = Color(0xFF22C55E)

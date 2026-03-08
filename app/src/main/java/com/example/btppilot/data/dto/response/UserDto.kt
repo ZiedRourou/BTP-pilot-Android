@@ -1,6 +1,5 @@
 package com.example.btppilot.data.dto.response
 
-
 import com.squareup.moshi.Json
 
 data class UserDto(
@@ -14,4 +13,3 @@ data class UserDto(
     val updatedAt: String?,
     val role: String
 )
-
