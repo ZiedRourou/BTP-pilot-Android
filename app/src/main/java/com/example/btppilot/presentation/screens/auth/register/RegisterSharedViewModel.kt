@@ -1,5 +1,6 @@
 package com.example.btppilot.presentation.screens.auth.register
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.requ.RegisterRequestDto
@@ -32,7 +33,7 @@ class RegisterSharedViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class RegisterState(
-        val selectedRole: UserRole = UserRole.COLLABORATOR,
+        val selectedRole: UserRole = UserRole.EMPLOYEE,
 
         val firstName: String = "",
         val email: String = "",
@@ -66,7 +67,7 @@ class RegisterSharedViewModel @Inject constructor(
 
             UserRole.OWNER -> Screen.RegisterOwnerCompany
 
-            UserRole.COLLABORATOR,
+            UserRole.EMPLOYEE,
             UserRole.CLIENT -> Screen.RegisterInviteCompany
         }
 
@@ -140,6 +141,9 @@ class RegisterSharedViewModel @Inject constructor(
                             email = it.user.email
                         )
                     }
+                    result.data?.user?.firstName?.let { Log.e("iici", it) }
+                    result.data?.user?.email?.let { Log.e("iici2", it) }
+
                     viewModelScope.launch {
                         _registerUserEventSharedFlow.emit(EventState.RedirectScreen(Screen.RegisterRole))
                     }

@@ -34,7 +34,7 @@ class AuthSharedPref(context: Context) {
     ) {
         sharedPreference.edit()
             .putBoolean(KEY_IS_ATTACHED_TO_COMPANY, true)
-            .putString(KEY__USER_ROLE_COMPANY, role.toString())
+            .putString(KEY__USER_ROLE_COMPANY, role)
             .putInt(KEY_COMPANY_Id, companyId)
             .apply()
     }
@@ -42,6 +42,7 @@ class AuthSharedPref(context: Context) {
 
     fun getUserId() = sharedPreference.getInt(KEY_USERID, 0)
     fun getUserName() = sharedPreference.getString(KEY_FIRSTNAME, "")
+    fun getUserRole() = sharedPreference.getString(KEY__USER_ROLE_COMPANY, "")
 
     fun getCompanyId() = sharedPreference.getInt(KEY_COMPANY_Id, 0)
 
@@ -53,6 +54,9 @@ class AuthSharedPref(context: Context) {
             .remove(KEY_ROLE_ID)
             .remove(KEY_FIRSTNAME)
             .remove(KEY_EMAIL).apply()
+    }
+    fun clearCompany(){
+        sharedPreference.edit().clear().apply()
     }
 
 }

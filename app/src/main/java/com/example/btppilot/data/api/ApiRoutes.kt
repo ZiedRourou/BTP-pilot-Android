@@ -8,5 +8,9 @@ object ApiRoutes {
     const val AUTH_REGISTER = "auth/register/"
     const val INVITE_USER_TO_COMPANY =  "/companies/inviteUser"
     const val CREATE_COMPANY = "/companies"
-    const val GET_PROJECTS_COMPANY = "/company/{id}/project"
+    const val GET_POST_PROJECTS_COMPANY = "/company/{id}/project"
+    const val GET_USER_COMPANY = "/companies/{id}/users"
+
+    const val GET_PROJECT_BY_ID = "/project/{projectId}"
+    const val GET_TASK_BY_PROJECT_ID = "/projects/{projectId}/tasks"
 }

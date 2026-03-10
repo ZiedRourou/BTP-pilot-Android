@@ -96,7 +96,7 @@ class RegisterCompanyViewModel @Inject constructor(
                 is Resource.Success -> {
                     _companyRegisterStateFlow.value =
                         _companyRegisterStateFlow.value.copy(isLoading = false)
-                    _companyRegisterEventSharedFlow.emit(EventState.RedirectScreen(Screen.Home))
+                    _companyRegisterEventSharedFlow.emit(EventState.RedirectScreen(Screen.MainGraph))
                     authSharedPref.saveCompanyInfo(
                         companyId = result.data?.id ?: 0,
                         role = UserRole.OWNER.name

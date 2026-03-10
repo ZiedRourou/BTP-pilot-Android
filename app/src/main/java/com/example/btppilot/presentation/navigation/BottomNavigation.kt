@@ -1,59 +1,79 @@
 package com.example.btppilot.presentation.navigation
 
-//sealed class BottomNavigation(
-//    val route: String,
-//    val title: String,
-//    val icon: ImageVector
-//) {
-//    object Home : BottomNavigation("home", "Accueil", Icons.Filled.Home)
-//    object Task : BottomNavigation("task", "Taches", Icons.Filled.Checklist)
-//    object Team : BottomNavigation("team", "Team", Icons.Filled.Groups)
-//    object Profile : BottomNavigation("profile", "Profile", Icons.Filled.Settings)
-//}
-//
-//fun bottomItemsForRole(role: UserRole): List<BottomNavigation> {
-//    return when (role) {
-//        UserRole.MANAGER -> listOf(
-//            BottomNavigation.Home,
-//            BottomNavigation.Task,
-//            BottomNavigation.Team,
-//            BottomNavigation.Profile
-//        )
-//
-//        UserRole.CLIENT -> listOf(
-//            BottomNavigation.Home,
-//            BottomNavigation.Task,
-//            BottomNavigation.Profile
-//        )
-//
-//        else -> {
-//            listOf( BottomNavigation.Home)}
-//    }
-//}
-//
-//@Composable
-//fun NavHostTest() {
-//
-//
-//    val userRole = //recupeRole depuis sharepreferencies
-//    val navigation  = when (userRole){
-//        UserRole.CLIENT -> BottomNavigationUserNonOwnerCompany,
-//        UserRole.MANAGER -> BottomNavigationOwnerCompany
-//
-//        else -> {BottomNavigationUserNonOwnerCompany}
-//    }
-//    val navController = rememberNavController()
-//
-//    NavHost(navController = navController, startDestination = navigation.Home.route) {
-//        composable(MainNavigationGraph.Home.route) {
-//
-//        }
-//
-//        composable(Screen.Infos.route) {
-//            val infoViewModel: InfosViewModel = hiltViewModel()
-//            InfoScreen(navController, infoViewModel)
-//        }
-//
-//
-//    }
-//}
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.btppilot.util.UserRole
+
+fun bottomNavItems(role: UserRole): List<Screen> {
+
+    return when (role) {
+
+        UserRole.OWNER -> listOf(
+            Screen.Home,
+            Screen.TaskList,
+            Screen.Team,
+            Screen.Profile
+        )
+
+        UserRole.EMPLOYEE -> listOf(
+            Screen.Home,
+            Screen.TaskList,
+            Screen.Profile
+        )
+
+        UserRole.CLIENT -> listOf(
+            Screen.Home,
+            Screen.Profile
+        )
+    }
+}
+
+@Composable
+fun BottomNavigationBar(
+    navController: NavHostController,
+    role: UserRole
+) {
+
+    val items = bottomNavItems(role)
+
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+
+    NavigationBar {
+
+        items.forEach { screen ->
+
+            NavigationBarItem(
+
+                icon = {
+                    Icon(screen.icon!!, contentDescription = null)
+                },
+
+                label = {
+                    Text(screen.title!!)
+                },
+
+                selected = currentRoute == screen.route,
+
+                onClick = {
+
+                    navController.navigate(screen.route) {
+
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}

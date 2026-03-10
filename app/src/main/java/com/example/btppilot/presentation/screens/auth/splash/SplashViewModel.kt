@@ -21,7 +21,8 @@ class SplashViewModel @Inject constructor(
     val mainScreenRouteSF = _mainScreenRoute.asSharedFlow()
 
     init {
-//        authSharedPref.clearLogin()
+        authSharedPref.clearLogin()
+            authSharedPref.clearCompany()
         switchNavigation()
     }
 
@@ -32,7 +33,7 @@ class SplashViewModel @Inject constructor(
 
             when {
                 authSharedPref.isLogin() && authSharedPref.isAttachedToCompany() ->
-                    _mainScreenRoute.emit(EventState.RedirectScreen(Screen.Home))
+                    _mainScreenRoute.emit(EventState.RedirectScreen(Screen.MainGraph))
 
                 authSharedPref.isLogin() && !authSharedPref.isAttachedToCompany() ->
                     _mainScreenRoute.emit(EventState.RedirectScreen(Screen.RegisterRole))

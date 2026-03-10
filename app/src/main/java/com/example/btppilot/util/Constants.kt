@@ -17,11 +17,11 @@ const val KEY__USER_ROLE_COMPANY = "role_company_id"
 const val KEY_USERID = "userId"
 const val KEY_ROLE_ID = "userId"
 const val KEY_FIRSTNAME = "firstname"
-const val KEY_EMAIL = "firstname"
+const val KEY_EMAIL = "email"
 
 enum class UserRole {
     OWNER,
-    COLLABORATOR,
+    EMPLOYEE,
     CLIENT
 }
 
@@ -41,7 +41,8 @@ enum class ProjectStatus(
     ALL("Tous", StatusTodo)
 }
 
-enum class ProjectPriorities(
+
+enum class ProjectAndTakPriorities(
     val label: String,
     val color : Color
 ) {
@@ -49,4 +50,15 @@ enum class ProjectPriorities(
     MEDIUM("Moyen", PriorityMedium),
     HIGH("Important", PriorityHigh),
 }
+
+
+enum  class TaskStatus(
+    val label: String,
+    val color : Color
+) {
+    TO_DO("A faire", PriorityHigh),
+    IN_PROGRESS("En cours", PriorityMedium),
+    DONE("Fini", PriorityLow)
+}
+
 

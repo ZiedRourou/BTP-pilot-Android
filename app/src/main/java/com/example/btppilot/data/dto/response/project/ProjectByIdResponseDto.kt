@@ -1,9 +1,10 @@
-package com.example.btppilot.data.dto.response
+package com.example.btppilot.data.dto.response.project
 
 
+import com.example.btppilot.data.dto.response.UserProject
 import com.squareup.moshi.Json
 
-data class ProjectResponseByUserCompanyDtoItem(
+data class ProjectByIdResponseDto(
     @Json(name = "id")
     val id: Int,
     @Json(name = "name")
@@ -16,15 +17,12 @@ data class ProjectResponseByUserCompanyDtoItem(
     val priority: String,
     @Json(name = "plannedStartDate")
     val plannedStartDate: String,
-    @Json(name = "currentEndDate")
-    val currentEndDate: String?= null,
     @Json(name = "plannedEndDate")
     val plannedEndDate: String,
+    @Json(name = "currentEndDate")
+    val currentEndDate: Int? = null,
+    @Json(name = "companyId")
+    val companyId: Int,
     @Json(name = "userProjects")
-    val userProjects: List<UserProject>,
-    @Json(name = "tasksTotal")
-    val countTask: Int,
-    @Json(name = "tasksCompleted")
-    val tasksCompleted: Int,
+    val userProjects: List<UserProject>
 )
-

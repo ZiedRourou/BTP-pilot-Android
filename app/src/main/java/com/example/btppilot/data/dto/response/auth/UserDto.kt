@@ -1,6 +1,6 @@
-package com.example.btppilot.data.dto.response
+package com.example.btppilot.data.dto.response.auth
 
-import com.squareup.moshi.Json
+import com.example.btppilot.data.dto.response.auth.UserCompany
 
 data class UserDto(
     val id: Int,
@@ -11,5 +11,7 @@ data class UserDto(
     val isActive: Boolean,
     val createdAt: String,
     val updatedAt: String?,
-    val role: String
+    val role: String,
+    val userCompanies: List<UserCompany>? = null
 )
+

@@ -39,12 +39,14 @@ class HomeViewModel @Inject constructor(
         val isLoading: Boolean = false,
         val currentUserName : String = "",
         val currentDate: String = Date().formatDateFr(),
+
         val projectStatus: List<ProjectStatus> = listOf(
             ProjectStatus.ALL,
             ProjectStatus.PLANNED,
             ProjectStatus.IN_PROGRESS,
             ProjectStatus.COMPLETED,
-        )
+        ),
+        val selectedFilter : ProjectStatus = ProjectStatus.ALL
     )
 
 
@@ -61,6 +63,22 @@ class HomeViewModel @Inject constructor(
         getCurrentUserInfo()
     }
 
+    fun onClickProject(projectId : Int) {
+        viewModelScope.launch {
+            _homeEventSharedFlow.emit(
+                EventState.RedirectScreenWithId(Screen.ProjectDetail.route + "/$projectId")
+            )
+        }
+    }
+
+
+    fun redirectAddProject(){
+        viewModelScope.launch {
+            _homeEventSharedFlow.emit(
+                EventState.RedirectScreen(Screen.NewProject)
+            )
+        }
+    }
 
     private fun getCurrentUserInfo(){
         _homeStateFlow.update {
@@ -94,11 +112,6 @@ class HomeViewModel @Inject constructor(
                             )
                         }
                     }
-
-                    viewModelScope.launch {
-                        _homeEventSharedFlow.emit(EventState.RedirectScreen(Screen.RegisterRole))
-                    }
-
                 }
 
                 is Resource.Error -> {

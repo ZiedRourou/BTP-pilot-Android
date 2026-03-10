@@ -1,0 +1,551 @@
+package com.example.btppilot.presentation.screens.project.projectDetails
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.btppilot.data.dto.response.UserProject
+import com.example.btppilot.data.dto.response.tasks.TasksByProjectDtoItem
+import com.example.btppilot.presentation.screens.component.AppLabelTitle
+import com.example.btppilot.presentation.screens.component.AppPrimaryButton
+import com.example.btppilot.presentation.screens.component.LoadingOverlay
+import com.example.btppilot.presentation.screens.home.HeaderScaffoldHome
+import com.example.btppilot.presentation.screens.uiState.EventState
+import com.example.btppilot.ui.theme.BtpPilotTheme
+import com.example.btppilot.ui.theme.StatusInProgress
+import com.example.btppilot.util.ProjectAndTakPriorities
+import com.example.btppilot.util.ProjectStatus
+import com.example.btppilot.util.TaskStatus
+import com.example.btppilot.util.isoToFrenchDate
+
+
+@Preview(showBackground = true, apiLevel = 33)
+@Composable
+private fun ProjectDetailsScreenPreview() {
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    BtpPilotTheme {
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            topBar = { HeaderScaffoldHome(userName = "test") },
+
+            ) { padding ->
+            ProjectDetailsContent(
+                paddingValues = padding,
+                projectState = ProjectDetailsViewModel.NewProjectState(
+
+                )
+            )
+        }
+
+    }
+}
+
+
+@Composable
+fun ProjectDetailsScreen(
+    navController: NavController,
+    projectDetailsViewModel: ProjectDetailsViewModel,
+    projectId: Long
+) {
+
+    projectDetailsViewModel.setProjectId(projectId)
+    val projectState by projectDetailsViewModel.detailProjectStateFlow.collectAsState()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        projectDetailsViewModel.detailProjectEventSharedFlow.collect { event ->
+            when (event) {
+                is EventState.ShowMessageSnackBar ->
+                    snackbarHostState.showSnackbar(event.message)
+
+                is EventState.RedirectScreen ->
+                    navController.navigate(event.screen.route)
+
+                else -> {}
+            }
+        }
+    }
+
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = { HeaderScaffoldHome(userName = "test") },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {},
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Text("+", fontSize = 25.sp, color = Color.White)
+            }
+        },
+    ) { padding ->
+        ProjectDetailsContent(
+            paddingValues = padding,
+            projectState = projectState
+        )
+    }
+}
+
+@Composable
+fun ProjectDetailsContent(
+    paddingValues: PaddingValues,
+    projectState: ProjectDetailsViewModel.NewProjectState
+) {
+//    ConfirmDeleteProjectDialog(
+//        projectName = projectState.project.name,
+//        onConfirm = {
+//        },
+//        onDismiss = {
+//        }
+//    )
+    Column(
+        modifier = Modifier
+            .padding(paddingValues)
+            .padding(15.dp)
+            .fillMaxSize()
+    ) {
+
+        ProjectDetailsStatusAndPriority(
+            status = ProjectStatus.valueOf(projectState.project.status),
+            priority = ProjectAndTakPriorities.valueOf(projectState.project.priority),
+        )
+
+        ProjectTitleRow(
+            projectState.project.name,
+            {},{}
+        )
+
+        AssignedTeamCard(
+            date = projectState.project.plannedEndDate,
+            members = projectState.project.userProjects
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+
+        AppLabelTitle(text = "Description")
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = projectState.project.description,
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        AppLabelTitle(text = "Tâches")
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        when {
+            projectState.tasks.isEmpty() -> {
+
+                Text(
+                    text = "Aucune tâche",
+                    modifier = Modifier.padding(16.dp)
+                )
+
+            }
+
+            else -> {
+
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+
+                    items(projectState.tasks) { item ->
+                        ItemTask(item)
+                    }
+
+                }
+
+            }
+        }
+    }
+}
+
+@Composable
+fun ConfirmDeleteProjectDialog(
+    projectName: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+
+        title = {
+            Text(
+                text = "Supprimer le projet",
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+
+        text = {
+            Text(
+                text = "Voulez-vous vraiment supprimer le projet \"$projectName\" ? Cette action est irréversible."
+            )
+        },
+
+        confirmButton = {
+
+            TextButton(
+                onClick = onConfirm
+            ) {
+                Text(
+                    text = "Supprimer",
+                    color = Color.Red
+                )
+            }
+
+        },
+
+        dismissButton = {
+
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text("Annuler")
+            }
+
+        }
+    )
+}
+
+@Composable
+fun ItemTask(
+    taskState: TasksByProjectDtoItem
+) {
+
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.secondary
+    ) {
+
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+
+            TaskStatusAndPriority(
+                TaskStatus.valueOf(taskState.status),
+                ProjectAndTakPriorities.valueOf(taskState.priority)
+            )
+
+            Text(
+                text = taskState.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Text(
+                text = taskState.description,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+
+@Composable
+fun AssignedTeamCard(
+    members: List<UserProject>,
+    date : String
+) {
+
+    val cardHeight = 140.dp
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+
+        DueDateCard(
+            date= date,
+            modifier = Modifier
+                .weight(1f)
+                .height(cardHeight)
+        )
+
+        TeamCard(
+            teamName = "L'équipe",
+            members = members,
+            modifier = Modifier
+                .weight(1f)
+                .height(cardHeight)
+        )
+    }
+}
+
+@Composable
+fun DueDateCard(
+    date: String,
+    modifier: Modifier = Modifier
+) {
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(16.dp)
+            .height(85.dp)
+    ) {
+
+        Text(
+            text = "date de fin de projet",
+            color = Color.LightGray,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Text(
+            text = isoToFrenchDate(date),
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+@Composable
+fun TeamCard(
+    teamName: String,
+    members: List<UserProject>,
+    modifier: Modifier = Modifier
+) {
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(16.dp)
+    ) {
+
+        Text(
+            text = "ÉQUIPE",
+            color = Color.LightGray,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+
+            Icon(
+                imageVector = Icons.Default.Group,
+                contentDescription = null,
+                tint = StatusInProgress
+            )
+
+            Spacer(modifier = Modifier.width(6.dp))
+
+            Text(
+                text = teamName,
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+
+            items(members) { member ->
+
+                Text(
+                    text = "${member.user.firstName} ${member.user.lastName} (${member.projectRole})",
+                    color = Color.LightGray,
+                    fontSize = 13.sp
+                )
+
+            }
+        }
+    }
+}
+
+@Composable
+fun ProjectTitleRow(
+    title: String,
+    onClickDelete: ()->Unit,
+    onClickEdit : ()->Unit
+) {
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+
+        Text(
+            text = title,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+
+        IconButton(onClick = onClickEdit) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = null,
+                tint = StatusInProgress
+            )
+        }
+
+        IconButton(onClick = onClickEdit) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = null,
+                tint = Color.Red
+            )
+        }
+    }
+}
+
+@Composable
+fun ProjectDetailsStatusAndPriority(
+    status: ProjectStatus,
+    priority: ProjectAndTakPriorities,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+
+        StatusPriorityBadge(
+            text = status.label,
+            background = status.color.copy(alpha = 0.15f),
+            border = status.color,
+            textColor = status.color
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+
+        StatusPriorityBadge(
+            text = priority.label,
+            background = priority.color.copy(alpha = 0.15f),
+            border = priority.color,
+            textColor = priority.color
+        )
+    }
+}
+
+
+@Composable
+fun TaskStatusAndPriority(
+    status: TaskStatus,
+    priority: ProjectAndTakPriorities,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+
+        StatusPriorityBadge(
+            text = status.label,
+            background = status.color.copy(alpha = 0.15f),
+            border = status.color,
+            textColor = status.color,
+            15.sp
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+
+        StatusPriorityBadge(
+            text = priority.label,
+            background = priority.color.copy(alpha = 0.15f),
+            border = priority.color,
+            textColor = priority.color,
+            15.sp
+        )
+    }
+}
+
+@Composable
+fun StatusPriorityBadge(
+    text: String,
+    background: Color,
+    border: Color,
+    textColor: Color,
+    fontSize: TextUnit = 20.sp
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(5.dp))
+            .background(background)
+            .border(
+                width = 1.dp,
+                color = border,
+                shape = RoundedCornerShape(5.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        Text(
+            text = text,
+            color = textColor,
+            fontSize = fontSize,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}

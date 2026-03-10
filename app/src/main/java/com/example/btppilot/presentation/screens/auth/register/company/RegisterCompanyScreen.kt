@@ -86,9 +86,11 @@ fun RegisterCompanyScreen(
                     snackBarHostState.showSnackbar(event.message)
 
                 is EventState.RedirectScreen ->
-                    navController.navigate(event.screen.route){
-                        popUpTo(Screen.Login.route) { inclusive = true }
+                    navController.navigate(event.screen.route) {
+                        if(event.screen is Screen.MainGraph)
+                            popUpTo(Screen.Login.route) { inclusive = true }
                     }
+                else -> {}
             }
         }
     }

@@ -52,6 +52,7 @@ fun RegisterSecondStepScreen(
 
                 is EventState.RedirectScreen ->
                     navController.navigate(event.screen.route)
+                else -> {}
             }
         }
     }

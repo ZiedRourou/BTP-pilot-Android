@@ -31,7 +31,7 @@ import com.example.btppilot.R
 import com.example.btppilot.presentation.navigation.Screen
 import com.example.btppilot.presentation.screens.component.AppLabelTitle
 import com.example.btppilot.presentation.screens.component.AppPrimaryButton
-import com.example.btppilot.presentation.screens.component.AppPrimaryTitleYellow
+import com.example.btppilot.presentation.screens.component.AppPrimaryTitle
 import com.example.btppilot.presentation.screens.component.AppSecondaryTitle
 import com.example.btppilot.presentation.screens.component.AppTextField
 import com.example.btppilot.presentation.screens.component.LoadingOverlay
@@ -56,8 +56,11 @@ fun LoginScreen(
 
                 is EventState.RedirectScreen ->
                     navController.navigate(event.screen.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
+                        if(event.screen is Screen.MainGraph)
+                            popUpTo(Screen.Login.route) { inclusive = true }
                     }
+
+                else -> {}
             }
         }
     }
@@ -72,9 +75,7 @@ fun LoginScreen(
             onEmailChange = loginViewModel::onEmailChange,
             onPasswordChange = loginViewModel::onPasswordChange,
             onLoginClick = loginViewModel::login,
-            onRegisterClick = {
-                navController.navigate(Screen.RegisterGraph.route)
-            }
+            onRegisterClick = loginViewModel::goToRegister
         )
     }
 }
@@ -125,7 +126,7 @@ fun LoginContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        AppPrimaryTitleYellow(text = "PilotBtp")
+        AppPrimaryTitle(text = "PilotBtp")
         AppSecondaryTitle(text = "Votre chantier entre de bonnes mains")
 
         Spacer(modifier = Modifier.height(40.dp))

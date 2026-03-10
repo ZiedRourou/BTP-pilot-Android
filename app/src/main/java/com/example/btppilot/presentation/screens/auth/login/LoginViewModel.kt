@@ -93,9 +93,13 @@ class LoginViewModel @Inject constructor(
                             role = it.user.role,
                             email = it.user.email
                         )
+                        authSharedPref.saveCompanyInfo(
+                            companyId = it.user.userCompanies?.first()?.companyId ?: 0,
+                            role = it.user.userCompanies?.first()?.role ?: ""
+                        )
                     }
 
-                    _loginUserEventStateFlo.emit(EventState.RedirectScreen(Screen.Home))
+                    _loginUserEventStateFlo.emit(EventState.RedirectScreen(Screen.MainGraph))
                 }
 
                 is Resource.Error -> {

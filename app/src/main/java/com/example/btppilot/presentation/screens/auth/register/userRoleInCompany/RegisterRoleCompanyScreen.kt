@@ -65,6 +65,7 @@ fun RegisterStepOneScreen(
                         navController.navigate(event.screen.route + "/$userRole")
                     else
                         navController.navigate(event.screen.route)
+                else -> {}
 
             }
         }
@@ -93,7 +94,7 @@ fun RegisterStepOnePreview() {
     BtpPilotTheme {
         RegisterContent(
             modifier = Modifier,
-            selectedRole = UserRole.COLLABORATOR,
+            selectedRole = UserRole.EMPLOYEE,
             onRoleSelected = {},
         )
     }
@@ -133,9 +134,9 @@ fun RegisterContent(
                 title = "Employé",
                 description = "Suivez vos tâches et mettez à jour l'avancement",
                 icon = Icons.Default.Email,
-                isSelected = selectedRole == UserRole.COLLABORATOR,
+                isSelected = selectedRole == UserRole.EMPLOYEE,
                 onClick = {
-                    onRoleSelected(UserRole.COLLABORATOR)
+                    onRoleSelected(UserRole.EMPLOYEE)
                 }
             )
 

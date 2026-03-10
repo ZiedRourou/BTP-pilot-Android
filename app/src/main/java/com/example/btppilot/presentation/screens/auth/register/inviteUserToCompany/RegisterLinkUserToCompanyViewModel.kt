@@ -80,7 +80,7 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
 
                 is Resource.Success -> {
                     _companyInfoInviteStateFlow.value = _companyInfoInviteStateFlow.value.copy(isLoading = false)
-                    _companyInfoInviteEventSharedFlow.emit(EventState.RedirectScreen(Screen.Home))
+                    _companyInfoInviteEventSharedFlow.emit(EventState.RedirectScreen(Screen.MainGraph))
                     authSharedPref.saveCompanyInfo(
                         companyId = result.data?.companyId ?: 0,
                         role = result.data?.role ?: ""
