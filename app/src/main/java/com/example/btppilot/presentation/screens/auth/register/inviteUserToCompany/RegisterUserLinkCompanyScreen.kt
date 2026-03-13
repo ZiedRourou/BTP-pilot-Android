@@ -32,12 +32,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.btppilot.presentation.navigation.Screen
+import com.example.btppilot.presentation.navigation.NavGraph
 import com.example.btppilot.presentation.screens.auth.register.component.BottomBarRegister
 import com.example.btppilot.presentation.screens.auth.register.component.HeaderRegister
-import com.example.btppilot.presentation.screens.component.AppPrimaryTitleBlue
-import com.example.btppilot.presentation.screens.component.AppSecondaryTitle
-import com.example.btppilot.presentation.screens.component.AppTextField
+import com.example.btppilot.presentation.screens.shared.component.AppPrimaryTitleBlue
+import com.example.btppilot.presentation.screens.shared.component.AppTitleDescription
+import com.example.btppilot.presentation.screens.shared.component.AppTextField
 import com.example.btppilot.presentation.screens.component.LoadingOverlay
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.ui.theme.BtpPilotTheme
@@ -55,13 +55,13 @@ private fun RegisterLinkUserToCompanyPreview() {
 fun RegisterLinkUserToCompanyScreen(
     navController: NavController,
     registerLinkUserToCompany: RegisterLinkUserToCompanyViewModel,
-    userRole: String
+//    userRole: String
 ) {
 
     val companyInfo by registerLinkUserToCompany.companyInfoInviteStateFlow.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    registerLinkUserToCompany.setUserRoleCompanyLink(userRole)
+//    registerLinkUserToCompany.setUserRoleCompanyLink(userRole)
 
     LaunchedEffect(Unit) {
         registerLinkUserToCompany.companyInfoInviteEventSharedFlow.collect { event ->
@@ -69,10 +69,9 @@ fun RegisterLinkUserToCompanyScreen(
                 is EventState.ShowMessageSnackBar ->
                     snackBarHostState.showSnackbar(event.message)
 
-                is EventState.RedirectScreen ->
-                    navController.navigate(event.screen.route) {
-                        if(event.screen is Screen.MainGraph)
-                            popUpTo(Screen.Login.route) { inclusive = true }
+                is EventState.RedirectGraph ->
+                    navController.navigate(event.graph.route) {
+                        popUpTo(NavGraph.AuthGraph.route){inclusive= true}
                     }
                 else -> {}
             }
@@ -145,7 +144,7 @@ fun RegisterLinkUserToCompanyContent(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                AppSecondaryTitle(
+                AppTitleDescription(
                     text = "Entrez l'email de votre entreprise afin de faire une demande d'invitation"
                 )
 

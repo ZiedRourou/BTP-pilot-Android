@@ -12,18 +12,14 @@ const val KEY_FILENAME = "sharePreferencesAuth"
 const val KEY_IS_LOGIN = "isLogin"
 const val KEY_IS_ATTACHED_TO_COMPANY = "isAttachedToCompany"
 const val KEY_TOKEN = "token"
-const val KEY_COMPANY_Id = "compnay_id"
+const val KEY_COMPANY_Id = "company_id"
 const val KEY__USER_ROLE_COMPANY = "role_company_id"
-const val KEY_USERID = "userId"
-const val KEY_ROLE_ID = "userId"
+const val KEY_USERID = "user_role"
+const val KEY_ROLE_ID = "user_Id"
 const val KEY_FIRSTNAME = "firstname"
 const val KEY_EMAIL = "email"
 
-enum class UserRole {
-    OWNER,
-    EMPLOYEE,
-    CLIENT
-}
+
 
 const val EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$"
 const val STRONG_PASSWORD_REGEX =
@@ -44,13 +40,14 @@ enum class ProjectStatus(
 
 enum class ProjectAndTakPriorities(
     val label: String,
-    val color : Color
+    val color : Color,
 ) {
     LOW("Faible", PriorityLow),
     MEDIUM("Moyen", PriorityMedium),
     HIGH("Important", PriorityHigh),
 }
 
+val arrayPriorities = listOf(ProjectAndTakPriorities.HIGH,ProjectAndTakPriorities.LOW,ProjectAndTakPriorities.MEDIUM)
 
 enum  class TaskStatus(
     val label: String,
@@ -61,4 +58,16 @@ enum  class TaskStatus(
     DONE("Fini", PriorityLow)
 }
 
+enum class UserRole {
+    OWNER,
+    COLLABORATOR,
+    CLIENT
+}
+
+
+enum class UserProjectRole {
+    MANAGER,
+    EMPLOYEE,
+    CLIENT,
+}
 

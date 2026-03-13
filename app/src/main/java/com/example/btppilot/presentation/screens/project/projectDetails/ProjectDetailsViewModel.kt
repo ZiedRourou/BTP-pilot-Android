@@ -8,12 +8,14 @@ import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
 import com.example.btppilot.data.dto.response.tasks.TasksByProjectDtoItem
 import com.example.btppilot.data.repository.ProjectRepository
 import com.example.btppilot.data.repository.TaskRepository
+import com.example.btppilot.presentation.navigation.Screen
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.ProjectStatus
 import com.example.btppilot.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -30,10 +32,10 @@ class ProjectDetailsViewModel @Inject constructor(
 
 ) : ViewModel() {
 
-    data class NewProjectState(
+    data class DetailsProjectState(
         val projectId: Long = 0,
-        val isLoading : Boolean = false,
-        val project : ProjectByIdResponseDto =
+        val isLoading: Boolean = false,
+        val project: ProjectByIdResponseDto =
             ProjectByIdResponseDto(
                 id = 0,
                 name = "",
@@ -46,31 +48,33 @@ class ProjectDetailsViewModel @Inject constructor(
                 companyId = 0,
                 userProjects = listOf(
                     UserProject(
-                    "test",
-                    User(0,"zied", "rourou")
-                ),
-                    UserProject(
                         "test",
-                        User(0,"zied", "rourou")
+                        User(0, "zied", "rourou")
                     ),
                     UserProject(
                         "test",
-                        User(0,"zied", "rourou")
+                        User(0, "zied", "rourou")
+                    ),
+                    UserProject(
+                        "test",
+                        User(0, "zied", "rourou")
                     )
                 )
 
             ),
-        val tasks : List<TasksByProjectDtoItem> = listOf()
+        val selectPriority: ProjectAndTakPriorities= ProjectAndTakPriorities.MEDIUM,
+        val tasks: List<TasksByProjectDtoItem> = listOf(),
+        val showDialog : Boolean = false
     )
 
-    private val _detailProjectStateFlow = MutableStateFlow(NewProjectState())
+    private val _detailProjectStateFlow = MutableStateFlow(DetailsProjectState())
     val detailProjectStateFlow = _detailProjectStateFlow.asStateFlow()
 
     private val _detailProjectEventSharedFlow = MutableSharedFlow<EventState>()
     val detailProjectEventSharedFlow = _detailProjectEventSharedFlow.asSharedFlow()
 
 
-    fun setProjectId(projectId: Long){
+    fun setProjectId(projectId: Long) {
         _detailProjectStateFlow.update {
             it.copy(
                 projectId = projectId
@@ -80,7 +84,99 @@ class ProjectDetailsViewModel @Inject constructor(
         fetchTasks()
     }
 
-    private fun fetchProject(){
+    fun onSelectPriority(priority : ProjectAndTakPriorities){
+        _detailProjectStateFlow.update {
+            it.copy(
+                selectPriority = priority
+            )
+        }
+    }
+
+    fun confirmDelete(){
+        _detailProjectStateFlow.update {
+            it.copy(
+                showDialog = true
+            )
+        }
+    }
+    fun closeDialogDelete(){
+        _detailProjectStateFlow.update {
+            it.copy(
+                showDialog = false
+            )
+        }
+    }
+
+    fun deleteProject() {
+        _detailProjectStateFlow.update {
+            it.copy(
+                showDialog = false
+            )
+        }
+
+        viewModelScope.launch {
+            _detailProjectStateFlow.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+
+            val result = withContext(Dispatchers.IO) {
+                projectRepository.deleteProject(detailProjectStateFlow.value.projectId.toInt())
+            }
+            when (result) {
+
+                is Resource.Success -> {
+                    _detailProjectStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    _detailProjectEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar("article supprimé")
+                    )
+                    delay(2000)
+                    _detailProjectEventSharedFlow.emit(
+                        EventState.RedirectScreen(Screen.Home)
+                    )
+                }
+
+                is Resource.Error -> {
+
+                    _detailProjectStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    _detailProjectEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar(result.message)
+                    )
+                }
+            }
+        }
+    }
+
+    fun onEditProject() {
+        viewModelScope.launch {
+            _detailProjectEventSharedFlow.emit(
+                EventState.RedirectScreenWithId(Screen.UpdateProject.route + "/${detailProjectStateFlow.value.projectId}")
+            )
+        }
+    }
+
+    fun redirectAddTask(){
+
+        viewModelScope.launch {
+            _detailProjectEventSharedFlow.emit(
+                EventState.RedirectScreenWithId(Screen.NewTask.route + "/${detailProjectStateFlow.value.projectId}")
+            )
+        }
+    }
+
+
+    private fun fetchProject() {
         viewModelScope.launch {
             _detailProjectStateFlow.update {
                 it.copy(
@@ -104,6 +200,7 @@ class ProjectDetailsViewModel @Inject constructor(
                         _detailProjectStateFlow.update {
                             it.copy(
                                 project = project,
+                                selectPriority = ProjectAndTakPriorities.valueOf(project.priority)
                             )
                         }
                     }
@@ -125,7 +222,7 @@ class ProjectDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun fetchTasks(){
+    private fun fetchTasks() {
 
         viewModelScope.launch {
             _detailProjectStateFlow.update {

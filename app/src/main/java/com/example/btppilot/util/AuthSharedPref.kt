@@ -2,6 +2,7 @@ package com.example.btppilot.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 
 class AuthSharedPref(context: Context) {
 
@@ -40,7 +41,14 @@ class AuthSharedPref(context: Context) {
     }
     fun getToken(): String = sharedPreference.getString(KEY_TOKEN, "")!!
 
-    fun getUserId() = sharedPreference.getInt(KEY_USERID, 0)
+//    fun getUserId() = sharedPreference.getInt(KEY_USERID, 0)
+fun getUserId(): Int {
+
+    val all = sharedPreference.all
+    Log.d("PREF_DEBUG", all.toString())
+
+    return sharedPreference.getInt(KEY_USERID, 0)
+}
     fun getUserName() = sharedPreference.getString(KEY_FIRSTNAME, "")
     fun getUserRole() = sharedPreference.getString(KEY__USER_ROLE_COMPANY, "")
 

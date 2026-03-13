@@ -16,12 +16,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BusinessCenter
 import androidx.compose.material.icons.filled.Construction
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Pin
 import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -39,14 +37,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.btppilot.presentation.navigation.Screen
+import com.example.btppilot.presentation.navigation.NavGraph
 import com.example.btppilot.presentation.screens.auth.register.component.BottomBarRegister
 import com.example.btppilot.presentation.screens.auth.register.component.HeaderRegister
-import com.example.btppilot.presentation.screens.component.AppTextField
-import com.example.btppilot.presentation.screens.component.AppTextFieldMultiline
+import com.example.btppilot.presentation.screens.shared.component.AppTextField
+import com.example.btppilot.presentation.screens.shared.component.AppTextFieldMultiline
 import com.example.btppilot.presentation.screens.component.LoadingOverlay
 import com.example.btppilot.presentation.screens.uiState.EventState
-import com.example.btppilot.ui.theme.BtpPilotTheme
 
 
 @Preview(showBackground = true, apiLevel = 33)
@@ -85,11 +82,11 @@ fun RegisterCompanyScreen(
                 is EventState.ShowMessageSnackBar ->
                     snackBarHostState.showSnackbar(event.message)
 
-                is EventState.RedirectScreen ->
-                    navController.navigate(event.screen.route) {
-                        if(event.screen is Screen.MainGraph)
-                            popUpTo(Screen.Login.route) { inclusive = true }
+                is EventState.RedirectGraph ->
+                    navController.navigate(event.graph.route) {
+                        popUpTo(NavGraph.AuthGraph.route){inclusive= true}
                     }
+
                 else -> {}
             }
         }

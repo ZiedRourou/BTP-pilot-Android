@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -36,7 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.btppilot.data.dto.response.company.UserCompany
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
-import com.example.btppilot.presentation.screens.component.AppLabelTitle
+import com.example.btppilot.presentation.screens.shared.component.AppSecondaryTitle
 import com.example.btppilot.ui.theme.StatusInProgress
 import com.example.btppilot.util.ProjectAndTakPriorities
 import java.util.Calendar
@@ -172,10 +173,105 @@ fun AppLabelTextFieldNewProject(
             tint = StatusInProgress
         )
         Spacer(modifier = Modifier.width(5.dp))
-        AppLabelTitle(text = title)
+        AppSecondaryTitle(text = title)
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppSelectUserMultiField(
+    label: String,
+    options: List<UsersOfCompanyItem>,
+    selectedUsers: List<UserCompany>,
+    onSelectionChange: (List<UserCompany>) -> Unit
+) {
 
+    var expanded by remember { mutableStateOf(false) }
+
+    val displayText = if (selectedUsers.isEmpty()) {
+        "Sélectionner"
+    } else {
+        selectedUsers.joinToString { "${it.firstName} ${it.lastName}" }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = StatusInProgress,
+            modifier = Modifier.padding(bottom = 6.dp)
+        )
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+
+            TextField(
+                value = displayText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.secondary,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                )
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+
+                options.forEach { option ->
+
+                    val isSelected = selectedUsers.any { it.id == option.user.id }
+
+                    DropdownMenuItem(
+                        text = {
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+
+                                Checkbox(
+                                    checked = isSelected,
+                                    onCheckedChange = null
+                                )
+
+                                Spacer(Modifier.width(5.dp))
+
+                                Text("${option.user.firstName} ${option.user.lastName}")
+                            }
+                        },
+                        onClick = {
+
+                            val newList =
+                                if (isSelected)
+                                    selectedUsers.filter { it.id != option.user.id }
+                                else
+                                    selectedUsers + option.user
+
+                            onSelectionChange(newList)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppSelectUserRadioBtnField(
@@ -196,7 +292,7 @@ fun AppSelectUserRadioBtnField(
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.primary,
+            color = StatusInProgress,
             modifier = Modifier.padding(bottom = 6.dp)
         )
 
@@ -259,6 +355,8 @@ fun AppSelectUserRadioBtnField(
         }
     }
 }
+
+
 
 @Composable
 fun AppDateField(

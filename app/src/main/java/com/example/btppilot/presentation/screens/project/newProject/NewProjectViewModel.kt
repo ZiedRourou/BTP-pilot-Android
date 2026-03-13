@@ -13,7 +13,10 @@ import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.ProjectStatus
 import com.example.btppilot.util.Resource
+import com.example.btppilot.util.UserRole
+import com.example.btppilot.util.isoToUiDate
 import com.example.btppilot.util.toIsoDate
+import com.example.btppilot.util.uiDateToIso
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -39,11 +42,14 @@ class NewProjectViewModel @Inject constructor(
 
         val title: String = "",
         val description: String = "",
-        val userOption : List<UsersOfCompanyItem> = listOf(),
+        val userOption: List<UsersOfCompanyItem> = listOf(),
+        val clientOption: List<UsersOfCompanyItem> = listOf(),
 
-        val manager: UserCompany = UserCompany(0,"","", ""),
+        val manager: UserCompany = UserCompany(0, "", "", ""),
+        val clientList: List<UserCompany> = listOf(),
+        val collaboratorList: List<UserCompany> = listOf(),
 
-        val dateBegin: String =   "%02d/%02d/%04d".format(
+        val dateBegin: String = "%02d/%02d/%04d".format(
             Calendar.getInstance().get(Calendar.MONTH) + 1,
             Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
             Calendar.getInstance().get(Calendar.YEAR)
@@ -65,7 +71,9 @@ class NewProjectViewModel @Inject constructor(
         val titleError: String? = null,
         val dateEndError: String? = null,
 
-        val isLoading : Boolean = false
+        val projectId: Long = 0,
+        val isLoading: Boolean = false,
+        val isEditorMode : Boolean = false
     )
 
     private val _newProjectStateFlow = MutableStateFlow(NewProjectState())
@@ -79,6 +87,15 @@ class NewProjectViewModel @Inject constructor(
         getUserCompany()
     }
 
+    fun setProjectId(projectId: Long) {
+        _newProjectStateFlow.update {
+            it.copy(
+                projectId = projectId,
+                isEditorMode = true
+            )
+        }
+        fetchProject()
+    }
 
     fun onTitleChange(title: String) {
         _newProjectStateFlow.value = _newProjectStateFlow.value.copy(
@@ -115,8 +132,82 @@ class NewProjectViewModel @Inject constructor(
             selectedPriority = priority,
         )
     }
+    fun onClientListChange(list: List<UserCompany>) {
+        _newProjectStateFlow.update {
+            it.copy(clientList = list)
+        }
+    }
 
-    private fun getUserCompany(){
+    fun onEmployeeListChange(list: List<UserCompany>) {
+        _newProjectStateFlow.update {
+            it.copy(collaboratorList = list)
+        }
+    }
+
+    private fun fetchProject(){
+        viewModelScope.launch {
+            _newProjectStateFlow.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+
+            val result = withContext(Dispatchers.IO) {
+                projectRepository.fetchProjectById(newProjectStateFlow.value.projectId.toInt())
+            }
+            when (result) {
+
+                is Resource.Success -> {
+                    _newProjectStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    result.data?.let { project ->
+
+                        val managerUserProject = project.userProjects.firstOrNull {
+                            it.projectRole == "MANAGER"
+                        }
+
+                        _newProjectStateFlow.update { it ->
+                            it.copy(
+                                title = project.name,
+                                description = project.description,
+                                dateBegin = isoToUiDate(project.plannedStartDate),
+                                dateEnd = isoToUiDate(project.plannedEndDate),
+                                selectedPriority = ProjectAndTakPriorities.valueOf(project.priority),
+                                manager = managerUserProject?.user?.let { user ->
+                                    UserCompany(
+                                        id = user.id,
+                                        email = "",
+                                        firstName = user.firstName,
+                                        lastName = user.lastName
+                                    )
+                                } ?: newProjectStateFlow.value.manager                            )
+                        }
+                    }
+                }
+
+                is Resource.Error -> {
+
+                    _newProjectStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    _newProjectEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar(result.message)
+                    )
+                }
+            }
+        }
+    }
+
+
+
+    private fun getUserCompany() {
 
         viewModelScope.launch {
             _newProjectStateFlow.update {
@@ -138,9 +229,10 @@ class NewProjectViewModel @Inject constructor(
                     }
 
                     result.data?.let { users ->
-                        _newProjectStateFlow.update {
+                        _newProjectStateFlow.update { it ->
                             it.copy(
-                                userOption = users,
+                                userOption = users.filter { it.role != UserRole.CLIENT.name },
+                                clientOption = users.filter { it.role == UserRole.CLIENT.name },
                                 manager = users.first().user
                             )
                         }
@@ -162,10 +254,74 @@ class NewProjectViewModel @Inject constructor(
             }
         }
     }
-    fun publishProject(){
 
-        if(!validateDataProject())
+    fun publishOrEdit(){
+
+        if (!validateDataProject())
             return
+        if(newProjectStateFlow.value.isEditorMode)
+            updateProject()
+        else
+            publishProject()
+    }
+    private fun updateProject(){
+
+        viewModelScope.launch {
+            _newProjectStateFlow.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+
+            val result = withContext(Dispatchers.IO) {
+                projectRepository.updateProject(
+                    projectId = newProjectStateFlow.value.projectId.toInt(),
+                    newProjectStateFlow.value.let {
+                        ProjectRequestDto(
+                            name = it.title,
+                            description = it.description,
+                            status = ProjectStatus.PLANNED.name,
+                            priority = it.selectedPriority.name,
+                            plannedStartDate = uiDateToIso(it.dateBegin),
+                            plannedEndDate = uiDateToIso(it.dateEnd),
+                            managerId = it.manager.id,
+                            isActive = true,
+                            clientIds = it.clientList.map { user -> user.id },
+                            employeeIds = it.collaboratorList.map { user -> user.id }
+                        )
+                    }
+                )
+            }
+            when (result) {
+
+                is Resource.Success -> {
+                    _newProjectStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    _newProjectEventSharedFlow.emit(
+                        EventState.RedirectScreen(Screen.Home)
+                    )
+                }
+
+                is Resource.Error -> {
+
+                    _newProjectStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    _newProjectEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar(result.message)
+                    )
+                }
+            }
+        }
+    }
+    fun publishProject() {
 
         viewModelScope.launch {
             _newProjectStateFlow.update {
@@ -184,8 +340,10 @@ class NewProjectViewModel @Inject constructor(
                             priority = it.selectedPriority.name,
                             plannedStartDate = toIsoDate(it.dateBegin),
                             plannedEndDate = toIsoDate(it.dateEnd),
-                            userId = it.manager.id,
-                            isActive = true
+                            managerId = it.manager.id,
+                            isActive = true,
+                            clientIds = it.clientList.map { user -> user.id },
+                            employeeIds = it.collaboratorList.map { user -> user.id }
                         )
                     }
 
@@ -200,9 +358,9 @@ class NewProjectViewModel @Inject constructor(
                         )
                     }
 
-                   _newProjectEventSharedFlow.emit(
-                       EventState.RedirectScreen(Screen.Home)
-                   )
+                    _newProjectEventSharedFlow.emit(
+                        EventState.RedirectScreen(Screen.Home)
+                    )
                 }
 
                 is Resource.Error -> {
@@ -222,7 +380,7 @@ class NewProjectViewModel @Inject constructor(
 
     }
 
-    private fun validateDataProject() : Boolean{
+    private fun validateDataProject(): Boolean {
 
         val currentData = newProjectStateFlow.value
         val format = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
@@ -246,7 +404,7 @@ class NewProjectViewModel @Inject constructor(
                 dateEndError = when {
                     start == null || end == null -> "Format de date invalide"
 
-                    start.after(end) ->"Veuillez sélectionner une période postérieure"
+                    start.after(end) -> "Veuillez sélectionner une période postérieure"
 
                     else -> null
                 }
@@ -254,7 +412,7 @@ class NewProjectViewModel @Inject constructor(
         }
 
         newProjectStateFlow.value.let {
-            if(it.titleError.isNullOrEmpty() && it.dateEndError.isNullOrEmpty())
+            if (it.titleError.isNullOrEmpty() && it.dateEndError.isNullOrEmpty())
                 return true
         }
         return false

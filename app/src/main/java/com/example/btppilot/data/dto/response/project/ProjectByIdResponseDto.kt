@@ -20,7 +20,7 @@ data class ProjectByIdResponseDto(
     @Json(name = "plannedEndDate")
     val plannedEndDate: String,
     @Json(name = "currentEndDate")
-    val currentEndDate: Int? = null,
+    val currentEndDate: String? = null,
     @Json(name = "companyId")
     val companyId: Int,
     @Json(name = "userProjects")

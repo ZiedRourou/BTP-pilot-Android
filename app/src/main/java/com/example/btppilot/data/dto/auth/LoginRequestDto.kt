@@ -1,4 +1,4 @@
-package com.example.btppilot.data.dto.request
+package com.example.btppilot.data.dto.auth
 
 
 data class LoginRequestDto (

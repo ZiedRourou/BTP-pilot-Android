@@ -1,4 +1,4 @@
-package com.example.btppilot.data.dto.response
+package com.example.btppilot.data.dto.response.auth
 
 
 import com.example.btppilot.data.dto.response.auth.UserDto

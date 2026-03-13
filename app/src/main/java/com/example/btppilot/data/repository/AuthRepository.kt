@@ -3,35 +3,24 @@ package com.example.btppilot.data.repository
 import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.dto.requ.RegisterRequestDto
 import com.example.btppilot.data.dto.request.InviteUserCompanyRequestDto
-import com.example.btppilot.data.dto.request.LoginRequestDto
-import com.example.btppilot.data.dto.response.AuthResponseDto
+import com.example.btppilot.data.dto.auth.LoginRequestDto
+import com.example.btppilot.data.dto.response.auth.AuthResponseDto
 import com.example.btppilot.data.dto.response.InviteUserCompanyResponseDto
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.Resource
-import com.squareup.moshi.Moshi
-import java.lang.Exception
 import javax.inject.Inject
 
 
 class AuthRepository @Inject constructor(
     private val api: ApiInterface,
-    private val moshi: Moshi,
     private val authSharedPref: AuthSharedPref
 ) {
 
-
-    data class ApiError(
-        val statusCode: Int?,
-        val message: Any?,
-        val error: String?
-    )
-
     suspend fun loginUser(
-        login: LoginRequestDto
+        loginInfo: LoginRequestDto
     ): Resource<AuthResponseDto> {
 
-
-        val response = api.loginUser(login)
+        val response = api.loginUser(loginInfo)
 
         if (response.isSuccessful) {
             response.body()?.let { userCredential ->

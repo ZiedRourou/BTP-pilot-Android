@@ -38,7 +38,7 @@ import com.example.btppilot.presentation.navigation.Screen
 import com.example.btppilot.presentation.screens.auth.register.component.HeaderRegister
 import com.example.btppilot.presentation.screens.auth.register.RegisterSharedViewModel
 import com.example.btppilot.presentation.screens.auth.register.component.BottomBarRegister
-import com.example.btppilot.presentation.screens.component.AppPrimaryTitleBlue
+import com.example.btppilot.presentation.screens.shared.component.AppPrimaryTitleBlue
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.ui.theme.BtpPilotTheme
 import com.example.btppilot.util.UserRole
@@ -94,7 +94,7 @@ fun RegisterStepOnePreview() {
     BtpPilotTheme {
         RegisterContent(
             modifier = Modifier,
-            selectedRole = UserRole.EMPLOYEE,
+            selectedRole = UserRole.COLLABORATOR,
             onRoleSelected = {},
         )
     }
@@ -134,9 +134,9 @@ fun RegisterContent(
                 title = "Employé",
                 description = "Suivez vos tâches et mettez à jour l'avancement",
                 icon = Icons.Default.Email,
-                isSelected = selectedRole == UserRole.EMPLOYEE,
+                isSelected = selectedRole == UserRole.COLLABORATOR,
                 onClick = {
-                    onRoleSelected(UserRole.EMPLOYEE)
+                    onRoleSelected(UserRole.COLLABORATOR)
                 }
             )
 

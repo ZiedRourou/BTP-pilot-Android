@@ -1,7 +1,6 @@
-package com.example.btppilot.presentation.navigation
+package com.example.btppilot.presentation.screens.main
 
 import androidx.lifecycle.ViewModel
-import com.example.btppilot.presentation.screens.auth.login.LoginViewModel
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.UserRole
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +16,7 @@ class MainViewModel @Inject constructor(
 
     data class currentUserInfo(
         val firstname: String = "",
-        val role: UserRole = UserRole.EMPLOYEE
+        val role: UserRole = UserRole.COLLABORATOR
     )
 
     private val _mainStateFlow = MutableStateFlow(currentUserInfo())
@@ -27,7 +26,7 @@ class MainViewModel @Inject constructor(
       _mainStateFlow.update {
           it.copy(
               firstname = authSharedPref.getUserName() ?: "ZIZOU",
-              role = UserRole.valueOf(authSharedPref.getUserRole() ?: UserRole.EMPLOYEE.name)
+              role = UserRole.valueOf(authSharedPref.getUserRole() ?: UserRole.COLLABORATOR.name)
           )
       }
   }

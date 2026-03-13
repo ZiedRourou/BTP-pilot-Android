@@ -27,9 +27,8 @@ import androidx.navigation.NavController
 import com.example.btppilot.presentation.screens.auth.register.component.BottomBarRegister
 import com.example.btppilot.presentation.screens.auth.register.component.HeaderRegister
 import com.example.btppilot.presentation.screens.auth.register.RegisterSharedViewModel
-import com.example.btppilot.presentation.screens.auth.register.inviteUserToCompany.RegisterLinkUserToCompanyContent
-import com.example.btppilot.presentation.screens.component.AppPrimaryTitleBlue
-import com.example.btppilot.presentation.screens.component.AppTextField
+import com.example.btppilot.presentation.screens.shared.component.AppPrimaryTitleBlue
+import com.example.btppilot.presentation.screens.shared.component.AppTextField
 import com.example.btppilot.presentation.screens.component.LoadingOverlay
 import com.example.btppilot.presentation.screens.uiState.EventState
 

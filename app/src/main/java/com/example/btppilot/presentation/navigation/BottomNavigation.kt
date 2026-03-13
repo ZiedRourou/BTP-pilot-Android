@@ -6,6 +6,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.btppilot.util.UserRole
@@ -21,7 +22,7 @@ fun bottomNavItems(role: UserRole): List<Screen> {
             Screen.Profile
         )
 
-        UserRole.EMPLOYEE -> listOf(
+        UserRole.COLLABORATOR -> listOf(
             Screen.Home,
             Screen.TaskList,
             Screen.Profile
@@ -45,7 +46,9 @@ fun BottomNavigationBar(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    NavigationBar {
+    NavigationBar (
+
+    ){
 
         items.forEach { screen ->
 
@@ -64,13 +67,8 @@ fun BottomNavigationBar(
                 onClick = {
 
                     navController.navigate(screen.route) {
-
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-
+                        popUpTo(navController.graph.findStartDestination().id)
                         launchSingleTop = true
-                        restoreState = true
                     }
                 }
             )

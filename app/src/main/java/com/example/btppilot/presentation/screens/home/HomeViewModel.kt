@@ -1,9 +1,8 @@
 package com.example.btppilot.presentation.screens.home
 
-import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDto
+import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDtoItem
 import com.example.btppilot.data.repository.ProjectRepository
 import com.example.btppilot.presentation.navigation.Screen
 import com.example.btppilot.presentation.screens.uiState.EventState
@@ -21,10 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
-
-
 
 
 @HiltViewModel
@@ -33,9 +29,12 @@ class HomeViewModel @Inject constructor(
     private val projectRepository: ProjectRepository,
 ) : ViewModel() {
 
-
     data class HomeState(
-        val companyData: ProjectResponseByUserCompanyDto = ProjectResponseByUserCompanyDto(listOf(),0),
+
+        val activeProjectStat :Int = 0,
+        val taskStatusTodoOrInProgressStat : Int = 0,
+        val projectFilteredList : List<ProjectResponseByUserCompanyDtoItem> = listOf(),
+
         val isLoading: Boolean = false,
         val currentUserName : String = "",
         val currentDate: String = Date().formatDateFr(),
@@ -49,7 +48,10 @@ class HomeViewModel @Inject constructor(
         val selectedFilter : ProjectStatus = ProjectStatus.ALL
     )
 
+    private val _projectListCopyStateFlow = MutableStateFlow(listOf <ProjectResponseByUserCompanyDtoItem>())
 
+    private val _userInfoStateFlow = MutableStateFlow(authSharedPref.getUserName())
+    val userInfoStateFlow = _userInfoStateFlow.asStateFlow()
 
     private val _homeStateFlow = MutableStateFlow(HomeState())
     val homeStateFlow = _homeStateFlow.asStateFlow()
@@ -63,6 +65,19 @@ class HomeViewModel @Inject constructor(
         getCurrentUserInfo()
     }
 
+    fun filterProject(status : ProjectStatus){
+        _homeStateFlow.update {
+            it.copy(
+                selectedFilter = status,
+                projectFilteredList =
+                _projectListCopyStateFlow.value.filter {
+                    if(status != ProjectStatus.ALL )
+                        it.status == status.label
+                    else true
+                }
+            )
+        }
+    }
     fun onClickProject(projectId : Int) {
         viewModelScope.launch {
             _homeEventSharedFlow.emit(
@@ -75,7 +90,9 @@ class HomeViewModel @Inject constructor(
     fun redirectAddProject(){
         viewModelScope.launch {
             _homeEventSharedFlow.emit(
-                EventState.RedirectScreen(Screen.NewProject)
+                EventState.RedirectScreenWithId(
+                    Screen.NewProject.route + "/0"
+                )
             )
         }
     }
@@ -108,9 +125,12 @@ class HomeViewModel @Inject constructor(
                     result.data?.let { projectData ->
                         _homeStateFlow.update {
                             it.copy(
-                                companyData = projectData
+                                activeProjectStat = projectData.projects.size,
+                                taskStatusTodoOrInProgressStat = projectData.taskInProgress,
+                                projectFilteredList = projectData.projects
                             )
                         }
+                        _projectListCopyStateFlow.value= projectData.projects
                     }
                 }
 

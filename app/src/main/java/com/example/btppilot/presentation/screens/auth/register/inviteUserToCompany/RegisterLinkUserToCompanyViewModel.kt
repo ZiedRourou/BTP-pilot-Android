@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.request.InviteUserCompanyRequestDto
 import com.example.btppilot.data.repository.AuthRepository
+import com.example.btppilot.presentation.navigation.NavGraph
 import com.example.btppilot.presentation.navigation.Screen
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.util.AuthSharedPref
@@ -80,7 +81,7 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
 
                 is Resource.Success -> {
                     _companyInfoInviteStateFlow.value = _companyInfoInviteStateFlow.value.copy(isLoading = false)
-                    _companyInfoInviteEventSharedFlow.emit(EventState.RedirectScreen(Screen.MainGraph))
+                    _companyInfoInviteEventSharedFlow.emit(EventState.RedirectGraph(NavGraph.MainGraph))
                     authSharedPref.saveCompanyInfo(
                         companyId = result.data?.companyId ?: 0,
                         role = result.data?.role ?: ""

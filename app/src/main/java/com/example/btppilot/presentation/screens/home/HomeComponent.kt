@@ -1,18 +1,15 @@
 package com.example.btppilot.presentation.screens.home
 
-import android.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -26,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.example.btppilot.presentation.screens.component.AppLabelTitle
-import com.example.btppilot.presentation.screens.component.AppPrimaryTitle
+import com.example.btppilot.presentation.screens.shared.component.AppSecondaryTitle
+import com.example.btppilot.presentation.screens.shared.component.AppPrimaryTitle
 import com.example.btppilot.ui.theme.StatusDone
 import com.example.btppilot.ui.theme.StatusInProgress
 
@@ -70,7 +67,7 @@ fun CurrentDate(
         )
         Spacer(modifier = Modifier.width(5.dp))
 
-        AppLabelTitle(
+        AppSecondaryTitle(
             text = dateString,
             color = StatusInProgress
         )
@@ -92,7 +89,7 @@ fun StatCard(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        AppLabelTitle(
+        AppSecondaryTitle(
             text = title,
             color = MaterialTheme.colorScheme.background
         )
@@ -132,18 +129,17 @@ fun FilterButton(
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(
             containerColor =
-            if (isSelected) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.secondaryContainer,
+            if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.8F)
+            else MaterialTheme.colorScheme.secondary.copy(alpha = 0.8F),
 
-            contentColor =
-            if (isSelected) androidx.compose.ui.graphics.Color.White
-            else MaterialTheme.colorScheme.onSecondaryContainer
+            contentColor = MaterialTheme.colorScheme.background
         )
     ) {
 
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyLarge,
+
         )
     }
 }

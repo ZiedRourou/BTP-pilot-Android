@@ -37,4 +37,29 @@ class TaskRepository @Inject constructor(
         return Resource.Error(400, "Erreur serveur ")
     }
 
+    suspend fun getTasksOfCompany(
+
+    ) : Resource<List<TasksByProjectDtoItem>> {
+
+        val token = authSharedPref.getToken()
+        val bearerToken = "Bearer $token"
+        val companyId = authSharedPref.getCompanyId()
+        val response =
+            api.fetchsTasksByCompany(bearerToken, companyId)
+
+        if (response.isSuccessful) {
+            response.body()?.let { projectsData ->
+                return Resource.Success(
+                    data = projectsData,
+                    code = response.code()
+                )
+            }
+        } else
+            return Resource.Error(
+                code = response.code() ?: 400,
+                message = "erreur"
+            )
+        return Resource.Error(400, "Erreur serveur ")
+    }
+
 }

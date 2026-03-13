@@ -92,3 +92,30 @@ fun isoToFrenchDate(date: String?): String {
         ""
     }
 }
+
+fun isoToUiDate(isoDate: String): String {
+    return try {
+        val apiFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        apiFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+        val uiFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+
+        val parsedDate = apiFormat.parse(isoDate)
+        parsedDate?.let { uiFormat.format(it) } ?: ""
+    } catch (e: Exception) {
+        ""
+    }
+}
+
+fun uiDateToIso(uiDate: String): String {
+    return try {
+        val uiFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        val apiFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        apiFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+        val parsedDate = uiFormat.parse(uiDate)
+        parsedDate?.let { apiFormat.format(it) } ?: ""
+    } catch (e: Exception) {
+        ""
+    }
+}

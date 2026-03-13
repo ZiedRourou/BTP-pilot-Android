@@ -33,7 +33,7 @@ class RegisterSharedViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class RegisterState(
-        val selectedRole: UserRole = UserRole.EMPLOYEE,
+        val selectedRole: UserRole = UserRole.COLLABORATOR,
 
         val firstName: String = "",
         val email: String = "",
@@ -67,7 +67,7 @@ class RegisterSharedViewModel @Inject constructor(
 
             UserRole.OWNER -> Screen.RegisterOwnerCompany
 
-            UserRole.EMPLOYEE,
+            UserRole.COLLABORATOR,
             UserRole.CLIENT -> Screen.RegisterInviteCompany
         }
 

@@ -8,6 +8,7 @@ import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDto
 import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDtoItem
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseDto
+import com.example.btppilot.data.dto.response.project.team.UserProjectDtoItem
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.Resource
 import javax.inject.Inject
@@ -101,4 +102,87 @@ class ProjectRepository  @Inject constructor(
         return Resource.Error(400, "Erreur serveur ")
     }
 
+
+    suspend fun updateProject(
+        projectId: Int,
+        project : ProjectRequestDto
+    ): Resource<Unit> {
+
+        val token = authSharedPref.getToken()
+        val bearerToken = "Bearer $token"
+        val response =
+            api.updateProject(bearerToken,projectId,project )
+
+        if (response.isSuccessful) {
+            response.body()?.let {
+                return Resource.Success(
+                    data = null,
+                    code = response.code()
+                )
+            }
+        } else
+            return Resource.Error(
+                code = response.code() ?: 400,
+                message = when (response.code()) {
+                    401 -> "erreur"
+                    else -> "erreur"
+                }
+            )
+        return Resource.Error(400, "Erreur serveur ")
+    }
+
+
+    suspend fun deleteProject(
+        projectId: Int,
+    ): Resource<Unit> {
+
+        val token = authSharedPref.getToken()
+        val bearerToken = "Bearer $token"
+        val response =
+            api.deleteProject(bearerToken,projectId)
+
+        if (response.isSuccessful) {
+            response.body()?.let {
+                return Resource.Success(
+                    data = null,
+                    code = response.code()
+                )
+            }
+        } else
+            return Resource.Error(
+                code = response.code() ?: 400,
+                message = when (response.code()) {
+                    401 -> "erreur"
+                    else -> "erreur"
+                }
+            )
+        return Resource.Error(400, "Erreur serveur ")
+    }
+
+    suspend fun getUsersOfProject(
+        projectId: Int,
+    ): Resource<List<UserProjectDtoItem>> {
+
+        val token = authSharedPref.getToken()
+        val bearerToken = "Bearer $token"
+        val response =
+            api.getUsersProject(bearerToken,projectId)
+
+        if (response.isSuccessful) {
+            response.body()?.let {users ->
+                return Resource.Success(
+                    data = users,
+                    code = response.code()
+                )
+            }
+        } else
+            return Resource.Error(
+                code = response.code() ?: 400,
+                message = when (response.code()) {
+                    401 -> "erreur"
+                    else -> "erreur"
+                }
+            )
+        return Resource.Error(400, "Erreur serveur ")
+    }
 }

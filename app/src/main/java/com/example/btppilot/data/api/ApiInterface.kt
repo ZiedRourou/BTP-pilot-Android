@@ -3,28 +3,33 @@ package com.example.btppilot.data.api
 
 import com.example.btppilot.data.dto.requ.RegisterRequestDto
 import com.example.btppilot.data.dto.request.InviteUserCompanyRequestDto
-import com.example.btppilot.data.dto.request.LoginRequestDto
+import com.example.btppilot.data.dto.auth.LoginRequestDto
 import com.example.btppilot.data.dto.request.NewCompanyRequestDto
 import com.example.btppilot.data.dto.request.ProjectRequestDto
-import com.example.btppilot.data.dto.response.AuthResponseDto
+import com.example.btppilot.data.dto.response.auth.AuthResponseDto
 import com.example.btppilot.data.dto.response.InviteUserCompanyResponseDto
 import com.example.btppilot.data.dto.response.NewCompanyResponseDto
 import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDto
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseDto
+import com.example.btppilot.data.dto.response.project.team.UserProjectDtoItem
 import com.example.btppilot.data.dto.response.tasks.TasksByProjectDtoItem
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiInterface {
 
-    @POST(ApiRoutes.AUTH_LOGIN)
-    suspend fun loginUser(@Body login: LoginRequestDto): Response<AuthResponseDto>
+    @POST(ApiRoutes.BTP_API_AUTH_LOGIN)
+    suspend fun loginUser(
+        @Body login: LoginRequestDto
+    ): Response<AuthResponseDto>
 
     @POST(ApiRoutes.AUTH_REGISTER)
     suspend fun registerUser(@Body login: RegisterRequestDto): Response<AuthResponseDto>
@@ -71,5 +76,30 @@ interface ApiInterface {
         @Header("Authorization") authorization: String,
         @Path("projectId") projectId: Int,
     ): Response<List<TasksByProjectDtoItem>>
+
+    @PATCH(ApiRoutes.GET_PROJECT_BY_ID)
+    suspend fun updateProject(
+        @Header("Authorization") authorization: String,
+        @Path("projectId") projectId: Int,
+        @Body project: ProjectRequestDto
+    ): Response<Unit>
+
+    @DELETE(ApiRoutes.GET_PROJECT_BY_ID)
+    suspend fun deleteProject(
+        @Header("Authorization") authorization: String,
+        @Path("projectId") projectId: Int,
+    ): Response<Unit>
+
+    @GET(ApiRoutes.GET_TASK_COMPANY)
+    suspend fun fetchsTasksByCompany(
+        @Header("Authorization") authorization: String,
+        @Path("id") companyId: Int,
+    ): Response<List<TasksByProjectDtoItem>>
+
+    @DELETE(ApiRoutes.GET_USERS_PROJECT)
+    suspend fun getUsersProject(
+        @Header("Authorization") authorization: String,
+        @Path("projectId") projectId: Int,
+    ): Response<List<UserProjectDtoItem>>
 
 }

@@ -15,8 +15,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.btppilot.R
+import com.example.btppilot.presentation.navigation.NavGraph
 import com.example.btppilot.presentation.navigation.Screen
-import com.example.btppilot.presentation.screens.component.AppPrimaryTitle
+import com.example.btppilot.presentation.screens.shared.component.AppPrimaryTitle
 import com.example.btppilot.presentation.screens.uiState.EventState
 
 
@@ -31,8 +32,11 @@ fun SplashScreen(
             when (event) {
                 is EventState.RedirectScreen ->
                     navController.navigate(event.screen.route) {
-                        if(event.screen is Screen.MainGraph)
                             popUpTo(Screen.Splash.route) { inclusive = true }
+                    }
+                is EventState.RedirectGraph ->
+                    navController.navigate(event.graph.route) {
+                        popUpTo(NavGraph.AuthGraph.route){inclusive= true}
                     }
 
                 else -> {}

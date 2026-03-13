@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.request.NewCompanyRequestDto
 import com.example.btppilot.data.repository.CompanyRepository
+import com.example.btppilot.presentation.navigation.NavGraph
 import com.example.btppilot.presentation.navigation.Screen
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.util.AuthSharedPref
@@ -96,7 +97,7 @@ class RegisterCompanyViewModel @Inject constructor(
                 is Resource.Success -> {
                     _companyRegisterStateFlow.value =
                         _companyRegisterStateFlow.value.copy(isLoading = false)
-                    _companyRegisterEventSharedFlow.emit(EventState.RedirectScreen(Screen.MainGraph))
+                    _companyRegisterEventSharedFlow.emit(EventState.RedirectGraph(NavGraph.MainGraph))
                     authSharedPref.saveCompanyInfo(
                         companyId = result.data?.id ?: 0,
                         role = UserRole.OWNER.name

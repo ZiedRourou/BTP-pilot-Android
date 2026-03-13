@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +21,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +38,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,19 +50,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.btppilot.data.dto.response.UserProject
 import com.example.btppilot.data.dto.response.tasks.TasksByProjectDtoItem
-import com.example.btppilot.presentation.screens.component.AppLabelTitle
-import com.example.btppilot.presentation.screens.component.AppPrimaryButton
-import com.example.btppilot.presentation.screens.component.LoadingOverlay
+import com.example.btppilot.presentation.screens.shared.component.AppSecondaryTitle
+import com.example.btppilot.presentation.screens.shared.component.AppPrimaryButton
 import com.example.btppilot.presentation.screens.home.HeaderScaffoldHome
+import com.example.btppilot.presentation.screens.test.DropdownPriority
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.ui.theme.BtpPilotTheme
 import com.example.btppilot.ui.theme.StatusInProgress
 import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.ProjectStatus
 import com.example.btppilot.util.TaskStatus
+import com.example.btppilot.util.arrayPriorities
 import com.example.btppilot.util.isoToFrenchDate
 
 
@@ -75,12 +82,13 @@ private fun ProjectDetailsScreenPreview() {
             ) { padding ->
             ProjectDetailsContent(
                 paddingValues = padding,
-                projectState = ProjectDetailsViewModel.NewProjectState(
-
-                )
+                projectState = ProjectDetailsViewModel.DetailsProjectState(),
+                onClickDelete = {},
+                onClickEdit = {},
+                onClickAddTask = { },
+                onSelectPriority = {}
             )
         }
-
     }
 }
 
@@ -106,6 +114,9 @@ fun ProjectDetailsScreen(
                 is EventState.RedirectScreen ->
                     navController.navigate(event.screen.route)
 
+                is EventState.RedirectScreenWithId ->
+                    navController.navigate(event.route)
+
                 else -> {}
             }
         }
@@ -126,23 +137,30 @@ fun ProjectDetailsScreen(
     ) { padding ->
         ProjectDetailsContent(
             paddingValues = padding,
-            projectState = projectState
+            projectState = projectState,
+            onClickDelete = projectDetailsViewModel::confirmDelete,
+            onClickEdit = projectDetailsViewModel::onEditProject,
+            onClickAddTask = projectDetailsViewModel::redirectAddTask,
+            onSelectPriority = projectDetailsViewModel::onSelectPriority,
         )
+        if (projectState.showDialog)
+            ConfirmDeleteProjectDialog(
+                onConfirm = projectDetailsViewModel::deleteProject,
+                onDismiss = projectDetailsViewModel::closeDialogDelete
+            )
     }
 }
 
 @Composable
 fun ProjectDetailsContent(
     paddingValues: PaddingValues,
-    projectState: ProjectDetailsViewModel.NewProjectState
+    projectState: ProjectDetailsViewModel.DetailsProjectState,
+    onClickDelete: () -> Unit,
+    onClickEdit: () -> Unit,
+    onClickAddTask: () -> Unit,
+    onSelectPriority: (ProjectAndTakPriorities) -> Unit
 ) {
-//    ConfirmDeleteProjectDialog(
-//        projectName = projectState.project.name,
-//        onConfirm = {
-//        },
-//        onDismiss = {
-//        }
-//    )
+
     Column(
         modifier = Modifier
             .padding(paddingValues)
@@ -151,13 +169,14 @@ fun ProjectDetailsContent(
     ) {
 
         ProjectDetailsStatusAndPriority(
+            projectState = projectState,
             status = ProjectStatus.valueOf(projectState.project.status),
-            priority = ProjectAndTakPriorities.valueOf(projectState.project.priority),
+            onSelectPriority = onSelectPriority
         )
 
         ProjectTitleRow(
             projectState.project.name,
-            {},{}
+            onClickDelete, onClickEdit
         )
 
         AssignedTeamCard(
@@ -166,7 +185,7 @@ fun ProjectDetailsContent(
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        AppLabelTitle(text = "Description")
+        AppSecondaryTitle(text = "Description")
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -177,8 +196,11 @@ fun ProjectDetailsContent(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        AppLabelTitle(text = "Tâches")
+        AppSecondaryTitle(text = "Tâches")
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        AppPrimaryButton(text = "ajouter une tache", onClick = onClickAddTask)
         Spacer(modifier = Modifier.height(8.dp))
 
         when {
@@ -214,7 +236,6 @@ fun ProjectDetailsContent(
 
 @Composable
 fun ConfirmDeleteProjectDialog(
-    projectName: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -231,7 +252,7 @@ fun ConfirmDeleteProjectDialog(
 
         text = {
             Text(
-                text = "Voulez-vous vraiment supprimer le projet \"$projectName\" ? Cette action est irréversible."
+                text = "Voulez-vous vraiment supprimer le projet ? Cette action est irréversible."
             )
         },
 
@@ -255,10 +276,11 @@ fun ConfirmDeleteProjectDialog(
             ) {
                 Text("Annuler")
             }
-
         }
     )
 }
+
+
 
 @Composable
 fun ItemTask(
@@ -299,7 +321,7 @@ fun ItemTask(
 @Composable
 fun AssignedTeamCard(
     members: List<UserProject>,
-    date : String
+    date: String
 ) {
 
     val cardHeight = 140.dp
@@ -310,7 +332,7 @@ fun AssignedTeamCard(
     ) {
 
         DueDateCard(
-            date= date,
+            date = date,
             modifier = Modifier
                 .weight(1f)
                 .height(cardHeight)
@@ -357,12 +379,15 @@ fun DueDateCard(
         )
     }
 }
+
 @Composable
 fun TeamCard(
     teamName: String,
     members: List<UserProject>,
     modifier: Modifier = Modifier
 ) {
+
+    var showDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -380,48 +405,128 @@ fun TeamCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-
-            Icon(
-                imageVector = Icons.Default.Group,
-                contentDescription = null,
-                tint = StatusInProgress
-            )
-
-            Spacer(modifier = Modifier.width(6.dp))
-
-            Text(
-                text = teamName,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
         ) {
 
-            items(members) { member ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
 
-                Text(
-                    text = "${member.user.firstName} ${member.user.lastName} (${member.projectRole})",
-                    color = Color.LightGray,
-                    fontSize = 13.sp
+                Icon(
+                    imageVector = Icons.Default.Group,
+                    contentDescription = null,
+                    tint = StatusInProgress
                 )
 
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = teamName,
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            IconButton(onClick = { showDialog = true }) {
+                Icon(
+                    imageVector = Icons.Filled.Visibility,
+                    contentDescription = null,
+                    tint = Color.White
+                )
             }
         }
+    }
+
+    if (showDialog) {
+
+        Dialog(onDismissRequest = { showDialog = false }) {
+
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.secondary
+            ) {
+
+                Column(
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .width(300.dp)
+                ) {
+
+                    Text(
+                        text = "Membres de l'équipe",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.White
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.heightIn(max = 350.dp)
+                    ) {
+
+                        items(members) { member ->
+
+                            TeamMemberRow(member)
+                        }
+                    }
+
+                    Spacer(Modifier.height(20.dp))
+
+                    Button(
+                        onClick = { showDialog = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Fermer")
+                    }
+                }
+            }
+        }
+    }
+}
+@Composable
+fun TeamMemberRow(member: UserProject) {
+
+    val roleColor = when (member.projectRole) {
+        "MANAGER" -> Color(0xFF4CAF50)
+        "CLIENT" -> Color(0xFF2196F3)
+        else -> Color(0xFFFF9800)
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                RoundedCornerShape(12.dp)
+            )
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Text(
+            text = "${member.user.firstName} ${member.user.lastName}",
+            color = Color.White
+        )
+
+        Text(
+            text = member.projectRole,
+            color = Color.White,
+            modifier = Modifier
+                .background(roleColor, RoundedCornerShape(50))
+                .padding(horizontal = 10.dp, vertical = 4.dp)
+        )
     }
 }
 
 @Composable
 fun ProjectTitleRow(
     title: String,
-    onClickDelete: ()->Unit,
-    onClickEdit : ()->Unit
+    onClickDelete: () -> Unit,
+    onClickEdit: () -> Unit
 ) {
 
     Row(
@@ -445,7 +550,7 @@ fun ProjectTitleRow(
             )
         }
 
-        IconButton(onClick = onClickEdit) {
+        IconButton(onClick = onClickDelete) {
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = null,
@@ -457,9 +562,11 @@ fun ProjectTitleRow(
 
 @Composable
 fun ProjectDetailsStatusAndPriority(
+    projectState: ProjectDetailsViewModel.DetailsProjectState,
     status: ProjectStatus,
-    priority: ProjectAndTakPriorities,
+    onSelectPriority: (ProjectAndTakPriorities) -> Unit
 ) {
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -467,23 +574,29 @@ fun ProjectDetailsStatusAndPriority(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-
-        StatusPriorityBadge(
-            text = status.label,
-            background = status.color.copy(alpha = 0.15f),
-            border = status.color,
-            textColor = status.color
+        DropdownPriority(
+            priorities = arrayPriorities,
+            selectedPriority = projectState.selectPriority,
+            onSelectPriority = onSelectPriority
         )
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(Modifier.width(12.dp))
 
+//        StatusPriorityBadge(
+//            text = status.label,
+//            background = status.color.copy(alpha = 0.15f),
+//            border = status.color,
+//            textColor = status.color
+//        )
 
-        StatusPriorityBadge(
-            text = priority.label,
-            background = priority.color.copy(alpha = 0.15f),
-            border = priority.color,
-            textColor = priority.color
-        )
+        Spacer(Modifier.width(8.dp))
+//
+//        StatusPriorityBadge(
+//            text = projectState.selectPriority.label,
+//            background = projectState.selectPriority.color.copy(alpha = 0.15f),
+//            border = projectState.selectPriority.color,
+//            textColor = projectState.selectPriority.color
+//        )
     }
 }
 

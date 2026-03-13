@@ -2,9 +2,9 @@ package com.example.btppilot.presentation.screens.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.btppilot.data.dto.request.LoginRequestDto
+import com.example.btppilot.data.dto.auth.LoginRequestDto
 import com.example.btppilot.data.repository.AuthRepository
-import com.example.btppilot.presentation.navigation.Screen
+import com.example.btppilot.presentation.navigation.NavGraph
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.EMAIL_REGEX
@@ -30,6 +30,7 @@ class LoginViewModel @Inject constructor(
     data class LoginInfo(
         val email: String = "",
         val password: String = "",
+
         val emailError: String? = null,
         val passwordError: String? = null,
 
@@ -39,8 +40,8 @@ class LoginViewModel @Inject constructor(
     private val _loginUserInfoStateFlow = MutableStateFlow(LoginInfo())
     val loginUserInfoStateFlo: StateFlow<LoginInfo> = _loginUserInfoStateFlow
 
-    private val _loginUserEventStateFlo = MutableSharedFlow<EventState>()
-    val loginUserEventStateFlo = _loginUserEventStateFlo.asSharedFlow()
+    private val _loginUserEventStateFlow = MutableSharedFlow<EventState>()
+    val loginUserEventStateFlow = _loginUserEventStateFlow.asSharedFlow()
 
     fun onEmailChange(email: String) {
         _loginUserInfoStateFlow.value = _loginUserInfoStateFlow.value.copy(
@@ -58,7 +59,7 @@ class LoginViewModel @Inject constructor(
 
     fun goToRegister(){
         viewModelScope.launch {
-            _loginUserEventStateFlo.emit(EventState.RedirectScreen(Screen.RegisterGraph))
+            _loginUserEventStateFlow.emit(EventState.RedirectGraph(NavGraph.RegisterGraph))
         }
     }
 
@@ -66,7 +67,7 @@ class LoginViewModel @Inject constructor(
 
         val currentState = loginUserInfoStateFlo.value
 
-        if(!validateLoginData())
+        if(!validateLoginDataAndSetError())
             return
 
         viewModelScope.launch {
@@ -99,15 +100,15 @@ class LoginViewModel @Inject constructor(
                         )
                     }
 
-                    _loginUserEventStateFlo.emit(EventState.RedirectScreen(Screen.MainGraph))
+                    _loginUserEventStateFlow.emit(EventState.RedirectGraph(NavGraph.MainGraph))
                 }
 
                 is Resource.Error -> {
 
-                    _loginUserInfoStateFlow.value = currentState.copy(isLoading = false)
+                    _loginUserInfoStateFlow.value =
+                        currentState.copy(isLoading = false)
 
-
-                    _loginUserEventStateFlo.emit(
+                    _loginUserEventStateFlow.emit(
                         EventState.ShowMessageSnackBar(result.message)
                     )
                 }
@@ -115,7 +116,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun validateLoginData(): Boolean {
+    private fun validateLoginDataAndSetError(): Boolean {
 
         val currentUserInfo = loginUserInfoStateFlo.value
 

@@ -2,6 +2,7 @@ package com.example.btppilot.presentation.screens.auth.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.presentation.navigation.NavGraph
 import com.example.btppilot.presentation.navigation.Screen
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.util.AuthSharedPref
@@ -21,8 +22,8 @@ class SplashViewModel @Inject constructor(
     val mainScreenRouteSF = _mainScreenRoute.asSharedFlow()
 
     init {
-        authSharedPref.clearLogin()
-            authSharedPref.clearCompany()
+//        authSharedPref.clearLogin()
+//        authSharedPref.clearCompany()
         switchNavigation()
     }
 
@@ -33,7 +34,7 @@ class SplashViewModel @Inject constructor(
 
             when {
                 authSharedPref.isLogin() && authSharedPref.isAttachedToCompany() ->
-                    _mainScreenRoute.emit(EventState.RedirectScreen(Screen.MainGraph))
+                    _mainScreenRoute.emit(EventState.RedirectGraph(NavGraph.MainGraph))
 
                 authSharedPref.isLogin() && !authSharedPref.isAttachedToCompany() ->
                     _mainScreenRoute.emit(EventState.RedirectScreen(Screen.RegisterRole))

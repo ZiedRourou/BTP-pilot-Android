@@ -3,6 +3,8 @@ package com.example.btppilot.presentation.screens.project.newProject
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,16 +25,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.btppilot.data.dto.response.company.UserCompany
-import com.example.btppilot.presentation.screens.component.AppPrimaryButton
+import com.example.btppilot.presentation.screens.shared.component.AppPrimaryButton
 import com.example.btppilot.presentation.screens.project.component.AppDateField
 import com.example.btppilot.presentation.screens.project.component.AppFieldProject
 import com.example.btppilot.presentation.screens.project.component.AppLabelTextFieldNewProject
 import com.example.btppilot.presentation.screens.project.component.AppSelectPriorityRadioBtnField
+import com.example.btppilot.presentation.screens.project.component.AppSelectUserMultiField
 import com.example.btppilot.presentation.screens.project.component.AppSelectUserRadioBtnField
 import com.example.btppilot.presentation.screens.project.component.ProjectAndTaskEditorTopBar
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.ui.theme.BtpPilotTheme
 import com.example.btppilot.util.ProjectAndTakPriorities
+import com.example.btppilot.util.UserRole
 
 
 @Preview(showBackground = true, apiLevel = 33)
@@ -62,7 +66,9 @@ private fun NewProjectScreenPreview() {
                 onBeginDateChange = {},
                 onEndDateChange = {},
                 onManagerChange = {},
-                onPriorityChange = {}
+                onPriorityChange = {},
+                onEmployeeListChange = {},
+                onClientListChange = {}
             )
         }
     }
@@ -71,10 +77,14 @@ private fun NewProjectScreenPreview() {
 @Composable
 fun NewProjectScreen(
     navController: NavController,
-    newProjectViewModel: NewProjectViewModel
+    newProjectViewModel: NewProjectViewModel,
+    projectId : Long
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val newProjectStateFlow by newProjectViewModel.newProjectStateFlow.collectAsState()
+
+    if(projectId.toInt() != 0)
+        newProjectViewModel.setProjectId(projectId)
 
     LaunchedEffect(Unit) {
         newProjectViewModel.newProjectEventSharedFlow.collect { event ->
@@ -95,7 +105,7 @@ fun NewProjectScreen(
         bottomBar = {
             AppPrimaryButton(
                 text = "Enregistrer",
-                onClick = newProjectViewModel::publishProject,
+                onClick = newProjectViewModel::publishOrEdit,
                 modifier = Modifier.padding(10.dp)
             )
         }
@@ -108,7 +118,9 @@ fun NewProjectScreen(
             onBeginDateChange = newProjectViewModel::onBeginDateChange,
             onEndDateChange = newProjectViewModel::onEndDateChange,
             onManagerChange = newProjectViewModel::onManagerChange,
-            onPriorityChange = newProjectViewModel::onPriorityChange
+            onPriorityChange = newProjectViewModel::onPriorityChange,
+            onClientListChange =newProjectViewModel::onClientListChange,
+            onEmployeeListChange = newProjectViewModel::onEmployeeListChange
         )
     }
 }
@@ -121,6 +133,8 @@ fun NewProjectContent(
     onTitleChange : (String) -> Unit,
     onDescriptionChange : (String) -> Unit,
     onManagerChange : (UserCompany) -> Unit,
+    onClientListChange : (List<UserCompany>) -> Unit,
+    onEmployeeListChange : (List<UserCompany>) -> Unit,
     onBeginDateChange : (String) -> Unit,
     onEndDateChange : (String) -> Unit,
     onPriorityChange : (ProjectAndTakPriorities) -> Unit,
@@ -159,13 +173,31 @@ fun NewProjectContent(
 
         AppLabelTextFieldNewProject(image = Icons.Outlined.PersonAddAlt, title = "Manager")
 
-        if (projectData.userOption.isNotEmpty())
+        if (projectData.userOption.isNotEmpty()){
             AppSelectUserRadioBtnField(
                 label = "Chef de chantier",
                 options = projectData.userOption,
                 selectedOption = projectData.manager,
                 onSelectionChange = onManagerChange,
             )
+            Spacer(modifier = Modifier.height(10.dp))
+            AppSelectUserMultiField(
+                label = "Clients",
+                options = projectData.clientOption,
+                selectedUsers = projectData.clientList,
+                onSelectionChange = onClientListChange
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            AppSelectUserMultiField(
+                label = "L'équipe du projet",
+                options = projectData.userOption.filter { it.role == UserRole.COLLABORATOR.name },
+                selectedUsers = projectData.collaboratorList,
+                onSelectionChange = onEmployeeListChange
+            )
+
+        }
+
 
         AppLabelTextFieldNewProject(image = Icons.Outlined.CalendarMonth, title = "Date")
 
