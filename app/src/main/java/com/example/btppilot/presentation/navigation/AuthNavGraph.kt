@@ -17,7 +17,7 @@ import com.example.btppilot.presentation.screens.auth.register.company.RegisterC
 import com.example.btppilot.presentation.screens.auth.register.company.RegisterCompanyViewModel
 import com.example.btppilot.presentation.screens.auth.register.inviteUserToCompany.RegisterLinkUserToCompanyScreen
 import com.example.btppilot.presentation.screens.auth.register.inviteUserToCompany.RegisterLinkUserToCompanyViewModel
-import com.example.btppilot.presentation.screens.auth.register.userInfo.RegisterSecondStepScreen
+import com.example.btppilot.presentation.screens.auth.register.userInfo.RegisterUserInfoScreen
 import com.example.btppilot.presentation.screens.auth.register.userRoleInCompany.RegisterStepOneScreen
 import com.example.btppilot.presentation.screens.auth.splash.SplashScreen
 import com.example.btppilot.presentation.screens.auth.splash.SplashViewModel
@@ -64,7 +64,7 @@ fun NavGraphBuilder.authNavGraph(
 
                 val vm: RegisterSharedViewModel = hiltViewModel(parentEntry)
 
-                RegisterSecondStepScreen(
+                RegisterUserInfoScreen(
                     navController = navController,
                     registerViewModel = vm
                 )

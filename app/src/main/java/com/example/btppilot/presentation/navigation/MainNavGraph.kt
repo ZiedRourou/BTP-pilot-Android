@@ -19,8 +19,8 @@ import com.example.btppilot.presentation.screens.project.newProject.NewProjectSc
 import com.example.btppilot.presentation.screens.project.newProject.NewProjectViewModel
 import com.example.btppilot.presentation.screens.project.projectDetails.ProjectDetailsScreen
 import com.example.btppilot.presentation.screens.project.projectDetails.ProjectDetailsViewModel
-import com.example.btppilot.presentation.screens.task.TaskListScreen
-import com.example.btppilot.presentation.screens.task.TaskListViewModel
+import com.example.btppilot.presentation.screens.task.taskList.TaskListScreen
+import com.example.btppilot.presentation.screens.task.taskList.TaskListViewModel
 import com.example.btppilot.presentation.screens.task.newTask.NewTaskScreen
 import com.example.btppilot.presentation.screens.task.newTask.NewTaskViewModel
 import com.example.btppilot.presentation.screens.team.TeamScreen
@@ -71,7 +71,6 @@ fun MainNavHost(
                     navController = navController,
                     taskListViewModel = vm,
                     sharedViewModel = sharedViewModel,
-                    snackbarHostState = snackbarHostState
                 )
             }
 
@@ -114,11 +113,17 @@ fun MainNavHost(
                     type = NavType.LongType
                 }
             )
-            ) {
-                val projectId = it.arguments?.getLong("projectId") ?: 0
+            ) { backStackEntry ->
+
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(NavGraph.MainGraph.route)
+                }
+                val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
+
+                val projectId = backStackEntry.arguments?.getLong("projectId") ?: 0
                 val vm: NewProjectViewModel = hiltViewModel()
 
-                NewProjectScreen(navController, vm, projectId)
+                NewProjectScreen(navController, vm, projectId, sharedViewModel)
             }
 
             composable(
@@ -128,34 +133,52 @@ fun MainNavHost(
                         type = NavType.LongType
                     }
                 )
-            ) {
+            ) { backStackEntry ->
 
-                val projectId = it.arguments?.getLong("projectId") ?: 0
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(NavGraph.MainGraph.route)
+                }
+                val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
+
+
+                val projectId = backStackEntry.arguments?.getLong("projectId") ?: 0
                 val vm: ProjectDetailsViewModel = hiltViewModel()
 
                 ProjectDetailsScreen(
-                    navController,
-                    vm,
-                    projectId
+                    navController=navController,
+                    projectDetailsViewModel = vm,
+                    sharedViewModel = sharedViewModel,
+                    projectId = projectId
                 )
             }
 
             composable(
-                Screen.NewTask.route + "/{projectId}",
+                Screen.NewTask.route + "/{projectId}/{taskId}",
                 arguments = listOf(
                     navArgument("projectId") {
                         type = NavType.LongType
+                    },
+                    navArgument("taskId") {
+                        type = NavType.LongType
                     }
                 )
-            ) {
+            ) { backStackEntry ->
 
-                val projectId = it.arguments?.getLong("projectId") ?: 0
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(NavGraph.MainGraph.route)
+                }
+                val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
+
+                val projectId = backStackEntry.arguments?.getLong("projectId") ?: 0
+                val taskId = backStackEntry.arguments?.getLong("taskId") ?: 0
                 val vm: NewTaskViewModel = hiltViewModel()
 
                 NewTaskScreen(
                     navController,
                     vm,
-                    projectId
+                    projectId,
+                    taskId,
+                    sharedViewModel
                 )
             }
         }

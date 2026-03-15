@@ -1,5 +1,6 @@
-package com.example.btppilot.presentation.screens.component
+package com.example.btppilot.presentation.screens.shared.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -22,14 +24,14 @@ fun LoadingOverlay(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .zIndex(1f)
+            .zIndex(1f).background(Color.LightGray.copy(alpha = 0.8F))
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
                         awaitPointerEvent()
                     }
                 }
-            },
+            }
     ) {
         Column(
             modifier = Modifier

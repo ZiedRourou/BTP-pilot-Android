@@ -1,27 +1,24 @@
 package com.example.btppilot.presentation.screens.team
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.presentation.screens.shared.SharedViewModel
 import com.example.btppilot.presentation.screens.project.component.AppFieldProject
+import com.example.btppilot.presentation.screens.shared.component.HeaderMainSreen
+import com.example.btppilot.presentation.screens.task.taskList.TaskListContent
+import com.example.btppilot.presentation.screens.uiState.EventState
 
 @Composable
 fun TeamScreen(
@@ -31,62 +28,37 @@ fun TeamScreen(
     snackbarHostState: SnackbarHostState
 ) {
     val state by teamViewModel.teamStateFlow.collectAsState()
+    val userInfo by sharedViewModel.userInfoStateFlow.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    TeamContent(
-        userListState = state
-    )
-}
+    LaunchedEffect(Unit) {
+        teamViewModel.teamEventSharedFlow.collect { event ->
+            when (event) {
+                is EventState.ShowMessageSnackBar ->
+                    snackbarHostState.showSnackbar(event.message)
 
-@Composable
-fun TeamContent(
-    userListState: TeamViewModel.TeamState
-) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+                is EventState.RedirectScreen ->
+                    navController.navigate(event.screen.route)
 
-            items(userListState.userList) { item ->
-                TeamItem(item)
+                is EventState.RedirectScreenWithId ->
+                    navController.navigate(event.route)
+                else -> {}
             }
         }
-
-        AppFieldProject(label = "Inviter une personne", value ="dd" , onValueChange ={} )
-
     }
-}
 
-@Composable
-fun TeamItem(
-    user: UsersOfCompanyItem
-) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.secondary
-    ) {
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = { HeaderMainSreen(userName = userInfo.userFirstname) },
+    ) { paddingValues ->
 
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-
-            Text(
-                text = user.role,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            Text(
-                text = user.user.firstName + " . "+ user.user.lastName,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
+        TeamContent(
+            paddingValues ,
+            userListState = state,
+            onRoleChange = teamViewModel::onRoleChange,
+            inviteUser = teamViewModel::inviteUser,
+            onEmailChange = teamViewModel::onEmailChange
+        )
     }
+
 }

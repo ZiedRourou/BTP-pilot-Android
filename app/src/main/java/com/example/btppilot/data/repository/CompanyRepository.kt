@@ -15,7 +15,6 @@ class CompanyRepository @Inject constructor(
     private val authSharedPref: AuthSharedPref
 ) {
 
-
     suspend fun createCompanyUser(
         companyData: NewCompanyRequestDto,
     ): Resource<NewCompanyResponseDto> {
@@ -36,7 +35,9 @@ class CompanyRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    401 -> "Email déjà utilisé"
+                    409 -> "vous etes déja lié a l'entreprise"
+                    400 -> "Informations invalides"
+                    404 -> "Entreprise non trouvé"
                     else -> "erreur"
                 }
             )

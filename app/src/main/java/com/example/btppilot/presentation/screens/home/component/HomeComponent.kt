@@ -1,23 +1,34 @@
-package com.example.btppilot.presentation.screens.home
+package com.example.btppilot.presentation.screens.home.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,28 +38,9 @@ import com.example.btppilot.presentation.screens.shared.component.AppSecondaryTi
 import com.example.btppilot.presentation.screens.shared.component.AppPrimaryTitle
 import com.example.btppilot.ui.theme.StatusDone
 import com.example.btppilot.ui.theme.StatusInProgress
+import com.example.btppilot.util.ProjectStatus
+import com.example.btppilot.util.arrayProjectStatus
 
-
-@Composable
-fun TasksProgressBar(
-    progress: Int,
-    maxProgress: Int,
-    modifier: Modifier = Modifier
-) {
-
-    val progressValue =
-        if (maxProgress == 0) 0f else progress.toFloat() / maxProgress
-
-    LinearProgressIndicator(
-        progress = { progressValue },
-        modifier = modifier
-            .fillMaxWidth()
-            .height(6.dp)
-            .clip(RoundedCornerShape(50)),
-        color = MaterialTheme.colorScheme.primary,
-        trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
-    )
-}
 
 @Composable
 fun CurrentDate(
@@ -74,6 +66,28 @@ fun CurrentDate(
 
     }
 }
+
+@Composable
+fun TasksProgressBar(
+    progress: Int,
+    maxProgress: Int,
+    modifier: Modifier = Modifier
+) {
+
+    val progressValue =
+        if (maxProgress == 0) 0f else progress.toFloat() / maxProgress
+
+    LinearProgressIndicator(
+        progress = { progressValue },
+        modifier = modifier
+            .fillMaxWidth()
+            .height(6.dp)
+            .clip(RoundedCornerShape(50)),
+        color = MaterialTheme.colorScheme.primary,
+        trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
+    )
+}
+
 @Composable
 fun StatCard(
     title: String,
@@ -96,7 +110,7 @@ fun StatCard(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
 
             Icon(
@@ -105,6 +119,7 @@ fun StatCard(
                 tint = tint,
                 modifier = Modifier.size(28.dp)
             )
+            Spacer(modifier = Modifier.width(15.dp))
 
             AppPrimaryTitle(
                 text = stat.toString(),
@@ -135,11 +150,73 @@ fun FilterButton(
             contentColor = MaterialTheme.colorScheme.background
         )
     ) {
-
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
-
         )
+    }
+}
+
+@Composable
+fun PriorityBadgeDropdown(
+    enableEdit: Boolean = false,
+    selected: ProjectStatus,
+    onSelect: (ProjectStatus) -> Unit,
+) {
+
+    var expanded by remember { mutableStateOf(false) }
+
+    Surface(
+        onClick = { if (enableEdit) expanded = true },
+        shape = RoundedCornerShape(50),
+        color = selected.color.copy(alpha = 0.18f),
+        modifier = Modifier
+            .wrapContentWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Text(
+                text = selected.label,
+                style = MaterialTheme.typography.labelMedium,
+                color = selected.color,
+            )
+
+            Spacer(Modifier.width(4.dp))
+
+            if (enableEdit)
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    tint = selected.color,
+                    modifier = Modifier.size(18.dp)
+                )
+        }
+    }
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        modifier = Modifier.background(MaterialTheme.colorScheme.secondary)
+    ) {
+
+        arrayProjectStatus.filter { it.label != selected.label }.forEach { priority ->
+
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        priority.label,
+                        color = priority.color,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                },
+                onClick = {
+                    onSelect(priority)
+                    expanded = false
+                }
+            )
+        }
     }
 }

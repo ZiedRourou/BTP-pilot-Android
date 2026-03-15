@@ -37,7 +37,6 @@ enum class ProjectStatus(
     ALL("Tous", StatusTodo)
 }
 
-
 enum class ProjectAndTakPriorities(
     val label: String,
     val color : Color,
@@ -47,7 +46,9 @@ enum class ProjectAndTakPriorities(
     HIGH("Important", PriorityHigh),
 }
 
-val arrayPriorities = listOf(ProjectAndTakPriorities.HIGH,ProjectAndTakPriorities.LOW,ProjectAndTakPriorities.MEDIUM)
+val arrayPriorities = arrayListOf(ProjectAndTakPriorities.HIGH,ProjectAndTakPriorities.LOW,ProjectAndTakPriorities.MEDIUM)
+val arrayProjectStatus = listOf(ProjectStatus.FINISH, ProjectStatus.PLANNED, ProjectStatus.IN_PROGRESS, ProjectStatus.COMPLETED)
+val arrayTaskStatus = listOf(TaskStatus.DONE, TaskStatus.IN_PROGRESS, TaskStatus.TO_DO)
 
 enum  class TaskStatus(
     val label: String,
@@ -55,7 +56,8 @@ enum  class TaskStatus(
 ) {
     TO_DO("A faire", PriorityHigh),
     IN_PROGRESS("En cours", PriorityMedium),
-    DONE("Fini", PriorityLow)
+    DONE("Fini", PriorityLow),
+    ALL("Tous", StatusTodo)
 }
 
 enum class UserRole {
@@ -64,6 +66,12 @@ enum class UserRole {
     CLIENT
 }
 
+enum class UserRoleInCompany(
+    val label: String,
+) {
+    COLLABORATOR("Employé"),
+    CLIENT("Client"),
+}
 
 enum class UserProjectRole {
     MANAGER,

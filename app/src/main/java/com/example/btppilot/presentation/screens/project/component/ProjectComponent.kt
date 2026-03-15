@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +41,7 @@ import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.presentation.screens.shared.component.AppSecondaryTitle
 import com.example.btppilot.ui.theme.StatusInProgress
 import com.example.btppilot.util.ProjectAndTakPriorities
+import com.example.btppilot.util.ProjectStatus
 import java.util.Calendar
 
 
@@ -48,7 +50,9 @@ fun ProjectAndTaskEditorTopBar(
     title: String,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 10.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -60,23 +64,10 @@ fun ProjectAndTaskEditorTopBar(
             horizontalArrangement = Arrangement.Center
         ) {
 
-//            TextButton(
-//                onClick = onCancel,
-//            ) {
-//                AppLabelTitle(text = "Annuler", color = StatusInProgress)
-//            }
-
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
             )
-
-//            TextButton(
-//                onClick = onSave,
-//
-//                ) {
-//                AppLabelTitle(text = "Enregister", color = StatusInProgress)
-//            }
 
         }
 
@@ -97,7 +88,8 @@ fun AppFieldProject(
     isError: Boolean = false,
     singleLine: Boolean = true,
     minLines: Int = 1,
-    maxLines: Int = 3
+    maxLines: Int = 3,
+    placeholder : String = label,
 ) {
 
     Column(
@@ -121,7 +113,7 @@ fun AppFieldProject(
             maxLines = if (singleLine) 1 else maxLines,
             isError = isError,
             placeholder = {
-                Text("e.g. Foundation Reinforcement")
+                Text( text = placeholder)
             },
             supportingText = {
                 supportingText?.let {
@@ -227,6 +219,8 @@ fun AppSelectUserMultiField(
                     unfocusedContainerColor = MaterialTheme.colorScheme.secondary,
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
+                    unfocusedIndicatorColor = Color.Transparent
+
                 )
             )
 
@@ -274,7 +268,7 @@ fun AppSelectUserMultiField(
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppSelectUserRadioBtnField(
+fun AppSelectUserRadioBtnFieldProject(
     label: String,
     options: List<UsersOfCompanyItem>,
     selectedOption: UserCompany,
@@ -319,6 +313,8 @@ fun AppSelectUserRadioBtnField(
 
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
+                    unfocusedIndicatorColor = Color.Transparent
+
                 )
             )
 
@@ -393,7 +389,7 @@ fun AppDateField(
             style = MaterialTheme.typography.labelMedium,
             color = StatusInProgress
         )
-
+        Spacer(modifier = Modifier.height(10.dp))
         TextField(
             value = selectedDate,
             onValueChange = {},
@@ -444,6 +440,7 @@ fun AppSelectPriorityRadioBtnField(
             color = StatusInProgress,
             modifier = Modifier.padding(bottom = 6.dp)
         )
+        Spacer(modifier = Modifier.height(10.dp))
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -463,11 +460,10 @@ fun AppSelectPriorityRadioBtnField(
                 shape = RoundedCornerShape(12.dp),
 
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.secondary,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.secondary,
-
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
+                    unfocusedContainerColor = selectedOption.color.copy(alpha = 0.35F),
+                    focusedContainerColor =selectedOption.color.copy(alpha = 0.35F),
+                    focusedTextColor = selectedOption.color,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
             )
 
@@ -490,7 +486,91 @@ fun AppSelectPriorityRadioBtnField(
 
                                 Spacer(Modifier.width(5.dp))
 
-                                Text(option.label)
+                                Text(text = option.label, color = option.color)
+                            }
+                        },
+                        onClick = {
+                            onSelectionChange(option)
+                            expanded = false
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppSelectStatusRadioBtnField(
+    label: String,
+    options: ArrayList<ProjectStatus>,
+    selectedOption: ProjectStatus,
+    onSelectionChange: (ProjectStatus) -> Unit
+) {
+
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = StatusInProgress,
+            modifier = Modifier.padding(bottom = 6.dp)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+
+            TextField(
+                value = selectedOption.label,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = selectedOption.color.copy(alpha = 0.35F),
+                    focusedContainerColor =selectedOption.color.copy(alpha = 0.35F),
+                    focusedTextColor = selectedOption.color,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+
+                                RadioButton(
+                                    selected = option == selectedOption,
+                                    onClick = null
+                                )
+
+                                Spacer(Modifier.width(5.dp))
+
+                                Text(text = option.label, color = option.color)
                             }
                         },
                         onClick = {

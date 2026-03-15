@@ -1,11 +1,9 @@
 package com.example.btppilot.data.repository
 
 import com.example.btppilot.data.api.ApiInterface
-import com.example.btppilot.data.dto.request.NewCompanyRequestDto
-import com.example.btppilot.data.dto.request.ProjectRequestDto
-import com.example.btppilot.data.dto.response.NewCompanyResponseDto
+import com.example.btppilot.data.dto.request.project.NewProjectRequestDto
+import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
 import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDto
-import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDtoItem
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseDto
 import com.example.btppilot.data.dto.response.project.team.UserProjectDtoItem
@@ -20,9 +18,9 @@ class ProjectRepository  @Inject constructor(
 
 
     suspend fun fetchProjectsByUser(
-        companyId: Int,
     ): Resource<ProjectResponseByUserCompanyDto> {
 
+        val companyId = authSharedPref.getCompanyId()
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
 
@@ -49,7 +47,7 @@ class ProjectRepository  @Inject constructor(
 
 
     suspend fun newProject(
-        project : ProjectRequestDto
+        project : NewProjectRequestDto
     ): Resource<ProjectResponseDto> {
 
         val token = authSharedPref.getToken()
@@ -105,7 +103,7 @@ class ProjectRepository  @Inject constructor(
 
     suspend fun updateProject(
         projectId: Int,
-        project : ProjectRequestDto
+        project : UpdateProjectRequestDto
     ): Resource<Unit> {
 
         val token = authSharedPref.getToken()
@@ -159,30 +157,5 @@ class ProjectRepository  @Inject constructor(
         return Resource.Error(400, "Erreur serveur ")
     }
 
-    suspend fun getUsersOfProject(
-        projectId: Int,
-    ): Resource<List<UserProjectDtoItem>> {
 
-        val token = authSharedPref.getToken()
-        val bearerToken = "Bearer $token"
-        val response =
-            api.getUsersProject(bearerToken,projectId)
-
-        if (response.isSuccessful) {
-            response.body()?.let {users ->
-                return Resource.Success(
-                    data = users,
-                    code = response.code()
-                )
-            }
-        } else
-            return Resource.Error(
-                code = response.code() ?: 400,
-                message = when (response.code()) {
-                    401 -> "erreur"
-                    else -> "erreur"
-                }
-            )
-        return Resource.Error(400, "Erreur serveur ")
-    }
 }

@@ -9,6 +9,6 @@ sealed class EventState {
     data class RedirectScreen(val screen: Screen) : EventState()
     data class RedirectScreenWithId(val route: String) : EventState()
     data class RedirectGraph(val graph: NavGraph) : EventState()
-//    data class RedirectWithCallbackScreen(val route: String) : EventState()
-//    data class PopBackStackWithResult(val result: Boolean) : EventState()
+    data class PopBackStackWithRefresh(val popBack : Unit) : EventState()
+
 }

@@ -57,7 +57,8 @@ class AuthRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    401 -> "Email déjà utilisé"
+                    409 -> "Cet email est déjà utilisé"
+                    400 -> "Informations invalides"
                     else -> "erreur"
                 }
             )
@@ -84,8 +85,39 @@ class AuthRepository @Inject constructor(
             return Resource.Error(
                 code = response.code(),
                 message = when (response.code()) {
-                    401 -> "déjà lié a cet entreprise"
-                    else -> "erreur"
+                    409 -> "vous etes déja lié a l'entreprise"
+                    400 -> "Informations invalides"
+                    404 -> "Entreprise non trouvé"
+                    else -> "erreur serveur "
+                }
+            )
+        return Resource.Error(400, "Erreur serveur ")
+    }
+
+    suspend fun inviteUserToMyCompany(
+        invitationInfo: InviteUserCompanyRequestDto,
+    ): Resource<Unit> {
+
+        val token = authSharedPref.getToken()
+        val companyId = authSharedPref.getCompanyId()
+        val bearerToken = "Bearer $token"
+        val response =
+            api.inviteUserToMyCompany(bearerToken, companyId, invitationInfo)
+        if (response.isSuccessful) {
+            response.body()?.let {
+                return Resource.Success(
+                    data = null,
+                    code = response.code()
+                )
+            }
+        } else
+            return Resource.Error(
+                code = response.code(),
+                message = when (response.code()) {
+                    409 -> "déja lié a l'entreprise"
+                    400 -> "Informations invalides"
+                    404 -> "Entreprise non trouvé"
+                    else -> "erreur serveur "
                 }
             )
         return Resource.Error(400, "Erreur serveur ")

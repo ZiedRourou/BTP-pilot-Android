@@ -1,14 +1,20 @@
 package com.example.btppilot.presentation.screens.shared
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDtoItem
+import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
+import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.UserProjectRole
 import com.example.btppilot.util.UserRole
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,11 +24,13 @@ class SharedViewModel @Inject constructor(
     data class UserInfoState(
         val userFirstname: String = "",
         val userRole: UserRole = UserRole.CLIENT,
-        val userProjectRole: UserProjectRole = UserProjectRole.CLIENT
+        val userProjectRole: UserProjectRole = UserProjectRole.CLIENT,
     )
 
     private val _userInfoStateFlow = MutableStateFlow(UserInfoState())
     val userInfoStateFlow = _userInfoStateFlow.asStateFlow()
+
+
 
     init {
         setUserInfo()
@@ -48,6 +56,24 @@ class SharedViewModel @Inject constructor(
             it.projectRole == UserProjectRole.MANAGER.name
                     && it.user.id == currentUserId
         } != null
+    }
+
+    fun isAuthorizedToEditDetailsProject(project: ProjectByIdResponseDto): Boolean {
+        val currentUserId = authSharedPref.getUserId()
+
+        if (userInfoStateFlow.value.userRole == UserRole.OWNER) {
+            return true
+        }
+
+        return project.userProjects.firstOrNull {
+            it.projectRole == UserProjectRole.MANAGER.name
+                    && it.user.id == currentUserId
+        } != null
+    }
+
+    fun isAuthorizedToEditTask(): Boolean {
+
+        return userInfoStateFlow.value.userRole != UserRole.CLIENT
     }
 
 }

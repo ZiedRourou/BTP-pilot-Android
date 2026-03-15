@@ -57,7 +57,7 @@ class LoginViewModel @Inject constructor(
         )
     }
 
-    fun goToRegister(){
+    fun goToRegister() {
         viewModelScope.launch {
             _loginUserEventStateFlow.emit(EventState.RedirectGraph(NavGraph.RegisterGraph))
         }
@@ -67,13 +67,15 @@ class LoginViewModel @Inject constructor(
 
         val currentState = loginUserInfoStateFlo.value
 
-        if(!validateLoginDataAndSetError())
+        if (!validateLoginDataAndSetError())
             return
 
         viewModelScope.launch {
 
-            _loginUserInfoStateFlow.value = currentState.copy(isLoading = true)
-            delay(2000)
+            _loginUserInfoStateFlow.update {
+                it.copy(isLoading = true)
+            }
+            delay(1000)
 
             val result = withContext(Dispatchers.IO) {
                 authRepository.loginUser(
@@ -84,8 +86,9 @@ class LoginViewModel @Inject constructor(
             when (result) {
 
                 is Resource.Success -> {
-                    _loginUserInfoStateFlow.value = currentState.copy(isLoading = false)
-
+                    _loginUserInfoStateFlow.update {
+                        it.copy(isLoading = false)
+                    }
                     result.data?.let {
                         authSharedPref.saveUserInfo(
                             token = it.accessToken,
@@ -104,9 +107,9 @@ class LoginViewModel @Inject constructor(
                 }
 
                 is Resource.Error -> {
-
-                    _loginUserInfoStateFlow.value =
-                        currentState.copy(isLoading = false)
+                    _loginUserInfoStateFlow.update {
+                        it.copy(isLoading = false)
+                    }
 
                     _loginUserEventStateFlow.emit(
                         EventState.ShowMessageSnackBar(result.message)

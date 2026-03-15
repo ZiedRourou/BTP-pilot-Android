@@ -17,7 +17,7 @@ data class TasksByProjectDtoItem(
     @Json(name = "plannedEndDate")
     val plannedEndDate: String,
     @Json(name = "doneEndDate")
-    val doneEndDate: String,
+    val doneEndDate: String? =null,
     @Json(name = "isClientTicket")
     val isClientTicket: Boolean,
     @Json(name = "createdAt")

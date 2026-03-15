@@ -1,4 +1,4 @@
-package com.example.btppilot.presentation.screens.auth.register.component
+package com.example.btppilot.presentation.screens.auth.register.sharedComponent
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,9 +26,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.btppilot.R
-import com.example.btppilot.presentation.screens.auth.register.company.RegisterCompanyViewModel
 import com.example.btppilot.ui.theme.BtpPilotTheme
 
+
+@Preview(showBackground = true, apiLevel = 33)
+@Composable
+private fun RegisterPreview() {
+
+    BtpPilotTheme {
+        HeaderRegister(step = 1)
+    }
+}
 
 @Composable
 fun HeaderRegister(
@@ -79,9 +87,9 @@ fun HeaderRegister(
 
         Row(
             modifier = Modifier
-                .width(300.dp)
+                .width(250.dp)
                 .align(Alignment.CenterHorizontally)
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = 50.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -97,7 +105,9 @@ fun HeaderRegister(
                     modifier = Modifier
                         .weight(1f)
                         .height(6.dp)
-                        .background(color, RoundedCornerShape(3.dp))
+                        .background(
+                            color,
+                            RoundedCornerShape(3.dp))
                 )
             }
         }
@@ -112,14 +122,3 @@ fun HeaderRegister(
     }
 }
 
-
-@Preview(showBackground = true, apiLevel = 33)
-@Composable
-private fun RegisterPreview() {
-
-
-    BtpPilotTheme {
-
-        HeaderRegister(step = 1)
-    }
-}

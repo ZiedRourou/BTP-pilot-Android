@@ -2,6 +2,7 @@ package com.example.btppilot.presentation.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
 import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDtoItem
 import com.example.btppilot.data.repository.ProjectRepository
 import com.example.btppilot.presentation.navigation.Screen
@@ -27,16 +28,17 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val authSharedPref: AuthSharedPref,
     private val projectRepository: ProjectRepository,
-) : ViewModel() {
+
+    ) : ViewModel() {
 
     data class HomeState(
 
-        val activeProjectStat :Int = 0,
-        val taskStatusTodoOrInProgressStat : Int = 0,
-        val projectFilteredList : List<ProjectResponseByUserCompanyDtoItem> = listOf(),
+        val activeProjectStat: Int = 0,
+        val taskStatusTodoOrInProgressStat: Int = 0,
+        val projectFilteredList: List<ProjectResponseByUserCompanyDtoItem> = listOf(),
 
         val isLoading: Boolean = false,
-        val currentUserName : String = "",
+        val currentUserName: String = "",
         val currentDate: String = Date().formatDateFr(),
 
         val projectStatus: List<ProjectStatus> = listOf(
@@ -45,13 +47,12 @@ class HomeViewModel @Inject constructor(
             ProjectStatus.IN_PROGRESS,
             ProjectStatus.COMPLETED,
         ),
-        val selectedFilter : ProjectStatus = ProjectStatus.ALL
-    )
+        val selectedFilter: ProjectStatus = ProjectStatus.ALL,
 
-    private val _projectListCopyStateFlow = MutableStateFlow(listOf <ProjectResponseByUserCompanyDtoItem>())
+        )
 
-    private val _userInfoStateFlow = MutableStateFlow(authSharedPref.getUserName())
-    val userInfoStateFlow = _userInfoStateFlow.asStateFlow()
+    private val _projectListCopyStateFlow =
+        MutableStateFlow(listOf<ProjectResponseByUserCompanyDtoItem>())
 
     private val _homeStateFlow = MutableStateFlow(HomeState())
     val homeStateFlow = _homeStateFlow.asStateFlow()
@@ -65,29 +66,50 @@ class HomeViewModel @Inject constructor(
         getCurrentUserInfo()
     }
 
-    fun filterProject(status : ProjectStatus){
+    fun changeProjectPriority(
+        projectId: Int,
+        newStatus: ProjectStatus
+    ) {
+        updateProject(projectId, newStatus)
+
+    }
+
+    fun filterProject(status: ProjectStatus) {
         _homeStateFlow.update {
             it.copy(
                 selectedFilter = status,
                 projectFilteredList =
                 _projectListCopyStateFlow.value.filter {
-                    if(status != ProjectStatus.ALL )
-                        it.status == status.label
+                    if (status != ProjectStatus.ALL)
+                        it.status == status.name
                     else true
                 }
             )
         }
     }
-    fun onClickProject(projectId : Int) {
+
+    fun onClickEditProject(
+        projectId: Int,
+    ) {
         viewModelScope.launch {
             _homeEventSharedFlow.emit(
-                EventState.RedirectScreenWithId(Screen.ProjectDetail.route + "/$projectId")
+                EventState.RedirectScreenWithId( Screen.NewProject.route + "/${projectId.toLong()}")
+            )
+        }
+    }
+
+    fun onClickViewProject(
+        projectId: Int,
+    ) {
+        viewModelScope.launch {
+            _homeEventSharedFlow.emit(
+                EventState.RedirectScreenWithId( Screen.ProjectDetail.route + "/${projectId.toLong()}")
             )
         }
     }
 
 
-    fun redirectAddProject(){
+    fun redirectAddProject() {
         viewModelScope.launch {
             _homeEventSharedFlow.emit(
                 EventState.RedirectScreenWithId(
@@ -97,24 +119,22 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getCurrentUserInfo(){
+    private fun getCurrentUserInfo() {
         _homeStateFlow.update {
             it.copy(
-                currentUserName =  authSharedPref.getUserName() ?: ""
+                currentUserName = authSharedPref.getUserName() ?: ""
             )
         }
     }
 
-    private fun fetchProjectUser() {
+     fun fetchProjectUser() {
 
         viewModelScope.launch {
             _homeStateFlow.value =
                 _homeStateFlow.value.copy(isLoading = true)
 
             val result = withContext(Dispatchers.IO) {
-                projectRepository.fetchProjectsByUser(
-                    authSharedPref.getCompanyId()
-                )
+                projectRepository.fetchProjectsByUser()
             }
             when (result) {
 
@@ -130,7 +150,7 @@ class HomeViewModel @Inject constructor(
                                 projectFilteredList = projectData.projects
                             )
                         }
-                        _projectListCopyStateFlow.value= projectData.projects
+                        _projectListCopyStateFlow.value = projectData.projects
                     }
                 }
 
@@ -146,5 +166,55 @@ class HomeViewModel @Inject constructor(
             }
         }
 
+    }
+
+    private fun updateProject(
+        projectId: Int,
+        newStatus: ProjectStatus
+    ) {
+
+        viewModelScope.launch {
+            _homeStateFlow.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+            val result = withContext(Dispatchers.IO) {
+                projectRepository.updateProject(
+                    projectId = projectId,
+                    UpdateProjectRequestDto(
+                        status = newStatus.name,
+                    )
+
+                )
+            }
+            when (result) {
+
+                is Resource.Success -> {
+                    _homeStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                    _homeEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar("Statut mis a jour")
+                    )
+                    fetchProjectUser()
+                }
+
+                is Resource.Error -> {
+
+                    _homeStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    _homeEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar(result.message)
+                    )
+                }
+            }
+        }
     }
 }

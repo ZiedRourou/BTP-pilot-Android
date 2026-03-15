@@ -1,12 +1,15 @@
 package com.example.btppilot.presentation.screens.profile
 
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import com.example.btppilot.presentation.navigation.Screen
 import com.example.btppilot.presentation.screens.shared.SharedViewModel
-import com.example.btppilot.presentation.screens.shared.component.AppPrimaryButton
+import com.example.btppilot.presentation.screens.shared.component.HeaderMainSreen
 import com.example.btppilot.presentation.screens.uiState.EventState
 
 @Composable
@@ -16,6 +19,8 @@ fun ProfileScreen(
     sharedViewModel: SharedViewModel,
     snackbarHostState: SnackbarHostState
 ) {
+
+    val userInfo by sharedViewModel.userInfoStateFlow.collectAsState()
 
     LaunchedEffect(Unit) {
         profileViewModel.profileEventSharedFlow.collect() { event ->
@@ -27,16 +32,15 @@ fun ProfileScreen(
         }
     }
 
-    ProfileContent(
-        logout = profileViewModel::logout
-    )
+    Scaffold(
+        topBar = {HeaderMainSreen(userName = userInfo.userFirstname)},
+
+    ) {padding ->
+
+        ProfileContent(
+            padding,
+            logout = profileViewModel::logout
+        )
+    }
 }
 
-@Composable
-fun ProfileContent(
-    logout: () -> Unit
-) {
-
-    AppPrimaryButton(text = "Se Déconnecter", onClick = logout)
-
-}

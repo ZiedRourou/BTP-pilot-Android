@@ -2,7 +2,8 @@ package com.example.btppilot.presentation.screens.project.newProject
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.btppilot.data.dto.request.ProjectRequestDto
+import com.example.btppilot.data.dto.request.project.NewProjectRequestDto
+import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
 import com.example.btppilot.data.dto.response.company.UserCompany
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.data.repository.CompanyRepository
@@ -13,6 +14,7 @@ import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.ProjectStatus
 import com.example.btppilot.util.Resource
+import com.example.btppilot.util.UserProjectRole
 import com.example.btppilot.util.UserRole
 import com.example.btppilot.util.isoToUiDate
 import com.example.btppilot.util.toIsoDate
@@ -65,15 +67,23 @@ class NewProjectViewModel @Inject constructor(
             ProjectAndTakPriorities.MEDIUM,
             ProjectAndTakPriorities.HIGH
         ),
+        val projectStatus: ArrayList<ProjectStatus> = arrayListOf(
+            ProjectStatus.COMPLETED,
+            ProjectStatus.IN_PROGRESS,
+            ProjectStatus.FINISH,
+            ProjectStatus.PLANNED,
+        ),
 
         val selectedPriority: ProjectAndTakPriorities = ProjectAndTakPriorities.LOW,
+        val selectedStatus: ProjectStatus = ProjectStatus.PLANNED,
 
         val titleError: String? = null,
+        val descriptionError: String? = null,
         val dateEndError: String? = null,
 
         val projectId: Long = 0,
         val isLoading: Boolean = false,
-        val isEditorMode : Boolean = false
+        val isEditorMode: Boolean = false
     )
 
     private val _newProjectStateFlow = MutableStateFlow(NewProjectState())
@@ -132,6 +142,13 @@ class NewProjectViewModel @Inject constructor(
             selectedPriority = priority,
         )
     }
+
+    fun onStatusChange(status: ProjectStatus) {
+        _newProjectStateFlow.value = _newProjectStateFlow.value.copy(
+            selectedStatus = status,
+        )
+    }
+
     fun onClientListChange(list: List<UserCompany>) {
         _newProjectStateFlow.update {
             it.copy(clientList = list)
@@ -144,7 +161,7 @@ class NewProjectViewModel @Inject constructor(
         }
     }
 
-    private fun fetchProject(){
+    private fun fetchProject() {
         viewModelScope.launch {
             _newProjectStateFlow.update {
                 it.copy(
@@ -166,25 +183,53 @@ class NewProjectViewModel @Inject constructor(
 
                     result.data?.let { project ->
 
-                        val managerUserProject = project.userProjects.firstOrNull {
-                            it.projectRole == "MANAGER"
-                        }
+                        val managerUser = project.userProjects
+                            .firstOrNull { it.projectRole == UserProjectRole.MANAGER.name }
 
-                        _newProjectStateFlow.update { it ->
-                            it.copy(
+                        val clientUsers = project.userProjects
+                            .filter { it.projectRole == UserProjectRole.CLIENT.name }
+
+                        val employeeUsers = project.userProjects
+                            .filter { it.projectRole == UserProjectRole.EMPLOYEE.name }
+
+                        _newProjectStateFlow.update { state ->
+
+                            state.copy(
                                 title = project.name,
                                 description = project.description,
                                 dateBegin = isoToUiDate(project.plannedStartDate),
                                 dateEnd = isoToUiDate(project.plannedEndDate),
+
                                 selectedPriority = ProjectAndTakPriorities.valueOf(project.priority),
-                                manager = managerUserProject?.user?.let { user ->
+                                selectedStatus = ProjectStatus.valueOf(project.status),
+
+                                manager = managerUser?.let {
                                     UserCompany(
-                                        id = user.id,
+                                        id = it.user.id,
                                         email = "",
-                                        firstName = user.firstName,
-                                        lastName = user.lastName
+                                        firstName = it.user.firstName,
+                                        lastName = it.user.lastName
                                     )
-                                } ?: newProjectStateFlow.value.manager                            )
+                                } ?: state.manager,
+
+                                clientList = clientUsers.map {
+                                    UserCompany(
+                                        id = it.user.id,
+                                        email = "",
+                                        firstName = it.user.firstName,
+                                        lastName = it.user.lastName
+                                    )
+                                },
+
+                                collaboratorList = employeeUsers.map {
+                                    UserCompany(
+                                        id = it.user.id,
+                                        email = "",
+                                        firstName = it.user.firstName,
+                                        lastName = it.user.lastName
+                                    )
+                                }
+                            )
                         }
                     }
                 }
@@ -204,7 +249,6 @@ class NewProjectViewModel @Inject constructor(
             }
         }
     }
-
 
 
     private fun getUserCompany() {
@@ -255,16 +299,17 @@ class NewProjectViewModel @Inject constructor(
         }
     }
 
-    fun publishOrEdit(){
+    fun publishOrEdit() {
 
         if (!validateDataProject())
             return
-        if(newProjectStateFlow.value.isEditorMode)
+        if (newProjectStateFlow.value.isEditorMode)
             updateProject()
         else
             publishProject()
     }
-    private fun updateProject(){
+
+    private fun updateProject() {
 
         viewModelScope.launch {
             _newProjectStateFlow.update {
@@ -277,17 +322,17 @@ class NewProjectViewModel @Inject constructor(
                 projectRepository.updateProject(
                     projectId = newProjectStateFlow.value.projectId.toInt(),
                     newProjectStateFlow.value.let {
-                        ProjectRequestDto(
+                        UpdateProjectRequestDto(
                             name = it.title,
                             description = it.description,
-                            status = ProjectStatus.PLANNED.name,
+                            status = it.selectedStatus.name,
                             priority = it.selectedPriority.name,
                             plannedStartDate = uiDateToIso(it.dateBegin),
                             plannedEndDate = uiDateToIso(it.dateEnd),
                             managerId = it.manager.id,
                             isActive = true,
                             clientIds = it.clientList.map { user -> user.id },
-                            employeeIds = it.collaboratorList.map { user -> user.id }
+                            employeeIds = it.collaboratorList.map { user -> user.id },
                         )
                     }
                 )
@@ -302,7 +347,7 @@ class NewProjectViewModel @Inject constructor(
                     }
 
                     _newProjectEventSharedFlow.emit(
-                        EventState.RedirectScreen(Screen.Home)
+                        EventState.PopBackStackWithRefresh(Unit)
                     )
                 }
 
@@ -321,7 +366,8 @@ class NewProjectViewModel @Inject constructor(
             }
         }
     }
-    fun publishProject() {
+
+    private fun publishProject() {
 
         viewModelScope.launch {
             _newProjectStateFlow.update {
@@ -333,10 +379,10 @@ class NewProjectViewModel @Inject constructor(
             val result = withContext(Dispatchers.IO) {
                 projectRepository.newProject(
                     newProjectStateFlow.value.let {
-                        ProjectRequestDto(
+                        NewProjectRequestDto(
                             name = it.title,
                             description = it.description,
-                            status = ProjectStatus.PLANNED.name,
+                            status = it.selectedStatus.name,
                             priority = it.selectedPriority.name,
                             plannedStartDate = toIsoDate(it.dateBegin),
                             plannedEndDate = toIsoDate(it.dateEnd),
@@ -359,7 +405,7 @@ class NewProjectViewModel @Inject constructor(
                     }
 
                     _newProjectEventSharedFlow.emit(
-                        EventState.RedirectScreen(Screen.Home)
+                        EventState.PopBackStackWithRefresh(Unit)
                     )
                 }
 
@@ -400,6 +446,11 @@ class NewProjectViewModel @Inject constructor(
 
                     else -> null
                 },
+                descriptionError = when {
+                    currentData.description.trim().isEmpty() -> "Description du projet requis"
+                    currentData.description.length < 2 -> "minimum 2 caractères"
+                    else -> null
+                },
 
                 dateEndError = when {
                     start == null || end == null -> "Format de date invalide"
@@ -412,7 +463,10 @@ class NewProjectViewModel @Inject constructor(
         }
 
         newProjectStateFlow.value.let {
-            if (it.titleError.isNullOrEmpty() && it.dateEndError.isNullOrEmpty())
+            if (it.titleError.isNullOrEmpty()
+                && it.dateEndError.isNullOrEmpty()
+                && it.descriptionError.isNullOrEmpty()
+            )
                 return true
         }
         return false

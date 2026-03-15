@@ -2,6 +2,7 @@ package com.example.btppilot.presentation.screens.project.projectDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.data.dto.request.updateTask.UpdateTaskDto
 import com.example.btppilot.data.dto.response.User
 import com.example.btppilot.data.dto.response.UserProject
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
@@ -13,6 +14,8 @@ import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.ProjectStatus
 import com.example.btppilot.util.Resource
+import com.example.btppilot.util.TaskStatus
+import com.example.btppilot.util.uiDateToIso
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -62,9 +65,9 @@ class ProjectDetailsViewModel @Inject constructor(
                 )
 
             ),
-        val selectPriority: ProjectAndTakPriorities= ProjectAndTakPriorities.MEDIUM,
+        val selectPriority: ProjectAndTakPriorities = ProjectAndTakPriorities.MEDIUM,
         val tasks: List<TasksByProjectDtoItem> = listOf(),
-        val showDialog : Boolean = false
+        val showDialog: Boolean = false
     )
 
     private val _detailProjectStateFlow = MutableStateFlow(DetailsProjectState())
@@ -84,7 +87,7 @@ class ProjectDetailsViewModel @Inject constructor(
         fetchTasks()
     }
 
-    fun onSelectPriority(priority : ProjectAndTakPriorities){
+    fun onSelectPriority(priority: ProjectAndTakPriorities) {
         _detailProjectStateFlow.update {
             it.copy(
                 selectPriority = priority
@@ -92,14 +95,15 @@ class ProjectDetailsViewModel @Inject constructor(
         }
     }
 
-    fun confirmDelete(){
+    fun confirmDelete() {
         _detailProjectStateFlow.update {
             it.copy(
                 showDialog = true
             )
         }
     }
-    fun closeDialogDelete(){
+
+    fun closeDialogDelete() {
         _detailProjectStateFlow.update {
             it.copy(
                 showDialog = false
@@ -110,17 +114,13 @@ class ProjectDetailsViewModel @Inject constructor(
     fun deleteProject() {
         _detailProjectStateFlow.update {
             it.copy(
-                showDialog = false
+                showDialog = false,
+                isLoading = true
             )
         }
 
-        viewModelScope.launch {
-            _detailProjectStateFlow.update {
-                it.copy(
-                    isLoading = true
-                )
-            }
 
+        viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
                 projectRepository.deleteProject(detailProjectStateFlow.value.projectId.toInt())
             }
@@ -134,9 +134,8 @@ class ProjectDetailsViewModel @Inject constructor(
                     }
 
                     _detailProjectEventSharedFlow.emit(
-                        EventState.ShowMessageSnackBar("article supprimé")
+                        EventState.ShowMessageSnackBar("article supprimé"),
                     )
-                    delay(2000)
                     _detailProjectEventSharedFlow.emit(
                         EventState.RedirectScreen(Screen.Home)
                     )
@@ -166,11 +165,18 @@ class ProjectDetailsViewModel @Inject constructor(
         }
     }
 
-    fun redirectAddTask(){
-
+    fun redirectAddTask() {
         viewModelScope.launch {
             _detailProjectEventSharedFlow.emit(
-                EventState.RedirectScreenWithId(Screen.NewTask.route + "/${detailProjectStateFlow.value.projectId}")
+                EventState.RedirectScreenWithId(Screen.NewTask.route + "/${detailProjectStateFlow.value.projectId}/0")
+            )
+        }
+    }
+
+    fun redirectEditTask(taskId: Int) {
+        viewModelScope.launch {
+            _detailProjectEventSharedFlow.emit(
+                EventState.RedirectScreenWithId(Screen.NewTask.route + "/${0}/${taskId.toLong()}")
             )
         }
     }
@@ -222,7 +228,97 @@ class ProjectDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun fetchTasks() {
+    fun updateTask(status: TaskStatus, task: TasksByProjectDtoItem) {
+        viewModelScope.launch {
+            _detailProjectStateFlow.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+
+            val result = withContext(Dispatchers.IO) {
+                taskRepository.updateTask(
+                    task.id,
+                    taskRequestDto = UpdateTaskDto(
+                        status = status.name
+                    )
+                )
+            }
+
+            when (result) {
+
+                is Resource.Success -> {
+                    _detailProjectStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                fetchTasks()
+                    _detailProjectEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar("Statut mis a jour ")
+                    )
+                }
+
+                is Resource.Error -> {
+
+                    _detailProjectStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    _detailProjectEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar(result.message)
+                    )
+                }
+            }
+        }
+    }
+
+    fun deleteTask(taskId: Int){
+        viewModelScope.launch {
+            _detailProjectStateFlow.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+
+            val result = withContext(Dispatchers.IO) {
+                taskRepository.deleteTask(taskId)
+            }
+
+            when (result) {
+
+                is Resource.Success -> {
+                    _detailProjectStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                    fetchTasks()
+                    _detailProjectEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar("Tache supprimé ")
+                    )
+                }
+
+                is Resource.Error -> {
+
+                    _detailProjectStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    _detailProjectEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar(result.message)
+                    )
+                }
+            }
+        }
+    }
+
+
+     fun fetchTasks() {
 
         viewModelScope.launch {
             _detailProjectStateFlow.update {

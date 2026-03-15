@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.request.InviteUserCompanyRequestDto
 import com.example.btppilot.data.repository.AuthRepository
 import com.example.btppilot.presentation.navigation.NavGraph
-import com.example.btppilot.presentation.navigation.Screen
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.Resource
@@ -37,7 +36,6 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
         val isLoading: Boolean = false
     )
 
-
     private val _companyInfoInviteStateFlow = MutableStateFlow(CompanyInfo())
     val companyInfoInviteStateFlow = _companyInfoInviteStateFlow.asStateFlow()
 
@@ -52,21 +50,15 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
         )
     }
 
-    fun setUserRoleCompanyLink(role: String) {
-        _companyInfoInviteStateFlow.value = _companyInfoInviteStateFlow.value.copy(
-            selectedRole = UserRole.valueOf(role)
-        )
-    }
-
-
     fun inviteUserToCompany() {
 
-        if(!validateInviteData())
+        if (!validateInviteDataAndSetError())
             return
 
         viewModelScope.launch {
 
-            _companyInfoInviteStateFlow.value = _companyInfoInviteStateFlow.value.copy(isLoading = true)
+            _companyInfoInviteStateFlow.value =
+                _companyInfoInviteStateFlow.value.copy(isLoading = true)
             delay(2000)
 
             val result = withContext(Dispatchers.IO) {
@@ -77,30 +69,35 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
                     )
                 )
             }
+
             when (result) {
 
                 is Resource.Success -> {
-                    _companyInfoInviteStateFlow.value = _companyInfoInviteStateFlow.value.copy(isLoading = false)
-                    _companyInfoInviteEventSharedFlow.emit(EventState.RedirectGraph(NavGraph.MainGraph))
+                    _companyInfoInviteStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
                     authSharedPref.saveCompanyInfo(
                         companyId = result.data?.companyId ?: 0,
                         role = result.data?.role ?: ""
                     )
+                    _companyInfoInviteEventSharedFlow.emit(
+                        EventState.RedirectGraph(NavGraph.MainGraph)
+                    )
+
                 }
 
                 is Resource.Error -> {
-                    _companyInfoInviteStateFlow.value =
-                        _companyInfoInviteStateFlow.value.copy(isLoading = false)
-
-                    when (result.code) {
-
-                        409 -> "vous etes déja lié a l'entreprise"
-                        400 -> "Informations invalides"
-                        404 -> "Entreprise non trouvé"
-                        else -> result.message ?: "Erreur inconnue"
-                    }.let {
-                        _companyInfoInviteEventSharedFlow.emit(EventState.ShowMessageSnackBar(it))
+                    _companyInfoInviteStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
                     }
+
+                    _companyInfoInviteEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar(result.message)
+                    )
 
                 }
 
@@ -108,7 +105,7 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
         }
     }
 
-    private fun validateInviteData(
+    private fun validateInviteDataAndSetError(
     ): Boolean {
 
         val currentData = companyInfoInviteStateFlow.value

@@ -16,4 +16,5 @@ object ApiRoutes {
     const val GET_TASK_BY_PROJECT_ID = "/projects/{projectId}/tasks"
 
     const val GET_USERS_PROJECT = "/project/{projectId}/member"
+    const val GET_TASK = "/tasks/{taskId}"
 }

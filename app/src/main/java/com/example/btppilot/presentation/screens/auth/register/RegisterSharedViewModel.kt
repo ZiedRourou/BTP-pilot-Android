@@ -1,6 +1,5 @@
 package com.example.btppilot.presentation.screens.auth.register
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.requ.RegisterRequestDto
@@ -108,13 +107,16 @@ class RegisterSharedViewModel @Inject constructor(
 
     fun registerUser() {
 
-        if (!validateRegisterData())
+        if (!validateRegisterDataAndSetError())
             return
 
         viewModelScope.launch {
-            _registerUserInfoStateFlow.value =
-                _registerUserInfoStateFlow.value.copy(isLoading = true)
-            delay(2000)
+            _registerUserInfoStateFlow.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+            delay(1000)
 
             val result = withContext(Dispatchers.IO) {
                 authRepository.registerUser(
@@ -129,9 +131,11 @@ class RegisterSharedViewModel @Inject constructor(
             when (result) {
 
                 is Resource.Success -> {
-                    _registerUserInfoStateFlow.value =
-                        _registerUserInfoStateFlow.value.copy(isLoading = false)
-
+                    _registerUserInfoStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
                     result.data?.let {
                         authSharedPref.saveUserInfo(
                             token = it.accessToken,
@@ -141,32 +145,27 @@ class RegisterSharedViewModel @Inject constructor(
                             email = it.user.email
                         )
                     }
-                    result.data?.user?.firstName?.let { Log.e("iici", it) }
-                    result.data?.user?.email?.let { Log.e("iici2", it) }
 
                     viewModelScope.launch {
-                        _registerUserEventSharedFlow.emit(EventState.RedirectScreen(Screen.RegisterRole))
+                        _registerUserEventSharedFlow.emit(
+                            EventState.RedirectScreen(Screen.RegisterRole)
+                        )
                     }
 
                 }
 
                 is Resource.Error -> {
 
-                    _registerUserInfoStateFlow.value =
-                        _registerUserInfoStateFlow.value.copy(isLoading = false)
-
-                    when (result.code) {
-
-                        409 -> "Cet email est déjà utilisé"
-
-                        400 -> "Informations invalides"
-
-                        else -> result.message ?: "Erreur inconnue"
-                    }.let {
-                        _registerUserEventSharedFlow.emit(
-                            EventState.ShowMessageSnackBar(it)
+                    _registerUserInfoStateFlow.update {
+                        it.copy(
+                            isLoading = false
                         )
                     }
+
+                        _registerUserEventSharedFlow.emit(
+                            EventState.ShowMessageSnackBar(result.message)
+                        )
+
                 }
 
             }
@@ -174,7 +173,7 @@ class RegisterSharedViewModel @Inject constructor(
     }
 
 
-    private fun validateRegisterData(): Boolean {
+    private fun validateRegisterDataAndSetError(): Boolean {
 
         val currentUserInfo = registerUserInfoStateFlow.value
 

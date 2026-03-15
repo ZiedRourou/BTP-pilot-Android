@@ -1,8 +1,8 @@
-package com.example.btppilot.data.dto.request
+package com.example.btppilot.data.dto.request.project
 
 
 import com.squareup.moshi.Json
-data class ProjectRequestDto(
+data class NewProjectRequestDto(
 
     @Json(name = "name")
     val name: String,

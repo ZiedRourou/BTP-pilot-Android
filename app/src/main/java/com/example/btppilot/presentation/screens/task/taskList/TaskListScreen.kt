@@ -1,14 +1,16 @@
-package com.example.btppilot.presentation.screens.home
+package com.example.btppilot.presentation.screens.task.taskList
 
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -18,19 +20,18 @@ import com.example.btppilot.presentation.screens.uiState.EventState
 
 
 @Composable
-fun HomeScreen(
+fun TaskListScreen(
     navController: NavController,
-    homeViewModel: HomeViewModel,
+    taskListViewModel: TaskListViewModel,
     sharedViewModel: SharedViewModel,
-    snackbarHostState: SnackbarHostState
-) {
-    val homeState by homeViewModel.homeStateFlow.collectAsState()
+){
     val userInfo by sharedViewModel.userInfoStateFlow.collectAsState()
-
-
+    val state by taskListViewModel.taskListStateFlow.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val isEnableToEditTask = sharedViewModel.isAuthorizedToEditTask()
 
     LaunchedEffect(Unit) {
-        homeViewModel.homeEventSharedFlow.collect { event ->
+        taskListViewModel.taskEventState.collect { event ->
             when (event) {
                 is EventState.ShowMessageSnackBar ->
                     snackbarHostState.showSnackbar(event.message)
@@ -40,36 +41,33 @@ fun HomeScreen(
 
                 is EventState.RedirectScreenWithId ->
                     navController.navigate(event.route)
-
                 else -> {}
             }
         }
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = { HeaderMainSreen(userName = userInfo.userFirstname) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = homeViewModel::redirectAddProject,
+                onClick = taskListViewModel::redirectAddTask,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text("+", fontSize = 25.sp, color = Color.White)
             }
         },
+    ) { padding ->
 
-        ) { paddingValues ->
-        HomeContent(
-            paddingValues = paddingValues,
-            homeState = homeState,
-            onClickEditProject = homeViewModel::onClickEditProject,
-            onClickViewProject = homeViewModel::onClickViewProject,
-            onFilterClick = homeViewModel::filterProject,
-            isAuthorizedToEdit = sharedViewModel::isAuthorizedToEditProject,
-            onPriorityChange = homeViewModel::changeProjectPriority
+        TaskListContent(
+            paddingValues = padding,
+            tasklist =state,
+            isEnableToEditTask = isEnableToEditTask,
+            changeStatus = taskListViewModel::updateTask,
+            redirectEditTask = taskListViewModel::redirectEditTask,
+            deleteTask = taskListViewModel::deleteTask,
+            filterTask = taskListViewModel::filterProject
         )
     }
-
 }
-
-
 

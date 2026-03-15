@@ -5,12 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.request.NewCompanyRequestDto
 import com.example.btppilot.data.repository.CompanyRepository
 import com.example.btppilot.presentation.navigation.NavGraph
-import com.example.btppilot.presentation.navigation.Screen
 import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.Resource
 import com.example.btppilot.util.UserRole
-import com.example.btppilot.util.isEmailValid
 import com.example.btppilot.util.isSiretValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -75,13 +73,13 @@ class RegisterCompanyViewModel @Inject constructor(
 
     fun createCompany() {
 
-        if(!validateCompanyData())
+        if(!validateCompanyDataAndSetError())
             return
 
         viewModelScope.launch {
 
             _companyRegisterStateFlow.value = _companyRegisterStateFlow.value.copy(isLoading = true)
-            delay(2000)
+            delay(1000)
 
             val result = withContext(Dispatchers.IO) {
                 companyRepository.createCompanyUser(
@@ -92,12 +90,17 @@ class RegisterCompanyViewModel @Inject constructor(
                     )
                 )
             }
+
             when (result) {
 
                 is Resource.Success -> {
                     _companyRegisterStateFlow.value =
                         _companyRegisterStateFlow.value.copy(isLoading = false)
-                    _companyRegisterEventSharedFlow.emit(EventState.RedirectGraph(NavGraph.MainGraph))
+
+                    _companyRegisterEventSharedFlow.emit(
+                        EventState.RedirectGraph(NavGraph.MainGraph)
+                    )
+
                     authSharedPref.saveCompanyInfo(
                         companyId = result.data?.id ?: 0,
                         role = UserRole.OWNER.name
@@ -105,23 +108,22 @@ class RegisterCompanyViewModel @Inject constructor(
                 }
 
                 is Resource.Error -> {
-                    _companyRegisterStateFlow.value =
-                        _companyRegisterStateFlow.value.copy(isLoading = false)
 
-                    val message = when (result.code) {
-
-                        409 -> "vous etes déja lié a l'entreprise"
-                        400 -> "Informations invalides"
-                        404 -> "Entreprise non trouvé"
-                        else -> result.message ?: "Erreur inconnue"
+                    _companyRegisterStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
                     }
-                    _companyRegisterEventSharedFlow.emit(EventState.ShowMessageSnackBar(message))
+
+                    _companyRegisterEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar(result.message)
+                    )
                 }
             }
         }
     }
 
-    private fun validateCompanyData(
+    private fun validateCompanyDataAndSetError(
     ): Boolean {
 
         val currentData = companyRegisterStateFlow.value

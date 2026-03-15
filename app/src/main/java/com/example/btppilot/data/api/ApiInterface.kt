@@ -5,7 +5,10 @@ import com.example.btppilot.data.dto.requ.RegisterRequestDto
 import com.example.btppilot.data.dto.request.InviteUserCompanyRequestDto
 import com.example.btppilot.data.dto.auth.LoginRequestDto
 import com.example.btppilot.data.dto.request.NewCompanyRequestDto
-import com.example.btppilot.data.dto.request.ProjectRequestDto
+import com.example.btppilot.data.dto.request.newTask.TaskRequestDto
+import com.example.btppilot.data.dto.request.project.NewProjectRequestDto
+import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
+import com.example.btppilot.data.dto.request.updateTask.UpdateTaskDto
 import com.example.btppilot.data.dto.response.auth.AuthResponseDto
 import com.example.btppilot.data.dto.response.InviteUserCompanyResponseDto
 import com.example.btppilot.data.dto.response.NewCompanyResponseDto
@@ -56,7 +59,7 @@ interface ApiInterface {
     suspend fun postProject(
         @Header("Authorization") authorization: String,
         @Path("id") companyId: Int,
-        @Body project: ProjectRequestDto
+        @Body project: NewProjectRequestDto
     ): Response<ProjectResponseDto>
 
     @GET(ApiRoutes.GET_USER_COMPANY)
@@ -81,7 +84,7 @@ interface ApiInterface {
     suspend fun updateProject(
         @Header("Authorization") authorization: String,
         @Path("projectId") projectId: Int,
-        @Body project: ProjectRequestDto
+        @Body project: UpdateProjectRequestDto
     ): Response<Unit>
 
     @DELETE(ApiRoutes.GET_PROJECT_BY_ID)
@@ -96,10 +99,40 @@ interface ApiInterface {
         @Path("id") companyId: Int,
     ): Response<List<TasksByProjectDtoItem>>
 
-    @DELETE(ApiRoutes.GET_USERS_PROJECT)
-    suspend fun getUsersProject(
+
+    @POST(ApiRoutes.GET_TASK_BY_PROJECT_ID)
+    suspend fun postNewTask(
         @Header("Authorization") authorization: String,
         @Path("projectId") projectId: Int,
-    ): Response<List<UserProjectDtoItem>>
+        @Body task: TaskRequestDto
+    ): Response<TasksByProjectDtoItem>
+
+
+    @GET(ApiRoutes.GET_TASK)
+    suspend fun fetchTaskByID(
+        @Header("Authorization") authorization: String,
+        @Path("taskId") taskId: Int,
+    ): Response<TasksByProjectDtoItem>
+
+    @PATCH(ApiRoutes.GET_TASK)
+    suspend fun updateTask(
+        @Header("Authorization") authorization: String,
+        @Path("taskId") taskId: Int,
+        @Body task: UpdateTaskDto
+    ): Response<Unit>
+
+    @DELETE(ApiRoutes.GET_TASK)
+    suspend fun deleteTask(
+        @Header("Authorization") authorization: String,
+        @Path("taskId") taskId: Int,
+    ): Response<Unit>
+
+
+    @POST(ApiRoutes.GET_USER_COMPANY)
+    suspend fun inviteUserToMyCompany(
+        @Header("Authorization") authorization: String,
+        @Path("id") companyId: Int,
+        @Body invitationInfo: InviteUserCompanyRequestDto,
+    ): Response<Unit>
 
 }
