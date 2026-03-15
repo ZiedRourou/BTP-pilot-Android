@@ -6,14 +6,16 @@ object ApiRoutes {
 
     const val API_AUTH_LOGIN_ROUTE = "auth/login/"
     const val API_AUTH_REGISTER_ROUTE = "auth/register/"
-    const val API_INVITE_USER_TO_COMPANY_ROUTE =  "/companies/inviteUser"
-    const val API_COMPANY_ROUTE = "/companies"
-    const val API_PROJECT_COMPANY_ROUTE = "/company/{id}/project"
-    const val API_TASK_COMPANY_ROUTE = "/company/{id}/tasks"
-    const val API_USER_COMPANY_ROUTE = "/companies/{id}/users"
-    const val API_PROJECT_ROUTE = "/project/{projectId}"
-    const val GET_TASK_BY_PROJECT_ID = "/projects/{projectId}/tasks"
 
-    const val GET_USERS_PROJECT = "/project/{projectId}/member"
-    const val GET_TASK = "/tasks/{taskId}"
+    const val API_INVITE_USER_TO_COMPANY_ROUTE =  "/companies/inviteUser"
+    const val API_USER_COMPANY_ROUTE = "/companies/{id}/users"
+
+    const val API_COMPANY_ROUTE = "/companies"
+
+    const val API_PROJECT_COMPANY_ROUTE = "/company/{id}/project"
+    const val API_PROJECT_ROUTE = "/project/{projectId}"
+
+    const val API_TASK_COMPANY_ROUTE = "/company/{id}/tasks"
+    const val API_TASK_PROJECT_ROUTE = "/projects/{projectId}/tasks"
+    const val API_TASK_ROUTE = "/tasks/{taskId}"
 }

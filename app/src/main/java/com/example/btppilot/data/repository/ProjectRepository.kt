@@ -3,15 +3,14 @@ package com.example.btppilot.data.repository
 import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.dto.request.project.NewProjectRequestDto
 import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
-import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDto
+import com.example.btppilot.data.dto.response.project.ProjectResponseByUserCompanyDto
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseDto
-import com.example.btppilot.data.dto.response.project.team.UserProjectDtoItem
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.Resource
 import javax.inject.Inject
 
-class ProjectRepository  @Inject constructor(
+class ProjectRepository @Inject constructor(
     private val api: ApiInterface,
     private val authSharedPref: AuthSharedPref
 ) {
@@ -25,7 +24,7 @@ class ProjectRepository  @Inject constructor(
         val bearerToken = "Bearer $token"
 
         val response =
-            api.getProjectByUserCompany(bearerToken ,companyId)
+            api.getProjectByUserCompany(bearerToken, companyId)
 
         if (response.isSuccessful) {
             response.body()?.let { projectsData ->
@@ -47,14 +46,14 @@ class ProjectRepository  @Inject constructor(
 
 
     suspend fun newProject(
-        project : NewProjectRequestDto
+        project: NewProjectRequestDto
     ): Resource<ProjectResponseDto> {
 
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
-    val companyId = authSharedPref.getCompanyId()
+        val companyId = authSharedPref.getCompanyId()
         val response =
-            api.postProject(bearerToken ,companyId,project )
+            api.postProject(bearerToken, companyId, project)
 
         if (response.isSuccessful) {
             response.body()?.let { projectsData ->
@@ -82,7 +81,7 @@ class ProjectRepository  @Inject constructor(
         val bearerToken = "Bearer $token"
 
         val response =
-            api.getProjectById(bearerToken ,projectId)
+            api.getProjectById(bearerToken, projectId)
 
         if (response.isSuccessful) {
             response.body()?.let { projectsData ->
@@ -103,13 +102,13 @@ class ProjectRepository  @Inject constructor(
 
     suspend fun updateProject(
         projectId: Int,
-        project : UpdateProjectRequestDto
+        project: UpdateProjectRequestDto
     ): Resource<Unit> {
 
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
         val response =
-            api.updateProject(bearerToken,projectId,project )
+            api.updateProject(bearerToken, projectId, project)
 
         if (response.isSuccessful) {
             response.body()?.let {
@@ -137,7 +136,7 @@ class ProjectRepository  @Inject constructor(
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
         val response =
-            api.deleteProject(bearerToken,projectId)
+            api.deleteProject(bearerToken, projectId)
 
         if (response.isSuccessful) {
             response.body()?.let {

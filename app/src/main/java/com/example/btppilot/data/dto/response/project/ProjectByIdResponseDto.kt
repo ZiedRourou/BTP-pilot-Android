@@ -1,7 +1,6 @@
 package com.example.btppilot.data.dto.response.project
 
 
-import com.example.btppilot.data.dto.response.UserProject
 import com.squareup.moshi.Json
 
 data class ProjectByIdResponseDto(

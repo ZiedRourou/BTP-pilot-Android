@@ -41,7 +41,7 @@ fun BottomNavigationBar(
     role: UserRole
 ) {
 
-    val items = bottomNavItems(role)
+    val itemsMenuByUserRole = bottomNavItems(role)
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -50,7 +50,7 @@ fun BottomNavigationBar(
 
     ){
 
-        items.forEach { screen ->
+        itemsMenuByUserRole.forEach { screen ->
 
             NavigationBarItem(
 

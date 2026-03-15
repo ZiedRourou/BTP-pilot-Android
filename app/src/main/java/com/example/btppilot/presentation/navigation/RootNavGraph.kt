@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.btppilot.presentation.screens.main.MainScreen
+import com.example.btppilot.ui.screens2.main.MainScreen
 
 sealed class Screen(
     val route: String,
@@ -49,22 +49,22 @@ sealed class NavGraph(
 
 @Composable
 fun RootNavGraph(
-    authNavController: NavHostController
+    rootNavController: NavHostController
 ) {
 
     NavHost(
-        navController = authNavController,
+        navController = rootNavController,
         startDestination = NavGraph.AuthGraph.route
     ) {
 
-        authNavGraph(authNavController)
+        authNavGraph(rootNavController)
 
 
         composable(
             route = NavGraph.MainGraph.route,
         ) {
             MainScreen(
-                rootNavController = authNavController
+                rootNavController = rootNavController
             )
         }
     }

@@ -10,17 +10,17 @@ import androidx.navigation.navigation
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.example.btppilot.presentation.screens.auth.login.LoginScreen
-import com.example.btppilot.presentation.screens.auth.login.LoginViewModel
-import com.example.btppilot.presentation.screens.auth.register.RegisterSharedViewModel
-import com.example.btppilot.presentation.screens.auth.register.company.RegisterCompanyScreen
-import com.example.btppilot.presentation.screens.auth.register.company.RegisterCompanyViewModel
-import com.example.btppilot.presentation.screens.auth.register.inviteUserToCompany.RegisterLinkUserToCompanyScreen
-import com.example.btppilot.presentation.screens.auth.register.inviteUserToCompany.RegisterLinkUserToCompanyViewModel
-import com.example.btppilot.presentation.screens.auth.register.userInfo.RegisterUserInfoScreen
-import com.example.btppilot.presentation.screens.auth.register.userRoleInCompany.RegisterStepOneScreen
-import com.example.btppilot.presentation.screens.auth.splash.SplashScreen
-import com.example.btppilot.presentation.screens.auth.splash.SplashViewModel
+import com.example.btppilot.ui.screens2.auth.login.LoginScreen
+import com.example.btppilot.ui.screens2.auth.login.LoginViewModel
+import com.example.btppilot.ui.screens2.auth.register.RegisterSharedViewModel
+import com.example.btppilot.ui.screens2.auth.register.company.RegisterCompanyScreen
+import com.example.btppilot.ui.screens2.auth.register.company.RegisterCompanyViewModel
+import com.example.btppilot.ui.screens2.auth.register.inviteUserToCompany.RegisterLinkUserToCompanyScreen
+import com.example.btppilot.ui.screens2.auth.register.inviteUserToCompany.RegisterLinkUserToCompanyViewModel
+import com.example.btppilot.ui.screens2.auth.register.userInfo.RegisterUserInfoScreen
+import com.example.btppilot.ui.screens2.auth.register.userRoleInCompany.RegisterStepOneScreen
+import com.example.btppilot.ui.screens2.auth.splash.SplashScreen
+import com.example.btppilot.ui.screens2.auth.splash.SplashViewModel
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController
@@ -43,11 +43,11 @@ fun NavGraphBuilder.authNavGraph(
 
         composable(Screen.Login.route) {
 
-            val vm: LoginViewModel = hiltViewModel()
+            val loginViewModel: LoginViewModel = hiltViewModel()
 
             LoginScreen(
                 navController = navController,
-                loginViewModel = vm
+                loginViewModel = loginViewModel
             )
         }
 
@@ -62,11 +62,11 @@ fun NavGraphBuilder.authNavGraph(
                     navController.getBackStackEntry(NavGraph.RegisterGraph.route)
                 }
 
-                val vm: RegisterSharedViewModel = hiltViewModel(parentEntry)
+                val registerSharedViewModel: RegisterSharedViewModel = hiltViewModel(parentEntry)
 
                 RegisterUserInfoScreen(
                     navController = navController,
-                    registerViewModel = vm
+                    registerViewModel = registerSharedViewModel
                 )
             }
             composable(Screen.RegisterRole.route) { backStackEntry ->
@@ -75,11 +75,11 @@ fun NavGraphBuilder.authNavGraph(
                     navController.getBackStackEntry(NavGraph.RegisterGraph.route)
                 }
 
-                val vm: RegisterSharedViewModel = hiltViewModel(parentEntry)
+                val registerSharedViewModel: RegisterSharedViewModel = hiltViewModel(parentEntry)
 
                 RegisterStepOneScreen(
                     navController = navController,
-                    registerViewModel = vm
+                    registerViewModel = registerSharedViewModel
                 )
             }
 
@@ -92,21 +92,21 @@ fun NavGraphBuilder.authNavGraph(
                 )
             ) {
 
-                val vm: RegisterLinkUserToCompanyViewModel = hiltViewModel()
+                val registerLinkUserToCompanyViewModel: RegisterLinkUserToCompanyViewModel = hiltViewModel()
 
                 RegisterLinkUserToCompanyScreen(
                     navController = navController,
-                    registerLinkUserToCompany = vm
+                    registerLinkUserToCompany = registerLinkUserToCompanyViewModel
                 )
             }
 
             composable(Screen.RegisterOwnerCompany.route) {
 
-                val vm: RegisterCompanyViewModel = hiltViewModel()
+                val registerCompanyViewModel: RegisterCompanyViewModel = hiltViewModel()
 
                 RegisterCompanyScreen(
                     navController = navController,
-                    registerViewModel = vm
+                    registerViewModel = registerCompanyViewModel
                 )
             }
         }

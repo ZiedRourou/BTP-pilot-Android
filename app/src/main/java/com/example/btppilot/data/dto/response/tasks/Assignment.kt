@@ -1,7 +1,7 @@
 package com.example.btppilot.data.dto.response.tasks
 
 
-import com.example.btppilot.data.dto.response.User
+import com.example.btppilot.data.dto.response.user.User
 import com.squareup.moshi.Json
 
 data class Assignment(

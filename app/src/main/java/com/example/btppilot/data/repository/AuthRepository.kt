@@ -1,11 +1,11 @@
 package com.example.btppilot.data.repository
 
 import com.example.btppilot.data.api.ApiInterface
-import com.example.btppilot.data.dto.requ.RegisterRequestDto
-import com.example.btppilot.data.dto.request.InviteUserCompanyRequestDto
+import com.example.btppilot.data.dto.request.auth.RegisterRequestDto
+import com.example.btppilot.data.dto.request.user.InviteUserCompanyRequestDto
 import com.example.btppilot.data.dto.request.auth.LoginRequestDto
 import com.example.btppilot.data.dto.response.auth.AuthResponseDto
-import com.example.btppilot.data.dto.response.InviteUserCompanyResponseDto
+import com.example.btppilot.data.dto.response.user.InviteUserCompanyResponseDto
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.Resource
 import javax.inject.Inject
@@ -73,7 +73,7 @@ class AuthRepository @Inject constructor(
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
         val response =
-            api.inviteUserToCompany(bearerToken, invitationInfo)
+            api.attachUserToCompany(bearerToken, invitationInfo)
         if (response.isSuccessful) {
             response.body()?.let { userCredential ->
                 return Resource.Success(

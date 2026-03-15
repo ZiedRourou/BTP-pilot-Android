@@ -22,7 +22,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
-
     @Provides
     @Singleton
     fun provideRetrofit(moshi: Moshi): Retrofit {
@@ -43,6 +42,7 @@ class AppModule {
             .client(client)
             .build()
     }
+
     @Provides
     @Singleton
     fun getApiService(retrofit: Retrofit): ApiInterface {
@@ -62,7 +62,6 @@ class AppModule {
     fun providesSharedPreferences(@ApplicationContext context: Context): AuthSharedPref {
         return AuthSharedPref(context)
     }
-
 }
 
 

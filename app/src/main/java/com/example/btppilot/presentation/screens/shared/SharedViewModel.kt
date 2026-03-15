@@ -1,7 +1,7 @@
 package com.example.btppilot.presentation.screens.shared
 
 import androidx.lifecycle.ViewModel
-import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDtoItem
+import com.example.btppilot.data.dto.response.project.ProjectResponseByUserCompanyDtoItem
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.UserProjectRole

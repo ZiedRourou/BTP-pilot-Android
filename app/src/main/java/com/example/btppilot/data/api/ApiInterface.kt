@@ -1,18 +1,18 @@
 package com.example.btppilot.data.api
 
 
-import com.example.btppilot.data.dto.requ.RegisterRequestDto
-import com.example.btppilot.data.dto.request.InviteUserCompanyRequestDto
+import com.example.btppilot.data.dto.request.auth.RegisterRequestDto
+import com.example.btppilot.data.dto.request.user.InviteUserCompanyRequestDto
 import com.example.btppilot.data.dto.request.auth.LoginRequestDto
-import com.example.btppilot.data.dto.request.NewCompanyRequestDto
-import com.example.btppilot.data.dto.request.newTask.TaskRequestDto
+import com.example.btppilot.data.dto.request.company.NewCompanyRequestDto
+import com.example.btppilot.data.dto.request.task.TaskRequestDto
 import com.example.btppilot.data.dto.request.project.NewProjectRequestDto
 import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
-import com.example.btppilot.data.dto.request.updateTask.UpdateTaskDto
+import com.example.btppilot.data.dto.request.task.UpdateTaskDto
 import com.example.btppilot.data.dto.response.auth.AuthResponseDto
-import com.example.btppilot.data.dto.response.InviteUserCompanyResponseDto
-import com.example.btppilot.data.dto.response.NewCompanyResponseDto
-import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDto
+import com.example.btppilot.data.dto.response.user.InviteUserCompanyResponseDto
+import com.example.btppilot.data.dto.response.company.NewCompanyResponseDto
+import com.example.btppilot.data.dto.response.project.ProjectResponseByUserCompanyDto
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseDto
@@ -37,13 +37,13 @@ interface ApiInterface {
     suspend fun registerUser(@Body login: RegisterRequestDto): Response<AuthResponseDto>
 
     @POST(ApiRoutes.API_INVITE_USER_TO_COMPANY_ROUTE)
-    suspend fun inviteUserToCompany(
+    suspend fun attachUserToCompany(
         @Header("Authorization") authorization: String,
         @Body invitationInfo: InviteUserCompanyRequestDto,
     ): Response<InviteUserCompanyResponseDto>
 
     @POST(ApiRoutes.API_COMPANY_ROUTE)
-    suspend fun createNewUserCompany(
+    suspend fun createNewCompany(
         @Header("Authorization") authorization: String,
         @Body companyData: NewCompanyRequestDto,
     ): Response<NewCompanyResponseDto>
@@ -73,7 +73,7 @@ interface ApiInterface {
         @Path("projectId") projectId: Int,
     ): Response<ProjectByIdResponseDto>
 
-    @GET(ApiRoutes.GET_TASK_BY_PROJECT_ID)
+    @GET(ApiRoutes.API_TASK_PROJECT_ROUTE)
     suspend fun getTasksByProjectId(
         @Header("Authorization") authorization: String,
         @Path("projectId") projectId: Int,
@@ -93,13 +93,13 @@ interface ApiInterface {
     ): Response<Unit>
 
     @GET(ApiRoutes.API_TASK_COMPANY_ROUTE)
-    suspend fun fetchsTasksByCompany(
+    suspend fun fetchTasksByCompany(
         @Header("Authorization") authorization: String,
         @Path("id") companyId: Int,
     ): Response<List<TasksByProjectDtoItem>>
 
 
-    @POST(ApiRoutes.GET_TASK_BY_PROJECT_ID)
+    @POST(ApiRoutes.API_TASK_PROJECT_ROUTE)
     suspend fun postNewTask(
         @Header("Authorization") authorization: String,
         @Path("projectId") projectId: Int,
@@ -107,20 +107,20 @@ interface ApiInterface {
     ): Response<TasksByProjectDtoItem>
 
 
-    @GET(ApiRoutes.GET_TASK)
+    @GET(ApiRoutes.API_TASK_ROUTE)
     suspend fun fetchTaskByID(
         @Header("Authorization") authorization: String,
         @Path("taskId") taskId: Int,
     ): Response<TasksByProjectDtoItem>
 
-    @PATCH(ApiRoutes.GET_TASK)
+    @PATCH(ApiRoutes.API_TASK_ROUTE)
     suspend fun updateTask(
         @Header("Authorization") authorization: String,
         @Path("taskId") taskId: Int,
         @Body task: UpdateTaskDto
     ): Response<Unit>
 
-    @DELETE(ApiRoutes.GET_TASK)
+    @DELETE(ApiRoutes.API_TASK_ROUTE)
     suspend fun deleteTask(
         @Header("Authorization") authorization: String,
         @Path("taskId") taskId: Int,

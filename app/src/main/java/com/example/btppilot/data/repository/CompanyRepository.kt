@@ -1,9 +1,8 @@
 package com.example.btppilot.data.repository
 
 import com.example.btppilot.data.api.ApiInterface
-import com.example.btppilot.data.dto.request.NewCompanyRequestDto
-import com.example.btppilot.data.dto.response.NewCompanyResponseDto
-import com.example.btppilot.data.dto.response.company.UserCompany
+import com.example.btppilot.data.dto.request.company.NewCompanyRequestDto
+import com.example.btppilot.data.dto.response.company.NewCompanyResponseDto
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.Resource
@@ -19,10 +18,10 @@ class CompanyRepository @Inject constructor(
         companyData: NewCompanyRequestDto,
     ): Resource<NewCompanyResponseDto> {
 
-            val token = authSharedPref.getToken()
-            val bearerToken = "Bearer $token"
-            val response =
-                api.createNewUserCompany(bearerToken ,companyData)
+        val token = authSharedPref.getToken()
+        val bearerToken = "Bearer $token"
+        val response =
+            api.createNewCompany(bearerToken, companyData)
 
         if (response.isSuccessful) {
             response.body()?.let { userCredential ->
@@ -51,7 +50,7 @@ class CompanyRepository @Inject constructor(
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
         val companyId = authSharedPref.getCompanyId()
-        val response = api.getUsersCompany(bearerToken , companyId )
+        val response = api.getUsersCompany(bearerToken, companyId)
 
         if (response.isSuccessful) {
             response.body()?.let { users ->

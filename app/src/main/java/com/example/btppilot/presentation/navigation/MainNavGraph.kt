@@ -1,6 +1,5 @@
 package com.example.btppilot.presentation.navigation
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -11,32 +10,33 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.btppilot.presentation.screens.shared.SharedViewModel
-import com.example.btppilot.presentation.screens.home.HomeScreen
-import com.example.btppilot.presentation.screens.home.HomeViewModel
-import com.example.btppilot.presentation.screens.profile.ProfileScreen
-import com.example.btppilot.presentation.screens.profile.ProfileViewModel
-import com.example.btppilot.presentation.screens.project.newProject.NewProjectScreen
-import com.example.btppilot.presentation.screens.project.newProject.NewProjectViewModel
-import com.example.btppilot.presentation.screens.project.projectDetails.ProjectDetailsScreen
-import com.example.btppilot.presentation.screens.project.projectDetails.ProjectDetailsViewModel
-import com.example.btppilot.presentation.screens.task.taskList.TaskListScreen
-import com.example.btppilot.presentation.screens.task.taskList.TaskListViewModel
-import com.example.btppilot.presentation.screens.task.newTask.NewTaskScreen
-import com.example.btppilot.presentation.screens.task.newTask.NewTaskViewModel
-import com.example.btppilot.presentation.screens.team.TeamScreen
-import com.example.btppilot.presentation.screens.team.TeamViewModel
+import com.example.btppilot.ui.screens2.home.HomeScreen
+import com.example.btppilot.ui.screens2.home.HomeViewModel
+import com.example.btppilot.ui.screens2.profile.ProfileScreen
+import com.example.btppilot.ui.screens2.profile.ProfileViewModel
+import com.example.btppilot.ui.screens2.project.newProject.NewProjectScreen
+import com.example.btppilot.ui.screens2.project.newProject.NewProjectViewModel
+import com.example.btppilot.ui.screens2.project.projectDetails.ProjectDetailsScreen
+import com.example.btppilot.ui.screens2.project.projectDetails.ProjectDetailsViewModel
+import com.example.btppilot.ui.screens2.task.taskList.TaskListScreen
+import com.example.btppilot.ui.screens2.task.taskList.TaskListViewModel
+import com.example.btppilot.ui.screens2.task.newTask.NewTaskScreen
+import com.example.btppilot.ui.screens2.task.newTask.NewTaskViewModel
+import com.example.btppilot.ui.screens2.team.TeamScreen
+import com.example.btppilot.ui.screens2.team.TeamViewModel
 
 
 @Composable
 fun MainNavHost(
     rootNavController: NavHostController,
     navController: NavHostController,
-    snackbarHostState: SnackbarHostState
 ) {
+
     NavHost(
         navController = navController,
         startDestination = NavGraph.MainGraph.route
     ) {
+
         navigation(
             route = NavGraph.MainGraph.route,
             startDestination = Screen.Home.route
@@ -47,14 +47,12 @@ fun MainNavHost(
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
                 }
                 val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
-
-                val vm: HomeViewModel = hiltViewModel()
+                val homeViewModel: HomeViewModel = hiltViewModel()
 
                 HomeScreen(
                     navController = navController,
-                    homeViewModel = vm,
+                    homeViewModel = homeViewModel,
                     sharedViewModel = sharedViewModel,
-                    snackbarHostState = snackbarHostState
                 )
             }
 
@@ -64,12 +62,11 @@ fun MainNavHost(
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
                 }
                 val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
-
-                val vm: TaskListViewModel = hiltViewModel()
+                val taskListViewModel: TaskListViewModel = hiltViewModel()
 
                 TaskListScreen(
                     navController = navController,
-                    taskListViewModel = vm,
+                    taskListViewModel = taskListViewModel,
                     sharedViewModel = sharedViewModel,
                 )
             }
@@ -80,14 +77,12 @@ fun MainNavHost(
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
                 }
                 val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
-
-                val vm: TeamViewModel = hiltViewModel()
+                val teamViewModel: TeamViewModel = hiltViewModel()
 
                 TeamScreen(
                     navController = navController,
-                    teamViewModel = vm,
+                    teamViewModel = teamViewModel,
                     sharedViewModel = sharedViewModel,
-                    snackbarHostState = snackbarHostState
                 )
             }
 
@@ -97,33 +92,36 @@ fun MainNavHost(
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
                 }
                 val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
-                val vm: ProfileViewModel = hiltViewModel()
+                val profileViewModel: ProfileViewModel = hiltViewModel()
 
                 ProfileScreen(
                     rootNavController = rootNavController,
-                    profileViewModel = vm,
+                    profileViewModel = profileViewModel,
                     sharedViewModel = sharedViewModel,
-                    snackbarHostState = snackbarHostState
                 )
             }
 
             composable(Screen.NewProject.route + "/{projectId}",
-            arguments = listOf(
-                navArgument("projectId") {
-                    type = NavType.LongType
-                }
-            )
+                arguments = listOf(
+                    navArgument("projectId") {
+                        type = NavType.LongType
+                    }
+                )
             ) { backStackEntry ->
 
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
                 }
-                val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
-
                 val projectId = backStackEntry.arguments?.getLong("projectId") ?: 0
-                val vm: NewProjectViewModel = hiltViewModel()
+                val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
+                val newProjectViewModel: NewProjectViewModel = hiltViewModel()
 
-                NewProjectScreen(navController, vm, projectId, sharedViewModel)
+                NewProjectScreen(
+                    navController = navController,
+                    newProjectViewModel = newProjectViewModel,
+                    projectId = projectId,
+                    sharedViewModel = sharedViewModel
+                )
             }
 
             composable(
@@ -138,15 +136,13 @@ fun MainNavHost(
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
                 }
-                val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
-
-
                 val projectId = backStackEntry.arguments?.getLong("projectId") ?: 0
-                val vm: ProjectDetailsViewModel = hiltViewModel()
+                val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
+                val projectDetailsViewModel: ProjectDetailsViewModel = hiltViewModel()
 
                 ProjectDetailsScreen(
-                    navController=navController,
-                    projectDetailsViewModel = vm,
+                    navController = navController,
+                    projectDetailsViewModel = projectDetailsViewModel,
                     sharedViewModel = sharedViewModel,
                     projectId = projectId
                 )
@@ -167,18 +163,19 @@ fun MainNavHost(
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
                 }
-                val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
 
                 val projectId = backStackEntry.arguments?.getLong("projectId") ?: 0
                 val taskId = backStackEntry.arguments?.getLong("taskId") ?: 0
-                val vm: NewTaskViewModel = hiltViewModel()
+
+                val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
+                val newTaskViewModel: NewTaskViewModel = hiltViewModel()
 
                 NewTaskScreen(
-                    navController,
-                    vm,
-                    projectId,
-                    taskId,
-                    sharedViewModel
+                    navController = navController,
+                    newTaskViewModel = newTaskViewModel,
+                    projectId = projectId,
+                    taskId = taskId,
+                    sharedViewModel = sharedViewModel
                 )
             }
         }

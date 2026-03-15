@@ -1,8 +1,8 @@
 package com.example.btppilot.data.repository
 
 import com.example.btppilot.data.api.ApiInterface
-import com.example.btppilot.data.dto.request.newTask.TaskRequestDto
-import com.example.btppilot.data.dto.request.updateTask.UpdateTaskDto
+import com.example.btppilot.data.dto.request.task.TaskRequestDto
+import com.example.btppilot.data.dto.request.task.UpdateTaskDto
 import com.example.btppilot.data.dto.response.tasks.TasksByProjectDtoItem
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.Resource
@@ -41,13 +41,13 @@ class TaskRepository @Inject constructor(
 
     suspend fun getTasksOfCompany(
 
-    ) : Resource<List<TasksByProjectDtoItem>> {
+    ): Resource<List<TasksByProjectDtoItem>> {
 
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
         val companyId = authSharedPref.getCompanyId()
         val response =
-            api.fetchsTasksByCompany(bearerToken, companyId)
+            api.fetchTasksByCompany(bearerToken, companyId)
 
         if (response.isSuccessful) {
             response.body()?.let { projectsData ->
@@ -94,7 +94,7 @@ class TaskRepository @Inject constructor(
 
     suspend fun getTaskById(
         taskId: Int
-    ) : Resource<TasksByProjectDtoItem> {
+    ): Resource<TasksByProjectDtoItem> {
 
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
@@ -124,7 +124,7 @@ class TaskRepository @Inject constructor(
         val bearerToken = "Bearer $token"
 
         val response =
-            api.updateTask(bearerToken, taskId,taskRequestDto )
+            api.updateTask(bearerToken, taskId, taskRequestDto)
 
         if (response.isSuccessful) {
             response.body()?.let {
@@ -151,7 +151,7 @@ class TaskRepository @Inject constructor(
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
         val response =
-            api.deleteTask(bearerToken,taskId)
+            api.deleteTask(bearerToken, taskId)
 
         if (response.isSuccessful) {
             response.body()?.let {
