@@ -27,9 +27,15 @@ fun HomeScreen(
     val homeState by homeViewModel.homeStateFlow.collectAsState()
     val userInfo by sharedViewModel.userInfoStateFlow.collectAsState()
 
+    val refresh by sharedViewModel.refreshProjectStateFlow.collectAsState()
 
+    if (refresh) {
+        homeViewModel.fetchProjectUser()
+        sharedViewModel.resetRefreshProject()
+    }
 
     LaunchedEffect(Unit) {
+
         homeViewModel.homeEventSharedFlow.collect { event ->
             when (event) {
                 is EventState.ShowMessageSnackBar ->

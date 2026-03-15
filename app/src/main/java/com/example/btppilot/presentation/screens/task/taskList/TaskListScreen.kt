@@ -24,7 +24,7 @@ fun TaskListScreen(
     navController: NavController,
     taskListViewModel: TaskListViewModel,
     sharedViewModel: SharedViewModel,
-){
+) {
     val userInfo by sharedViewModel.userInfoStateFlow.collectAsState()
     val state by taskListViewModel.taskListStateFlow.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -41,6 +41,12 @@ fun TaskListScreen(
 
                 is EventState.RedirectScreenWithId ->
                     navController.navigate(event.route)
+
+                is EventState.PopBackStackWithRefresh -> {
+                    sharedViewModel.refreshTask()
+                    navController.popBackStack()
+                }
+
                 else -> {}
             }
         }
@@ -61,7 +67,7 @@ fun TaskListScreen(
 
         TaskListContent(
             paddingValues = padding,
-            tasklist =state,
+            tasklist = state,
             isEnableToEditTask = isEnableToEditTask,
             changeStatus = taskListViewModel::updateTask,
             redirectEditTask = taskListViewModel::redirectEditTask,

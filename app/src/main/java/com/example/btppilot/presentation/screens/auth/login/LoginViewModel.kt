@@ -2,7 +2,7 @@ package com.example.btppilot.presentation.screens.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.btppilot.data.dto.auth.LoginRequestDto
+import com.example.btppilot.data.dto.request.auth.LoginRequestDto
 import com.example.btppilot.data.repository.AuthRepository
 import com.example.btppilot.presentation.navigation.NavGraph
 import com.example.btppilot.presentation.screens.uiState.EventState

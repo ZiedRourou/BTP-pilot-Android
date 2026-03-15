@@ -40,7 +40,11 @@ fun NewTaskScreen(
             when (event) {
                 is EventState.ShowMessageSnackBar ->
                     snackbarHostState.showSnackbar(event.message)
-
+                is EventState.PopBackStackWithRefresh ->
+                {
+                    sharedViewModel.refreshTask()
+                    navController.popBackStack()
+                }
                 else -> {}
             }
         }

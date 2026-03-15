@@ -3,7 +3,7 @@ package com.example.btppilot.data.repository
 import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.dto.requ.RegisterRequestDto
 import com.example.btppilot.data.dto.request.InviteUserCompanyRequestDto
-import com.example.btppilot.data.dto.auth.LoginRequestDto
+import com.example.btppilot.data.dto.request.auth.LoginRequestDto
 import com.example.btppilot.data.dto.response.auth.AuthResponseDto
 import com.example.btppilot.data.dto.response.InviteUserCompanyResponseDto
 import com.example.btppilot.util.AuthSharedPref

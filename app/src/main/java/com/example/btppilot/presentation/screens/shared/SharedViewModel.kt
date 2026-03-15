@@ -1,20 +1,15 @@
 package com.example.btppilot.presentation.screens.shared
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.response.ProjectResponseByUserCompanyDtoItem
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
-import com.example.btppilot.presentation.screens.uiState.EventState
 import com.example.btppilot.util.AuthSharedPref
 import com.example.btppilot.util.UserProjectRole
 import com.example.btppilot.util.UserRole
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,17 +25,39 @@ class SharedViewModel @Inject constructor(
     private val _userInfoStateFlow = MutableStateFlow(UserInfoState())
     val userInfoStateFlow = _userInfoStateFlow.asStateFlow()
 
+    private val _refreshProjectStateFlow = MutableStateFlow(false)
+    val refreshProjectStateFlow = _refreshProjectStateFlow.asStateFlow()
 
+    private val _refreshTaskStateFlow = MutableStateFlow(false)
+    val refreshTaskStateFlow = _refreshTaskStateFlow.asStateFlow()
+
+    fun refreshProject() {
+        _refreshProjectStateFlow.value = true
+    }
+
+    fun resetRefreshProject() {
+        _refreshProjectStateFlow.value = false
+    }
+
+    fun refreshTask() {
+        _refreshTaskStateFlow.value = true
+    }
+
+    fun resetTaskRefresh() {
+        _refreshTaskStateFlow.value = false
+    }
 
     init {
         setUserInfo()
     }
 
-    private fun setUserInfo(){
+
+
+    private fun setUserInfo() {
         _userInfoStateFlow.update {
             it.copy(
                 userFirstname = authSharedPref.getUserName() ?: UserRole.COLLABORATOR.name,
-                userRole = UserRole.valueOf(authSharedPref.getUserRole()?: UserRole.CLIENT.name)
+                userRole = UserRole.valueOf(authSharedPref.getUserRole() ?: UserRole.CLIENT.name)
             )
         }
     }

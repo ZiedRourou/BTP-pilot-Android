@@ -40,6 +40,7 @@ fun NewProjectScreen(
                     snackbarHostState.showSnackbar(event.message)
 
                 is EventState.PopBackStackWithRefresh -> {
+                    sharedViewModel.refreshProject()
                     navController.popBackStack()
                 }
 

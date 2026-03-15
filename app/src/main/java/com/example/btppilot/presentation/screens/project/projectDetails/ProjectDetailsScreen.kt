@@ -31,6 +31,12 @@ fun ProjectDetailsScreen(
     val userInfo by sharedViewModel.userInfoStateFlow.collectAsState()
 
 
+    val refresh by sharedViewModel.refreshTaskStateFlow.collectAsState()
+
+    if (refresh) {
+        projectDetailsViewModel.fetchTasks()
+        sharedViewModel.resetTaskRefresh()
+    }
 
     LaunchedEffect(Unit) {
         projectDetailsViewModel.detailProjectEventSharedFlow.collect { event ->
