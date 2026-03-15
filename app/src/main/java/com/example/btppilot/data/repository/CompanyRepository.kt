@@ -4,7 +4,7 @@ import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.dto.request.company.NewCompanyRequestDto
 import com.example.btppilot.data.dto.response.company.NewCompanyResponseDto
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
-import com.example.btppilot.util.AuthSharedPref
+import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.Resource
 import javax.inject.Inject
 

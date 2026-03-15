@@ -3,7 +3,7 @@ package com.example.btppilot.di
 import android.content.Context
 import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.api.ApiRoutes
-import com.example.btppilot.util.AuthSharedPref
+import com.example.btppilot.data.local.AuthSharedPref
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import dagger.Module

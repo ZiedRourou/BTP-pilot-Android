@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.navigation.compose.rememberNavController
-import com.example.btppilot.presentation.navigation.RootNavGraph
+import com.example.btppilot.ui.navigation.RootNavGraph
 
 import com.example.btppilot.ui.theme.BtpPilotTheme
 import dagger.hilt.android.AndroidEntryPoint

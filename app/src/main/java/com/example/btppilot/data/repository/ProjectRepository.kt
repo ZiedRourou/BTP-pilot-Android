@@ -6,7 +6,7 @@ import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseByUserCompanyDto
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseDto
-import com.example.btppilot.util.AuthSharedPref
+import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.Resource
 import javax.inject.Inject
 

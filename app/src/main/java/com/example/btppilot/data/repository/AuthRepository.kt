@@ -6,7 +6,7 @@ import com.example.btppilot.data.dto.request.user.InviteUserCompanyRequestDto
 import com.example.btppilot.data.dto.request.auth.LoginRequestDto
 import com.example.btppilot.data.dto.response.auth.AuthResponseDto
 import com.example.btppilot.data.dto.response.user.InviteUserCompanyResponseDto
-import com.example.btppilot.util.AuthSharedPref
+import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.Resource
 import javax.inject.Inject
 
