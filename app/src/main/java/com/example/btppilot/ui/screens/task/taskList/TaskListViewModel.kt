@@ -2,11 +2,12 @@ package com.example.btppilot.ui.screens.task.taskList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.request.task.UpdateTaskDto
 import com.example.btppilot.data.dto.response.tasks.TasksByProjectDtoItem
 import com.example.btppilot.data.repository.TaskRepository
 import com.example.btppilot.ui.navigation.Screen
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.util.Resource
 import com.example.btppilot.util.TaskStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,10 +33,11 @@ class TaskListViewModel @Inject constructor(
 
         val taskStatus: List<TaskStatus> = listOf(
             TaskStatus.ALL,
+            TaskStatus.IN_PROGRESS,
             TaskStatus.TO_DO,
             TaskStatus.DONE,
-            TaskStatus.IN_PROGRESS,
         ),
+
         val selectedFilter: TaskStatus = TaskStatus.ALL,
     )
 
@@ -99,7 +101,7 @@ class TaskListViewModel @Inject constructor(
                     }
                     fetchTasks()
                     _taskListEventSharedFlow.emit(
-                        EventState.ShowMessageSnackBar("Statut mis a jour ")
+                        EventState.ShowMessageSnackBar(R.string.status_updated)
                     )
                 }
 
@@ -149,7 +151,7 @@ class TaskListViewModel @Inject constructor(
                     }
                     fetchTasks()
                     _taskListEventSharedFlow.emit(
-                        EventState.ShowMessageSnackBar("Tache supprimé ")
+                        EventState.ShowMessageSnackBar(R.string.task_deleted)
                     )
                 }
 
@@ -169,7 +171,7 @@ class TaskListViewModel @Inject constructor(
         }
     }
 
-    private fun fetchTasks() {
+     fun fetchTasks() {
 
         viewModelScope.launch {
             _taskListStateFlow.update {

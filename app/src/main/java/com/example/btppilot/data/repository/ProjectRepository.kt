@@ -1,11 +1,11 @@
 package com.example.btppilot.data.repository
 
+import com.example.btppilot.R
 import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.dto.request.project.NewProjectRequestDto
 import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseByUserCompanyDto
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
-import com.example.btppilot.data.dto.response.project.ProjectResponseDto
 import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.Resource
 import javax.inject.Inject
@@ -37,17 +37,17 @@ class ProjectRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    401 -> "Email déjà utilisé"
-                    else -> "erreur"
+                    401 -> R.string.email_already_used
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
 
     suspend fun newProject(
         project: NewProjectRequestDto
-    ): Resource<ProjectResponseDto> {
+    ): Resource<Unit> {
 
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
@@ -56,9 +56,9 @@ class ProjectRepository @Inject constructor(
             api.postProject(bearerToken, companyId, project)
 
         if (response.isSuccessful) {
-            response.body()?.let { projectsData ->
+            response.body()?.let {
                 return Resource.Success(
-                    data = projectsData,
+                    data = null,
                     code = response.code()
                 )
             }
@@ -66,11 +66,11 @@ class ProjectRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    401 -> "Email déjà utilisé"
-                    else -> "erreur"
+                    401 -> R.string.email_already_used
+                    else ->R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
     suspend fun fetchProjectById(
@@ -93,10 +93,10 @@ class ProjectRepository @Inject constructor(
         } else
             return Resource.Error(
                 code = response.code() ?: 400,
-                message = "erreur"
+                message =  R.string.error_server
 
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
 
@@ -121,11 +121,11 @@ class ProjectRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    401 -> "erreur"
-                    else -> "erreur"
+
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
 
@@ -149,11 +149,10 @@ class ProjectRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    401 -> "erreur"
-                    else -> "erreur"
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
 

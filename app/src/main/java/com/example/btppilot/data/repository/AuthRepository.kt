@@ -1,5 +1,6 @@
 package com.example.btppilot.data.repository
 
+import com.example.btppilot.R
 import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.dto.request.auth.RegisterRequestDto
 import com.example.btppilot.data.dto.request.user.InviteUserCompanyRequestDto
@@ -33,11 +34,11 @@ class AuthRepository @Inject constructor(
             return Resource.Error(
                 code = response.code(),
                 message = when (response.code()) {
-                    401 -> "Utilisateur inconnu"
-                    else -> "erreur serveur"
+                    401 -> R.string.user_unknow
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
     suspend fun registerUser(
@@ -57,12 +58,12 @@ class AuthRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    409 -> "Cet email est déjà utilisé"
-                    400 -> "Informations invalides"
-                    else -> "erreur"
+                    409 -> R.string.email_already_used
+                    400 -> R.string.info_invalid
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
 
@@ -85,13 +86,13 @@ class AuthRepository @Inject constructor(
             return Resource.Error(
                 code = response.code(),
                 message = when (response.code()) {
-                    409 -> "vous etes déja lié a l'entreprise"
-                    400 -> "Informations invalides"
-                    404 -> "Entreprise non trouvé"
-                    else -> "erreur serveur "
+                    409 ->R.string.already_link_to_company
+                    400 ->  R.string.info_invalid
+                    404 ->  R.string.company_not_found
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
     suspend fun inviteUserToMyCompany(
@@ -114,12 +115,12 @@ class AuthRepository @Inject constructor(
             return Resource.Error(
                 code = response.code(),
                 message = when (response.code()) {
-                    409 -> "déja lié a l'entreprise"
-                    400 -> "Informations invalides"
-                    404 -> "Entreprise non trouvé"
-                    else -> "erreur serveur "
+                    409 ->R.string.already_link_to_company
+                    400 ->  R.string.info_invalid
+                    404 ->  R.string.info_invalid
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400,  R.string.error_server)
     }
 }

@@ -9,7 +9,7 @@ import androidx.navigation.NavController
 import com.example.btppilot.ui.navigation.Screen
 import com.example.btppilot.ui.screens.shared.SharedViewModel
 import com.example.btppilot.ui.screens.shared.component.HeaderMainSreen
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 
 @Composable
 fun ProfileScreen(

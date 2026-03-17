@@ -41,11 +41,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.response.user.User
 import com.example.btppilot.data.dto.response.project.UserProject
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
@@ -62,7 +64,7 @@ import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.ProjectStatus
 import com.example.btppilot.util.TaskStatus
 import com.example.btppilot.util.UserProjectRole
-import com.example.btppilot.util.isoToFrenchDate
+import com.example.btppilot.util.formatStrDateToWordFrDate
 
 
 @Preview(showBackground = true, apiLevel = 33)
@@ -112,7 +114,7 @@ private fun ProjectDetailsScreenPreview() {
                 onClickEdit = {},
                 onClickAddTask = { },
                 isEnableToEditProject = true,
-                isEnableToEditTask = true,
+                isEnableToEditStatus =true,
                 redirectEditTask = {},
                 changeStatus = { taskStatus, tasksByProjectDtoItem -> Unit  },
                 deleteTask = {}
@@ -129,7 +131,7 @@ fun ProjectDetailsContent(
     onClickEdit: () -> Unit,
     onClickAddTask: () -> Unit,
     isEnableToEditProject: Boolean,
-    isEnableToEditTask: Boolean,
+    isEnableToEditStatus:  Boolean,
     redirectEditTask : (Int) -> Unit,
     changeStatus: (TaskStatus, TasksByProjectDtoItem) -> Unit,
     deleteTask : (Int)-> Unit
@@ -165,7 +167,7 @@ fun ProjectDetailsContent(
             )
             Spacer(modifier = Modifier.height(20.dp))
 
-            AppSecondaryTitle(text = "Description")
+            AppSecondaryTitle(text = stringResource(R.string.description))
             Spacer(modifier = Modifier.height(5.dp))
 
             Text(
@@ -181,7 +183,7 @@ fun ProjectDetailsContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                AppSecondaryTitle(text = "Tâches")
+                AppSecondaryTitle(text = stringResource(R.string.tasks))
 
                 if (isEnableToEditProject)
                     IconButton(
@@ -212,7 +214,8 @@ fun ProjectDetailsContent(
             items(projectState.tasks) { item ->
                 ItemTask(
                     taskState = item,
-                    canEdit = isEnableToEditTask,
+                    canEditTask = isEnableToEditProject,
+                    canEditStatus = isEnableToEditStatus,
                     changeStatus = changeStatus,
                     redirectEditTask = redirectEditTask,
                     deleteTask = deleteTask
@@ -238,7 +241,7 @@ fun TasksNotFound(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Aucune taches dans ce chantier")
+            Text(text = stringResource(R.string.no_tasks_to_display))
         }
     }
 }
@@ -254,14 +257,14 @@ fun ConfirmDeleteProjectDialog(
 
         title = {
             Text(
-                text = "Supprimer le projet",
+                text = stringResource(R.string.delete_project),
                 style = MaterialTheme.typography.titleLarge
             )
         },
 
         text = {
             Text(
-                text = "Voulez-vous vraiment supprimer le projet ? Cette action est irréversible."
+                text = stringResource(R.string.confirm_delete_project)
             )
         },
 
@@ -271,7 +274,7 @@ fun ConfirmDeleteProjectDialog(
                 onClick = onConfirm
             ) {
                 Text(
-                    text = "Supprimer",
+                    text = stringResource(R.string.delete),
                     color = Color.Red
                 )
             }
@@ -283,7 +286,7 @@ fun ConfirmDeleteProjectDialog(
             TextButton(
                 onClick = onDismiss
             ) {
-                Text("Annuler")
+                Text(stringResource(id = R.string.cancel))
             }
         }
     )
@@ -312,7 +315,7 @@ fun AssignedTeamCard(
         ) {
 
             Text(
-                text = "FIN DU CHANTIER :",
+                text = stringResource(R.string.end_project),
                 color = Color.LightGray,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold
@@ -321,7 +324,7 @@ fun AssignedTeamCard(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = isoToFrenchDate(date),
+                text = date.formatStrDateToWordFrDate(),
                 color = Color.White,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
@@ -353,7 +356,7 @@ fun TeamCard(
     ) {
 
         Text(
-            text = "ÉQUIPE",
+            text = stringResource(R.string.team),
             color = Color.LightGray,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold
@@ -378,7 +381,7 @@ fun TeamCard(
                 Spacer(modifier = Modifier.width(6.dp))
 
                 Text(
-                    text = "L'équipe",
+                    text = stringResource(R.string.team),
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
@@ -411,7 +414,7 @@ fun TeamCard(
                 ) {
 
                     Text(
-                        text = "Membres de l'équipe",
+                        text = stringResource(R.string.team_member),
                         style = MaterialTheme.typography.titleLarge,
                         color = Color.White
                     )
@@ -427,7 +430,7 @@ fun TeamCard(
 
                     Text(text = "Manager ")
                     Spacer(modifier = Modifier.height(5.dp))
-                    Text(text = "${manager?.user?.firstName} - ${manager?.user?.lastName}")
+                    Text(text = "${manager?.user?.firstName}")
 
 
                     if (clients.isNotEmpty()) {
@@ -439,27 +442,27 @@ fun TeamCard(
                             modifier = Modifier.heightIn(max = 350.dp)
                         ) {
                             items(items = clients) { member ->
-                                Text(text = " ${member.user.firstName} - ${member.user.lastName} ")
+                                Text(text = " ${member.user.firstName}  ")
                             }
                         }
                     }
                     if (collaborator.isNotEmpty()) {
                         Spacer(Modifier.height(16.dp))
-                        Text(text = "Employés")
+                        Text(text = stringResource(id = R.string.collaborator))
                         Spacer(modifier = Modifier.height(5.dp))
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(10.dp),
                             modifier = Modifier.heightIn(max = 350.dp)
                         ) {
                             items(collaborator) { member ->
-                                Text(text = " ${member.user.firstName} - ${member.user.lastName} ")
+                                Text(text = " ${member.user.firstName} ")
                             }
                         }
                     }
 
                     Spacer(Modifier.height(20.dp))
 
-                    AppPrimaryButton(text = "Fermer",
+                    AppPrimaryButton(text = stringResource(R.string.close),
                         onClick = { showDialog = false })
                 }
             }
@@ -491,7 +494,7 @@ fun ProjectDetailsStatusAndPriority(
         ) {
 
             Text(
-                text = "STATUS",
+                text = stringResource(R.string.status_uppercase),
                 style = MaterialTheme.typography.labelSmall,
             )
 
@@ -515,7 +518,7 @@ fun ProjectDetailsStatusAndPriority(
         ) {
 
             Text(
-                text = "PRIORITE",
+                text = stringResource(R.string.priority_upper),
                 style = MaterialTheme.typography.labelSmall,
             )
 
@@ -554,53 +557,4 @@ fun ProjectDetailsStatusAndPriority(
 }
 
 
-@Composable
-fun TaskStatusAndPriority(
-    status: TaskStatus,
-    priority: ProjectAndTakPriorities,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
 
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        Column(
-            modifier = Modifier
-                .padding(12.dp)
-        ) {
-
-
-            Text(
-                text = status.label,
-                style = MaterialTheme.typography.labelSmall,
-                color = status.color,
-                modifier = Modifier
-                    .background(
-                        status.color.copy(alpha = 0.25f),
-                        RoundedCornerShape(8.dp)
-                    )
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
-            )
-        }
-        Column(
-            modifier = Modifier
-                .padding(12.dp)
-        ) {
-
-            Text(
-                text = priority.label,
-                style = MaterialTheme.typography.labelSmall,
-                color = priority.color,
-                modifier = Modifier
-                    .background(
-                        priority.color.copy(alpha = 0.25f),
-                        RoundedCornerShape(8.dp)
-                    )
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
-            )
-        }
-    }
-}

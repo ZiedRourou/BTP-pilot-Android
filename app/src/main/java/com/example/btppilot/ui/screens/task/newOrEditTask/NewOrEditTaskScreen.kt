@@ -10,12 +10,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.btppilot.R
 import com.example.btppilot.ui.screens.project.component.ProjectAndTaskEditorTopBar
 import com.example.btppilot.ui.screens.shared.SharedViewModel
 import com.example.btppilot.ui.screens.shared.component.AppPrimaryButton
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 
 @Composable
 fun NewOrEditTaskScreen(
@@ -26,12 +29,11 @@ fun NewOrEditTaskScreen(
     sharedViewModel: SharedViewModel
 ){
 
-
     if (taskId.toInt() != 0)
         newTaskViewModel.setTaskId(taskId)
     if (projectId.toInt() != 0)
         newTaskViewModel.setProjectId(projectId)
-
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val newTaskStateFlow by newTaskViewModel.newTaskStateFlow.collectAsState()
 
@@ -39,10 +41,11 @@ fun NewOrEditTaskScreen(
         newTaskViewModel.newTaskEventSharedFlow.collect { event ->
             when (event) {
                 is EventState.ShowMessageSnackBar ->
-                    snackbarHostState.showSnackbar(event.message)
+                    snackbarHostState.showSnackbar(context.getString(event.message))
                 is EventState.PopBackStackWithRefresh ->
                 {
                     sharedViewModel.refreshTask()
+                    sharedViewModel.refreshProject()
                     navController.popBackStack()
                 }
                 else -> {}
@@ -52,10 +55,10 @@ fun NewOrEditTaskScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { ProjectAndTaskEditorTopBar("Nouveau chantier") },
+        topBar = { ProjectAndTaskEditorTopBar(stringResource(R.string.new_task)) },
         bottomBar = {
             AppPrimaryButton(
-                text = "Enregistrer",
+                text = stringResource(id = R.string.save),
                 onClick = newTaskViewModel::publishOrEdit,
                 modifier = Modifier.padding(10.dp)
             )
@@ -70,9 +73,9 @@ fun NewOrEditTaskScreen(
             onBeginDateChange = newTaskViewModel::onBeginDateChange,
             onDescriptionChange = newTaskViewModel::onDescriptionChange,
             onTitleChange = newTaskViewModel::onTitleChange,
-            onHoursChange = newTaskViewModel::onHoursChange,
             onProjectChange = newTaskViewModel::onProjectChange,
-            onUsersChange = newTaskViewModel::onClientListChange
+            onUsersChange = newTaskViewModel::onClientListChange,
+            onDurationSelected = newTaskViewModel::onDurationSelected
         )
     }
 }

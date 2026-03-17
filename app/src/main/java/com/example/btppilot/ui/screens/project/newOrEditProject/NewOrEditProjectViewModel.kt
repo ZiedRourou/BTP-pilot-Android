@@ -8,22 +8,22 @@ import com.example.btppilot.data.dto.response.company.UserCompany
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.data.repository.CompanyRepository
 import com.example.btppilot.data.repository.ProjectRepository
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.ProjectStatus
 import com.example.btppilot.util.Resource
 import com.example.btppilot.util.UserProjectRole
 import com.example.btppilot.util.UserRole
-import com.example.btppilot.util.isoToUiDate
-import com.example.btppilot.util.toIsoDate
-import com.example.btppilot.util.uiDateToIso
+import com.example.btppilot.util.formatStrDateToIsoAPi
+import com.example.btppilot.util.formatStrDateToShortDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -67,7 +67,6 @@ class NewOrEditProjectViewModel @Inject constructor(
             ProjectAndTakPriorities.HIGH
         ),
         val projectStatus: ArrayList<ProjectStatus> = arrayListOf(
-            ProjectStatus.COMPLETED,
             ProjectStatus.IN_PROGRESS,
             ProjectStatus.FINISH,
             ProjectStatus.PLANNED,
@@ -126,10 +125,12 @@ class NewOrEditProjectViewModel @Inject constructor(
     fun onManagerChange(user: UserCompany) {
         _newProjectStateFlow.update {
             it.copy(
-                manager = user
+                manager = user,
+                collaboratorList = newProjectStateFlow.value.collaboratorList.filter { it.id != user.id }
             )
         }
     }
+
 
     fun onBeginDateChange(beginDate: String) {
         _newProjectStateFlow.update {
@@ -214,8 +215,8 @@ class NewOrEditProjectViewModel @Inject constructor(
                             state.copy(
                                 title = project.name,
                                 description = project.description,
-                                dateBegin = isoToUiDate(project.plannedStartDate),
-                                dateEnd = isoToUiDate(project.plannedEndDate),
+                                dateBegin = project.plannedStartDate.formatStrDateToShortDate(),
+                                dateEnd = project.plannedEndDate.formatStrDateToShortDate(),
 
                                 selectedPriority = ProjectAndTakPriorities.valueOf(project.priority),
                                 selectedStatus = ProjectStatus.valueOf(project.status),
@@ -344,8 +345,8 @@ class NewOrEditProjectViewModel @Inject constructor(
                             description = it.description,
                             status = it.selectedStatus.name,
                             priority = it.selectedPriority.name,
-                            plannedStartDate = uiDateToIso(it.dateBegin),
-                            plannedEndDate = uiDateToIso(it.dateEnd),
+                            plannedStartDate = it.dateBegin.formatStrDateToIsoAPi(),
+                            plannedEndDate = it.dateEnd.formatStrDateToIsoAPi(),
                             managerId = it.manager.id,
                             isActive = true,
                             clientIds = it.clientList.map { user -> user.id },
@@ -401,8 +402,8 @@ class NewOrEditProjectViewModel @Inject constructor(
                             description = it.description,
                             status = it.selectedStatus.name,
                             priority = it.selectedPriority.name,
-                            plannedStartDate = toIsoDate(it.dateBegin),
-                            plannedEndDate = toIsoDate(it.dateEnd),
+                            plannedStartDate = it.dateBegin.formatStrDateToIsoAPi(),
+                            plannedEndDate = it.dateEnd.formatStrDateToIsoAPi(),
                             managerId = it.manager.id,
                             isActive = true,
                             clientIds = it.clientList.map { user -> user.id },

@@ -2,6 +2,7 @@ package com.example.btppilot.ui.screens.project.projectDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.request.task.UpdateTaskDto
 import com.example.btppilot.data.dto.response.user.User
 import com.example.btppilot.data.dto.response.project.UserProject
@@ -10,7 +11,7 @@ import com.example.btppilot.data.dto.response.tasks.TasksByProjectDtoItem
 import com.example.btppilot.data.repository.ProjectRepository
 import com.example.btppilot.data.repository.TaskRepository
 import com.example.btppilot.ui.navigation.Screen
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.ProjectStatus
 import com.example.btppilot.util.Resource
@@ -105,7 +106,6 @@ class ProjectDetailsViewModel @Inject constructor(
         _detailProjectStateFlow.update {
             it.copy(
                 showDialog = false,
-                isLoading = true
             )
         }
 
@@ -117,14 +117,9 @@ class ProjectDetailsViewModel @Inject constructor(
             when (result) {
 
                 is Resource.Success -> {
-                    _detailProjectStateFlow.update {
-                        it.copy(
-                            isLoading = false
-                        )
-                    }
 
                     _detailProjectEventSharedFlow.emit(
-                        EventState.ShowMessageSnackBar("article supprimé"),
+                        EventState.ShowMessageSnackBar(R.string.project_delete),
                     )
                     _detailProjectEventSharedFlow.emit(
                         EventState.RedirectScreen(Screen.Home)
@@ -132,13 +127,6 @@ class ProjectDetailsViewModel @Inject constructor(
                 }
 
                 is Resource.Error -> {
-
-                    _detailProjectStateFlow.update {
-                        it.copy(
-                            isLoading = false
-                        )
-                    }
-
                     _detailProjectEventSharedFlow.emit(
                         EventState.ShowMessageSnackBar(result.message)
                     )
@@ -174,11 +162,6 @@ class ProjectDetailsViewModel @Inject constructor(
 
     private fun fetchProject() {
         viewModelScope.launch {
-            _detailProjectStateFlow.update {
-                it.copy(
-                    isLoading = true
-                )
-            }
 
             val result = withContext(Dispatchers.IO) {
                 projectRepository.fetchProjectById(detailProjectStateFlow.value.projectId.toInt())
@@ -186,11 +169,6 @@ class ProjectDetailsViewModel @Inject constructor(
             when (result) {
 
                 is Resource.Success -> {
-                    _detailProjectStateFlow.update {
-                        it.copy(
-                            isLoading = false
-                        )
-                    }
 
                     result.data?.let { project ->
                         _detailProjectStateFlow.update {
@@ -203,12 +181,6 @@ class ProjectDetailsViewModel @Inject constructor(
                 }
 
                 is Resource.Error -> {
-
-                    _detailProjectStateFlow.update {
-                        it.copy(
-                            isLoading = false
-                        )
-                    }
 
                     _detailProjectEventSharedFlow.emit(
                         EventState.ShowMessageSnackBar(result.message)
@@ -245,7 +217,7 @@ class ProjectDetailsViewModel @Inject constructor(
                     }
                 fetchTasks()
                     _detailProjectEventSharedFlow.emit(
-                        EventState.ShowMessageSnackBar("Statut mis a jour ")
+                        EventState.ShowMessageSnackBar(R.string.status_updated)
                     )
                 }
 
@@ -287,7 +259,7 @@ class ProjectDetailsViewModel @Inject constructor(
                     }
                     fetchTasks()
                     _detailProjectEventSharedFlow.emit(
-                        EventState.ShowMessageSnackBar("Tache supprimé ")
+                        EventState.ShowMessageSnackBar(R.string.task_deleted)
                     )
                 }
 
@@ -311,11 +283,6 @@ class ProjectDetailsViewModel @Inject constructor(
      fun fetchTasks() {
 
         viewModelScope.launch {
-            _detailProjectStateFlow.update {
-                it.copy(
-                    isLoading = true
-                )
-            }
 
             val result = withContext(Dispatchers.IO) {
                 taskRepository.getTasksOfProject(detailProjectStateFlow.value.projectId.toInt())
@@ -323,11 +290,6 @@ class ProjectDetailsViewModel @Inject constructor(
             when (result) {
 
                 is Resource.Success -> {
-                    _detailProjectStateFlow.update {
-                        it.copy(
-                            isLoading = false
-                        )
-                    }
 
                     _detailProjectStateFlow.update {
                         it.copy(
@@ -338,12 +300,6 @@ class ProjectDetailsViewModel @Inject constructor(
                 }
 
                 is Resource.Error -> {
-
-                    _detailProjectStateFlow.update {
-                        it.copy(
-                            isLoading = false
-                        )
-                    }
 
                     _detailProjectEventSharedFlow.emit(
                         EventState.ShowMessageSnackBar(result.message)

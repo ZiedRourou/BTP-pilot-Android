@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.request.auth.RegisterRequestDto
 import com.example.btppilot.data.repository.AuthRepository
 import com.example.btppilot.ui.navigation.Screen
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.Resource
 import com.example.btppilot.util.UserRole
@@ -66,12 +66,15 @@ class RegisterSharedViewModel @Inject constructor(
 
             UserRole.OWNER -> Screen.RegisterOwnerCompany
 
-            UserRole.COLLABORATOR,
+            UserRole.COLLABORATOR-> Screen.RegisterInviteCompany
             UserRole.CLIENT -> Screen.RegisterInviteCompany
         }
 
 
         viewModelScope.launch {
+            if (route is Screen.RegisterInviteCompany)
+                _registerUserEventSharedFlow.emit(EventState.RedirectScreenWithId(route.route +"/"+ registerUserInfoStateFlow.value.selectedRole.name ))
+                else
             _registerUserEventSharedFlow.emit(EventState.RedirectScreen(route))
         }
     }

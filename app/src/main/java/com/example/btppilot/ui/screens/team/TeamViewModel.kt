@@ -2,11 +2,12 @@ package com.example.btppilot.ui.screens.team
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.request.user.InviteUserCompanyRequestDto
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.data.repository.AuthRepository
 import com.example.btppilot.data.repository.CompanyRepository
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.util.Resource
 import com.example.btppilot.util.UserRole
 import com.example.btppilot.util.isEmailValid
@@ -103,7 +104,7 @@ class TeamViewModel @Inject constructor(
 
                     getUserCompany()
                     _teamEventSharedFlow.emit(
-                        EventState.ShowMessageSnackBar("utilisateur invité")
+                        EventState.ShowMessageSnackBar(R.string.user_invited)
                     )
 
                 }

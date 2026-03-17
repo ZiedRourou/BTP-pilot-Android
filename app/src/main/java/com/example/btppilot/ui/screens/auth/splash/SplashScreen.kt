@@ -18,7 +18,7 @@ import com.example.btppilot.R
 import com.example.btppilot.ui.navigation.NavGraph
 import com.example.btppilot.ui.navigation.Screen
 import com.example.btppilot.ui.screens.shared.component.AppPrimaryTitle
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 
 
 @Composable

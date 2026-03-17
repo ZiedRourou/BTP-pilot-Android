@@ -20,45 +20,19 @@ private val LightColorScheme = lightColorScheme(
     primary = Primary,
     secondary = Secondary,
     tertiary = Tertiary,
-
     surface = surface,
-
     onPrimary = YellowDark,
-
     error = Error,
 )
 
-//private val DarkColorScheme = darkColorScheme(
-//    primary = YellowPrimary,
-//    secondary = YellowLight,
-//    tertiary = WarningOrange,
-//
-//    background = NavyPrimary,
-//    surface = NavySurface,
-//
-//    onPrimary = Color.Black,
-//    onSecondary = Color.Black,
-//    onTertiary = Color.White,
-//
-//    onBackground = Color.White,
-//    onSurface = Color.White
-//)
 
 @Composable
 fun BtpPilotTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val colorScheme = LightColorScheme
 
-        darkTheme -> LightColorScheme
-        else -> LightColorScheme
-    }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {

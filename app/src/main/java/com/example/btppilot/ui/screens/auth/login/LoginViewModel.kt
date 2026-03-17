@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.request.auth.LoginRequestDto
 import com.example.btppilot.data.repository.AuthRepository
 import com.example.btppilot.ui.navigation.NavGraph
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.EMAIL_REGEX
 import com.example.btppilot.util.Resource

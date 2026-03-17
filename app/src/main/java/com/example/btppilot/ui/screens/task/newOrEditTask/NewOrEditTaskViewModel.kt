@@ -10,12 +10,13 @@ import com.example.btppilot.data.dto.response.project.UserProject
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.data.repository.ProjectRepository
 import com.example.btppilot.data.repository.TaskRepository
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.Resource
 import com.example.btppilot.util.TaskStatus
-import com.example.btppilot.util.isoToUiDate
-import com.example.btppilot.util.uiDateToIso
+import com.example.btppilot.util.formatStrDateToIsoAPi
+import com.example.btppilot.util.formatStrDateToShortDate
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,7 +41,7 @@ class NewOrEditTaskViewModel @Inject constructor(
         val title: String = "",
         val description: String = "",
         val userOption: List<UsersOfCompanyItem> = listOf(),
-        val estimateHours: String = "",
+        val estimateHours: Double = 1.0,
 
         val project: List<ProjectResponseByUserCompanyDtoItem>? = null,
 
@@ -76,11 +77,10 @@ class NewOrEditTaskViewModel @Inject constructor(
         val titleError: String? = null,
         val descriptionError: String? = null,
         val dateEndError: String? = null,
-        val estimateHoursError: String? = null,
         val selectedUserError: String? = null,
-
+        val projectError: String? = null,
         val isLoading: Boolean = false,
-        val projectUpdate : Int =0
+        val projectUpdate: Int = 0
     )
 
     private val _newTaskStateFlow = MutableStateFlow(NewTaskState())
@@ -89,15 +89,17 @@ class NewOrEditTaskViewModel @Inject constructor(
     private val _newTaskEventSharedFlow = MutableSharedFlow<EventState>()
     val newTaskEventSharedFlow = _newTaskEventSharedFlow.asSharedFlow()
 
+    init {
+        fetchProjectUser()
+    }
 
     fun setProjectId(projectId: Long) {
-        if(!newTaskStateFlow.value.isEditorMode){
+        if (!newTaskStateFlow.value.isEditorMode) {
             _newTaskStateFlow.update {
                 it.copy(
                     selectedProject = newTaskStateFlow.value.project?.find { it.id == projectId.toInt() }
                 )
             }
-            fetchProjectUser()
         }
     }
 
@@ -124,17 +126,12 @@ class NewOrEditTaskViewModel @Inject constructor(
         }
     }
 
-    fun onHoursChange(hour: String) {
 
-        if (!hour.matches(Regex("^\\d*\$"))) return
-
+    fun onDurationSelected(hour: Int, minute: Int) {
+        val decimalMinutes = hour + (minute / 60.0)
         _newTaskStateFlow.update {
             it.copy(
-                estimateHours = hour,
-                estimateHoursError =
-                if (hour.isNotEmpty() && hour.toIntOrNull() == null)
-                    "Nombre entier requis"
-                else null
+                estimateHours = decimalMinutes
             )
         }
     }
@@ -190,65 +187,61 @@ class NewOrEditTaskViewModel @Inject constructor(
 
     private fun publishTask() {
         viewModelScope.launch {
-            viewModelScope.launch {
-                _newTaskStateFlow.update {
-                    it.copy(
-                        isLoading = true
-                    )
-                }
-                val hoursDouble = newTaskStateFlow.value.estimateHours
-                    .replace(",", ".")
-                    .toDouble()
-                val currentData = newTaskStateFlow.value
-
-                val result = withContext(Dispatchers.IO) {
-                    taskRepository.postNewTask(
-                        projectId = currentData.selectedProject!!.id,
-                        taskRequestDto = TaskRequestDto(
-                            title = currentData.title,
-                            description = currentData.description,
-                            priority = currentData.selectedPriority.name,
-                            status = currentData.selectedStatus.name,
-                            plannedStartDate = uiDateToIso(currentData.dateBegin),
-                            plannedEndDate = uiDateToIso(currentData.dateEnd),
-                            estimationHours = hoursDouble.toInt(),
-                            assignedUserIds = currentData.selectUser.map { user -> user.user.id },
-                            doneEndDate = uiDateToIso(currentData.dateEnd),
-                        )
-                    )
-                }
-
-                when (result) {
-
-                    is Resource.Success -> {
-                        _newTaskStateFlow.update {
-                            it.copy(
-                                isLoading = false
-                            )
-                        }
-
-                        _newTaskEventSharedFlow.emit(
-                            EventState.PopBackStackWithRefresh(Unit)
-                        )
-                    }
-
-                    is Resource.Error -> {
-
-                        _newTaskStateFlow.update {
-                            it.copy(
-                                isLoading = false
-                            )
-                        }
-
-                        _newTaskEventSharedFlow.emit(
-                            EventState.ShowMessageSnackBar(result.message)
-                        )
-                    }
-                }
+            _newTaskStateFlow.update {
+                it.copy(
+                    isLoading = true
+                )
             }
 
+            val currentData = newTaskStateFlow.value
+
+            val result = withContext(Dispatchers.IO) {
+                taskRepository.postNewTask(
+                    projectId = currentData.selectedProject?.id ?: 0,
+                    taskRequestDto = TaskRequestDto(
+                        title = currentData.title,
+                        description = currentData.description,
+                        priority = currentData.selectedPriority.name,
+                        status = currentData.selectedStatus.name,
+                        plannedStartDate = currentData.dateBegin.formatStrDateToIsoAPi(),
+                        plannedEndDate = currentData.dateEnd.formatStrDateToIsoAPi(),
+                        estimationHours = currentData.estimateHours,
+                        assignedUserIds = currentData.selectUser.map { user -> user.user.id },
+                        doneEndDate = currentData.dateEnd.formatStrDateToIsoAPi(),
+                    )
+                )
+            }
+
+            when (result) {
+
+                is Resource.Success -> {
+                    _newTaskStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    _newTaskEventSharedFlow.emit(
+                        EventState.PopBackStackWithRefresh(Unit)
+                    )
+                }
+
+                is Resource.Error -> {
+
+                    _newTaskStateFlow.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    _newTaskEventSharedFlow.emit(
+                        EventState.ShowMessageSnackBar(result.message)
+                    )
+                }
+            }
         }
     }
+
 
     fun publishOrEdit() {
         if (!validateDataTask()) return
@@ -267,9 +260,7 @@ class NewOrEditTaskViewModel @Inject constructor(
                     isLoading = true
                 )
             }
-            val hoursDouble = newTaskStateFlow.value.estimateHours
-                .replace(",", ".")
-                .toDouble()
+
             val currentData = newTaskStateFlow.value
 
             val result = withContext(Dispatchers.IO) {
@@ -280,11 +271,11 @@ class NewOrEditTaskViewModel @Inject constructor(
                         description = currentData.description,
                         priority = currentData.selectedPriority.name,
                         status = currentData.selectedStatus.name,
-                        plannedStartDate = uiDateToIso(currentData.dateBegin),
-                        plannedEndDate = uiDateToIso(currentData.dateEnd),
-                        estimationHours = hoursDouble.toInt(),
+                        plannedStartDate = currentData.dateBegin.formatStrDateToIsoAPi(),
+                        plannedEndDate = currentData.dateEnd.formatStrDateToIsoAPi(),
+                        estimationHours = currentData.estimateHours,
                         assignedUserIds = currentData.selectUser.map { user -> user.user.id },
-                        doneEndDate = uiDateToIso(currentData.dateEnd),
+                        doneEndDate = currentData.dateEnd.formatStrDateToIsoAPi(),
                     )
                 )
             }
@@ -344,9 +335,9 @@ class NewOrEditTaskViewModel @Inject constructor(
                                 description = task.description,
                                 selectedStatus = TaskStatus.valueOf(task.status),
                                 selectedPriority = ProjectAndTakPriorities.valueOf(task.priority),
-                                dateBegin = isoToUiDate(task.plannedStartDate),
-                                dateEnd = isoToUiDate(task.plannedEndDate),
-                                estimateHours = task.estimationHours.toString(),
+                                dateBegin = task.plannedStartDate.formatStrDateToShortDate(),
+                                dateEnd = task.plannedEndDate.formatStrDateToShortDate(),
+                                estimateHours = task.estimationHours,
                                 selectUser = task.assignments.map {
                                     UserProject(
                                         "",
@@ -357,7 +348,8 @@ class NewOrEditTaskViewModel @Inject constructor(
                                         )
                                     )
                                 },
-                                projectUpdate = task.projectId
+                                projectUpdate = task.projectId,
+                                selectedProject = newTaskStateFlow.value.project?.first { it.id == task.projectId }
                             )
                         }
                     }
@@ -400,8 +392,9 @@ class NewOrEditTaskViewModel @Inject constructor(
                     result.data?.let { projectData ->
                         _newTaskStateFlow.update {
                             it.copy(
-                                project = projectData.projects
-                            )
+                                project = projectData.projects,
+
+                                )
                         }
                     }
                 }
@@ -431,7 +424,6 @@ class NewOrEditTaskViewModel @Inject constructor(
         val start = format.parse(currentData.dateBegin)
         val end = format.parse(currentData.dateEnd)
 
-        val hoursInt = currentData.estimateHours.toIntOrNull()
 
         _newTaskStateFlow.update {
 
@@ -450,11 +442,8 @@ class NewOrEditTaskViewModel @Inject constructor(
                     else -> null
                 },
 
-                estimateHoursError =
-                when {
-                    currentData.estimateHours.isEmpty() -> "Estimation requise"
-                    hoursInt == null -> "Nombre entier requis"
-                    hoursInt <= 0 -> "Doit être > 0"
+                projectError = when {
+                    currentData.selectedProject == null -> "Sélectionner un projet"
                     else -> null
                 },
 
@@ -472,9 +461,9 @@ class NewOrEditTaskViewModel @Inject constructor(
         newTaskStateFlow.value.let {
             if (it.titleError.isNullOrEmpty()
                 && it.descriptionError.isNullOrEmpty()
-                && it.estimateHoursError.isNullOrEmpty()
                 && it.dateEndError.isNullOrEmpty()
                 && it.selectedUserError.isNullOrEmpty()
+                && it.projectError.isNullOrEmpty()
             )
                 return true
         }

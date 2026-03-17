@@ -9,18 +9,24 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.example.btppilot.R
 import com.example.btppilot.ui.navigation.NavGraph
 import com.example.btppilot.ui.screens.auth.register.component.BottomBarRegister
 import com.example.btppilot.ui.screens.auth.register.component.HeaderRegister
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 
 @Composable
 fun RegisterLinkUserToCompanyScreen(
     navController: NavController,
     registerLinkUserToCompany: RegisterLinkUserToCompanyViewModel,
+    roleEnum : String,
 ) {
 
+    registerLinkUserToCompany.setRole(roleEnum)
+    val context = LocalContext.current
     val companyInfo by registerLinkUserToCompany.companyInfoInviteStateFlow.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -28,7 +34,7 @@ fun RegisterLinkUserToCompanyScreen(
         registerLinkUserToCompany.companyInfoInviteEventSharedFlow.collect { event ->
             when (event) {
                 is EventState.ShowMessageSnackBar ->
-                    snackBarHostState.showSnackbar(event.message)
+                    snackBarHostState.showSnackbar(context.getString(event.message))
 
                 is EventState.RedirectGraph ->
                     navController.navigate(event.graph.route) {
@@ -44,7 +50,7 @@ fun RegisterLinkUserToCompanyScreen(
         snackbarHost = { SnackbarHost(snackBarHostState) },
         bottomBar = {
             BottomBarRegister(
-                text = "Valider",
+                text = stringResource(id = R.string.btn_txt_validate),
                 onClick = registerLinkUserToCompany::inviteUserToCompany
             )
         },

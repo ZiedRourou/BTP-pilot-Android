@@ -1,8 +1,9 @@
 package com.example.btppilot.data.repository
 
+import com.example.btppilot.R
 import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.dto.request.company.NewCompanyRequestDto
-import com.example.btppilot.data.dto.response.company.NewCompanyResponseDto
+import com.example.btppilot.data.dto.response.company.Company
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.Resource
@@ -16,7 +17,7 @@ class CompanyRepository @Inject constructor(
 
     suspend fun createCompanyUser(
         companyData: NewCompanyRequestDto,
-    ): Resource<NewCompanyResponseDto> {
+    ): Resource<Company> {
 
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
@@ -34,13 +35,13 @@ class CompanyRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    409 -> "vous etes déja lié a l'entreprise"
-                    400 -> "Informations invalides"
-                    404 -> "Entreprise non trouvé"
-                    else -> "erreur"
+                    409 -> R.string.already_link_to_company
+                    400 -> R.string.info_invalid
+                    404 -> R.string.company_not_found
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
 
@@ -62,9 +63,9 @@ class CompanyRepository @Inject constructor(
         } else
             return Resource.Error(
                 code = response.code() ?: 400,
-                message = "erreur"
+                message =R.string.error_server
 
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 }

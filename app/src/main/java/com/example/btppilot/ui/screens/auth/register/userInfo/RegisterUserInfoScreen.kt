@@ -13,12 +13,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.btppilot.ui.navigation.Screen
 import com.example.btppilot.ui.screens.auth.register.component.BottomBarRegister
 import com.example.btppilot.ui.screens.auth.register.component.HeaderRegister
 import com.example.btppilot.ui.screens.auth.register.RegisterSharedViewModel
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 
 
 @Composable
@@ -29,16 +31,21 @@ fun RegisterUserInfoScreen(
 
     val userInfo by registerViewModel.registerUserInfoStateFlow.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         registerViewModel.registerUserEventSharedFlow.collect { event ->
             when (event) {
 
                 is EventState.ShowMessageSnackBar ->
-                    snackBarHostState.showSnackbar(event.message)
+                    snackBarHostState.showSnackbar(context.getString(event.message))
 
                 is EventState.RedirectScreen ->
-                    navController.navigate(event.screen.route)
+                    navController.navigate(event.screen.route) {
+                        if (event.screen is Screen.RegisterRole)
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+
                 else -> {}
             }
         }
@@ -62,7 +69,7 @@ fun RegisterUserInfoScreen(
                 onClick = registerViewModel::registerUser,
             )
         }
-    ){ padding->
+    ) { padding ->
 
         RegisterUserInfoContent(
             paddingValues = padding,

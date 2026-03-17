@@ -3,7 +3,7 @@ package com.example.btppilot.ui.screens.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.btppilot.ui.navigation.Screen
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.data.local.AuthSharedPref
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,7 +21,7 @@ class ProfileViewModel @Inject constructor(
     val profileEventSharedFlow = _profileEventSharedFlow.asSharedFlow()
 
     fun logout(){
-        authSharedPref.clearCompany()
+        authSharedPref.clearInfoLogout()
         viewModelScope.launch{
             _profileEventSharedFlow.emit(
                 EventState.RedirectScreen(Screen.Login)

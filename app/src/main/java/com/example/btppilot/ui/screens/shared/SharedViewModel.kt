@@ -3,6 +3,7 @@ package com.example.btppilot.ui.screens.shared
 import androidx.lifecycle.ViewModel
 import com.example.btppilot.data.dto.response.project.ProjectResponseByUserCompanyDtoItem
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
+import com.example.btppilot.data.dto.response.tasks.TasksByProjectDtoItem
 import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.UserProjectRole
 import com.example.btppilot.util.UserRole
@@ -88,9 +89,17 @@ class SharedViewModel @Inject constructor(
         } != null
     }
 
-    fun isAuthorizedToEditTask(): Boolean {
+    fun isAuthorizedToEditTask(
+        userProjectRole: UserProjectRole
+    ): Boolean {
 
-        return userInfoStateFlow.value.userRole != UserRole.CLIENT
+        if (userInfoStateFlow.value.userRole == UserRole.OWNER) return true
+
+        return userProjectRole == UserProjectRole.MANAGER
+    }
+
+    fun isAuthorizedToEditStatus(): Boolean {
+        return  userInfoStateFlow.value.userRole != UserRole.CLIENT
     }
 
 }

@@ -9,7 +9,7 @@ data class TaskRequestDto(
     @Json(name = "description")
     val description: String,
     @Json(name = "estimationHours")
-    val estimationHours: Int,
+    val estimationHours: Double,
     @Json(name = "plannedStartDate")
     val plannedStartDate: String,
     @Json(name = "plannedEndDate")

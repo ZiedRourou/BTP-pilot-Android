@@ -8,10 +8,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.btppilot.ui.screens.shared.SharedViewModel
 import com.example.btppilot.ui.screens.shared.component.HeaderMainSreen
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 
 @Composable
 fun TeamScreen(
@@ -22,12 +23,13 @@ fun TeamScreen(
     val state by teamViewModel.teamStateFlow.collectAsState()
     val userInfo by sharedViewModel.userInfoStateFlow.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         teamViewModel.teamEventSharedFlow.collect { event ->
             when (event) {
                 is EventState.ShowMessageSnackBar ->
-                    snackbarHostState.showSnackbar(event.message)
+                    snackbarHostState.showSnackbar(context.getString(event.message))
 
                 is EventState.RedirectScreen ->
                     navController.navigate(event.screen.route)

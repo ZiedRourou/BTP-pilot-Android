@@ -10,12 +10,11 @@ import com.example.btppilot.data.dto.request.project.NewProjectRequestDto
 import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
 import com.example.btppilot.data.dto.request.task.UpdateTaskDto
 import com.example.btppilot.data.dto.response.auth.AuthResponseDto
+import com.example.btppilot.data.dto.response.company.Company
 import com.example.btppilot.data.dto.response.user.InviteUserCompanyResponseDto
-import com.example.btppilot.data.dto.response.company.NewCompanyResponseDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseByUserCompanyDto
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.data.dto.response.project.ProjectByIdResponseDto
-import com.example.btppilot.data.dto.response.project.ProjectResponseDto
 import com.example.btppilot.data.dto.response.tasks.TasksByProjectDtoItem
 import retrofit2.Response
 import retrofit2.http.Body
@@ -46,7 +45,7 @@ interface ApiInterface {
     suspend fun createNewCompany(
         @Header("Authorization") authorization: String,
         @Body companyData: NewCompanyRequestDto,
-    ): Response<NewCompanyResponseDto>
+    ): Response<Company>
 
     @GET(ApiRoutes.API_PROJECT_COMPANY_ROUTE)
     suspend fun getProjectByUserCompany(
@@ -59,7 +58,7 @@ interface ApiInterface {
         @Header("Authorization") authorization: String,
         @Path("id") companyId: Int,
         @Body project: NewProjectRequestDto
-    ): Response<ProjectResponseDto>
+    ): Response<Unit>
 
     @GET(ApiRoutes.API_USER_COMPANY_ROUTE)
     suspend fun getUsersCompany(
@@ -98,14 +97,12 @@ interface ApiInterface {
         @Path("id") companyId: Int,
     ): Response<List<TasksByProjectDtoItem>>
 
-
     @POST(ApiRoutes.API_TASK_PROJECT_ROUTE)
     suspend fun postNewTask(
         @Header("Authorization") authorization: String,
         @Path("projectId") projectId: Int,
         @Body task: TaskRequestDto
-    ): Response<TasksByProjectDtoItem>
-
+    ): Response<Unit>
 
     @GET(ApiRoutes.API_TASK_ROUTE)
     suspend fun fetchTaskByID(

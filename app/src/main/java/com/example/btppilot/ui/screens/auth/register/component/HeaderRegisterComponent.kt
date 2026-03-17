@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -62,13 +63,13 @@ fun HeaderRegister(
             ) {
                 Text(
                     text = buildAnnotatedString {
-                        append("Votre app ")
+                        append(stringResource(R.string.txt_your_app_app))
                         withStyle(
                             style = SpanStyle(
                                 color = MaterialTheme.colorScheme.primary
                             )
                         ) {
-                            append("Gestionnaire")
+                            append(stringResource(R.string.txt_gestionnaire))
                         }
                     },
                     style = MaterialTheme.typography.headlineSmall,
@@ -76,7 +77,7 @@ fun HeaderRegister(
                 )
 
                 Text(
-                    text = "de chantier",
+                    text = stringResource(R.string.txt_title_suffix_header_register),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -107,7 +108,8 @@ fun HeaderRegister(
                         .height(6.dp)
                         .background(
                             color,
-                            RoundedCornerShape(3.dp))
+                            RoundedCornerShape(3.dp)
+                        )
                 )
             }
         }
@@ -115,7 +117,7 @@ fun HeaderRegister(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Étape $step sur 3",
+            text = stringResource(R.string.txt_step) + "$step sur 3",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )

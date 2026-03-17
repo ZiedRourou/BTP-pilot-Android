@@ -1,5 +1,6 @@
 package com.example.btppilot.data.repository
 
+import com.example.btppilot.R
 import com.example.btppilot.data.api.ApiInterface
 import com.example.btppilot.data.dto.request.task.TaskRequestDto
 import com.example.btppilot.data.dto.request.task.UpdateTaskDto
@@ -34,9 +35,9 @@ class TaskRepository @Inject constructor(
         } else
             return Resource.Error(
                 code = response.code() ?: 400,
-                message = "erreur"
+                message = R.string.error_server
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
     suspend fun getTasksOfCompany(
@@ -59,15 +60,15 @@ class TaskRepository @Inject constructor(
         } else
             return Resource.Error(
                 code = response.code() ?: 400,
-                message = "erreur"
+                message =R.string.error_server
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
     suspend fun postNewTask(
         projectId: Int,
         taskRequestDto: TaskRequestDto
-    ): Resource<TasksByProjectDtoItem> {
+    ): Resource<Unit> {
         val token = authSharedPref.getToken()
         val bearerToken = "Bearer $token"
 
@@ -75,9 +76,9 @@ class TaskRepository @Inject constructor(
             api.postNewTask(bearerToken, projectId, taskRequestDto)
 
         if (response.isSuccessful) {
-            response.body()?.let { projectsData ->
+            response.body()?.let {
                 return Resource.Success(
-                    data = projectsData,
+                    data = null,
                     code = response.code()
                 )
             }
@@ -85,11 +86,10 @@ class TaskRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    401 -> "Email déjà utilisé"
-                    else -> "erreur"
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
     suspend fun getTaskById(
@@ -111,9 +111,9 @@ class TaskRepository @Inject constructor(
         } else
             return Resource.Error(
                 code = response.code() ?: 400,
-                message = "erreur"
+                message =R.string.error_server
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
     suspend fun updateTask(
@@ -137,11 +137,10 @@ class TaskRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    401 -> "Email déjà utilisé"
-                    else -> "erreur"
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
     suspend fun deleteTask(
@@ -164,11 +163,10 @@ class TaskRepository @Inject constructor(
             return Resource.Error(
                 code = response.code() ?: 400,
                 message = when (response.code()) {
-                    401 -> "erreur"
-                    else -> "erreur"
+                    else -> R.string.error_server
                 }
             )
-        return Resource.Error(400, "Erreur serveur ")
+        return Resource.Error(400, R.string.error_server)
     }
 
 }

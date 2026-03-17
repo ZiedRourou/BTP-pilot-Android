@@ -9,7 +9,7 @@ data class UpdateTaskDto(
     @Json(name = "description")
     val description: String? = null,
     @Json(name = "estimationHours")
-    val estimationHours: Int? = null,
+    val estimationHours: Double? = null,
     @Json(name = "plannedStartDate")
     val plannedStartDate: String? = null,
     @Json(name = "plannedEndDate")

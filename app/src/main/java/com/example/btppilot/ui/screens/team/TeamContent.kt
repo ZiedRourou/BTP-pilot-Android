@@ -37,9 +37,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.response.company.UsersOfCompanyItem
 import com.example.btppilot.ui.screens.shared.component.AppPrimaryButton
 import com.example.btppilot.ui.screens.shared.component.AppSecondaryTitle
@@ -124,7 +126,7 @@ fun TeamContent(
 
 
                         Spacer(modifier = Modifier.width(10.dp))
-                        AppSecondaryTitle(text = "Inviter un client ou employé a votre entreprise")
+                        AppSecondaryTitle(text = stringResource(R.string.invite_collaborator_or_client))
 
                         Spacer(modifier = Modifier.height(20.dp))
 
@@ -133,7 +135,7 @@ fun TeamContent(
                             onValueChange = onEmailChange,
                             isError = userListState.emailError != null,
                             supportingText = userListState.emailError,
-                            label = "Email de votre invité",
+                            label = stringResource(R.string.email_of_invited),
                             leadingIcon = Icons.Filled.Email
                         )
 
@@ -144,7 +146,7 @@ fun TeamContent(
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                         AppPrimaryButton(
-                            text = "Inviter",
+                            text = stringResource(R.string.invite),
                             onClick = inviteUser,
                             modifier = Modifier
                                 .padding(horizontal = 50.dp)
@@ -174,7 +176,7 @@ fun NoTeamToDisplay() {
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Aucun Utilisateur lié a votre entreprise")
+            Text(text = stringResource(R.string.no_user_to_display))
         }
     }
 }
@@ -195,7 +197,7 @@ fun TeamItem(
         ) {
 
             Text(
-                text = user.user.firstName + " . " + user.user.lastName,
+                text = user.user.firstName ,
                 style = MaterialTheme.typography.titleMedium
             )
             Row (
@@ -266,7 +268,7 @@ fun AppSelectUserRoleRadioBtnFieldTeam(
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth(),
-                label = { Text("Role de votre invité") },
+                label = { Text(stringResource(R.string.role_of_yor_invite)) },
             )
 
             ExposedDropdownMenu(

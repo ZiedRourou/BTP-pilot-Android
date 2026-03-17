@@ -2,15 +2,16 @@ package com.example.btppilot.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseByUserCompanyDtoItem
 import com.example.btppilot.data.repository.ProjectRepository
 import com.example.btppilot.ui.navigation.Screen
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.ProjectStatus
 import com.example.btppilot.util.Resource
-import com.example.btppilot.util.formatDateFr
+import com.example.btppilot.util.formatDateInFrWord
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,18 +35,21 @@ class HomeViewModel @Inject constructor(
     data class HomeState(
 
         val activeProjectStat: Int = 0,
-        val taskStatusTodoOrInProgressStat: Int = 0,
+        val taskTodoWeek :Int = 0,
+        val taskLateWeek :Int = 0,
+        val taskInProgressWeek :Int = 0,
+
         val projectFilteredList: List<ProjectResponseByUserCompanyDtoItem> = listOf(),
 
         val isLoading: Boolean = false,
         val currentUserName: String = "",
-        val currentDate: String = Date().formatDateFr(),
+        val currentDate: String = Date().formatDateInFrWord(),
 
         val projectStatus: List<ProjectStatus> = listOf(
             ProjectStatus.ALL,
-            ProjectStatus.PLANNED,
             ProjectStatus.IN_PROGRESS,
-            ProjectStatus.COMPLETED,
+            ProjectStatus.PLANNED,
+            ProjectStatus.FINISH
         ),
         val selectedFilter: ProjectStatus = ProjectStatus.ALL,
 
@@ -57,7 +61,9 @@ class HomeViewModel @Inject constructor(
     private val _homeStateFlow = MutableStateFlow(HomeState())
     val homeStateFlow = _homeStateFlow.asStateFlow()
 
-    private val _homeEventSharedFlow = MutableSharedFlow<EventState>()
+    private val _homeEventSharedFlow = MutableSharedFlow<EventState>(
+        extraBufferCapacity = 1
+    )
     val homeEventSharedFlow = _homeEventSharedFlow.asSharedFlow()
 
 
@@ -151,8 +157,10 @@ class HomeViewModel @Inject constructor(
                     result.data?.let { projectData ->
                         _homeStateFlow.update {
                             it.copy(
-                                activeProjectStat = projectData.projects.size,
-                                taskStatusTodoOrInProgressStat = projectData.taskInProgress,
+                                activeProjectStat = projectData.projects.filter { it.status != ProjectStatus.FINISH.name }.size,
+                                taskInProgressWeek = projectData.weekStats.inProgress,
+                                taskLateWeek = projectData.weekStats.late,
+                                taskTodoWeek = projectData.weekStats.todo,
                                 projectFilteredList = projectData.projects
                             )
                         }
@@ -206,7 +214,7 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                     _homeEventSharedFlow.emit(
-                        EventState.ShowMessageSnackBar("Statut mis a jour")
+                        EventState.ShowMessageSnackBar(R.string.status_updated)
                     )
                     fetchProjectUser()
                 }

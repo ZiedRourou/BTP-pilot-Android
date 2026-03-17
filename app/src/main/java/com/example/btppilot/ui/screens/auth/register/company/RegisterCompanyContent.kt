@@ -16,8 +16,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.btppilot.R
 import com.example.btppilot.ui.screens.auth.register.component.BottomBarRegister
 import com.example.btppilot.ui.screens.auth.register.component.HeaderRegister
 import com.example.btppilot.ui.screens.shared.component.AppSecondaryTitle
@@ -36,7 +38,7 @@ private fun RegisterPreview() {
             topBar = { HeaderRegister(3) },
             bottomBar = {
                 BottomBarRegister(
-                    text = "Valider",
+                    text = stringResource(R.string.btn_txt_validate),
                     onClick = {}
                 )
             },
@@ -82,14 +84,15 @@ fun RegisterCompanyContent(
         ) {
 
             AppSecondaryTitle(
-                text = "Les Informations de votre entreprise")
+                text = stringResource(R.string.txt_company_info)
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
 
             AppTextField(
                 value = companyInfo.name,
                 onValueChange = onNameChange,
-                label = "Nom de votre entreprise",
+                label = stringResource(R.string.txt_compnay_name),
                 isError = companyInfo.nameError != null,
                 supportingText = companyInfo.nameError,
                 leadingIcon = Icons.Filled.BusinessCenter,
@@ -106,10 +109,10 @@ fun RegisterCompanyContent(
             AppTextFieldMultiline(
                 value = companyInfo.activity,
                 onValueChange = onActivityChange,
-                label = "Votre secteur d'activité",
+                label = stringResource(R.string.txt_activity_company),
                 isError = companyInfo.activityError != null,
                 supportingText = companyInfo.activityError
-                    ?: "Indiquez le domaine principal de votre entreprise (ex : électricité générale, plomberie-chauffage, climatisation …).",
+                    ?: stringResource(R.string.activity_txt_info_example),
                 minLines = 3,
                 maxLines = 3,
                 leadingIcon = Icons.Filled.Construction

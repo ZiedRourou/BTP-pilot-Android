@@ -26,8 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.btppilot.R
 import com.example.btppilot.ui.screens.shared.component.HeaderMainSreen
 import com.example.btppilot.ui.theme.BtpPilotTheme
 
@@ -77,26 +79,12 @@ fun ProfileContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Icon(Icons.Outlined.PrivacyTip, null)
-                Text("Configurer la collecte de vos données")
+                Text(stringResource(R.string.configure_cookies))
             }
 
             Spacer(Modifier.height(10.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.surface,
-                        RoundedCornerShape(10.dp)
-                    )
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Icon(Icons.Outlined.Flag, null)
-                Text("Configurer la collecte de vos données")
-            }
 
-            Spacer(Modifier.height(10.dp))
 
             Row(
                 modifier = Modifier
@@ -109,7 +97,7 @@ fun ProfileContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Icon(Icons.Outlined.Password, null)
-                Text("Modifier vos informations")
+                Text(stringResource(R.string.update_user_info))
             }
         }
 
@@ -130,7 +118,7 @@ fun ProfileContent(
             )
             Spacer(Modifier.width(8.dp))
             Text(
-                "Se déconnecter",
+                stringResource(R.string.logout),
                 color = MaterialTheme.colorScheme.background,
                 style = MaterialTheme.typography.labelLarge
             )

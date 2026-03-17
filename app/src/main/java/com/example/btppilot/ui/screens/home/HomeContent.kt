@@ -18,12 +18,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.SupervisorAccount
 import androidx.compose.material.icons.filled.Task
-import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,9 +38,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.btppilot.R
 import com.example.btppilot.data.dto.response.project.ProjectResponseByUserCompanyDtoItem
 import com.example.btppilot.data.dto.response.user.User
@@ -47,18 +48,21 @@ import com.example.btppilot.data.dto.response.project.UserProject
 import com.example.btppilot.ui.screens.home.component.CurrentDate
 import com.example.btppilot.ui.screens.home.component.FilterButton
 import com.example.btppilot.ui.screens.home.component.PriorityBadgeDropdown
-import com.example.btppilot.ui.screens.home.component.StatCard
 import com.example.btppilot.ui.screens.home.component.TasksProgressBar
+import com.example.btppilot.ui.screens.shared.component.AppPrimaryTitle
 import com.example.btppilot.ui.screens.shared.component.AppSecondaryTitle
 import com.example.btppilot.ui.screens.shared.component.AppTitleDescription
 import com.example.btppilot.ui.screens.shared.component.HeaderMainSreen
 import com.example.btppilot.ui.screens.shared.component.LoadingOverlay
 import com.example.btppilot.ui.theme.BtpPilotTheme
 import com.example.btppilot.ui.theme.StatusDelayed
+import com.example.btppilot.ui.theme.StatusDone
 import com.example.btppilot.ui.theme.StatusInProgress
+import com.example.btppilot.ui.theme.StatusTodo
 import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.ProjectStatus
-import com.example.btppilot.util.toShortDate
+import com.example.btppilot.util.formatStrDateToShortDate
+import com.example.btppilot.util.formatStrDateToWordFrDate
 
 
 @Preview(showBackground = true, apiLevel = 33)
@@ -73,7 +77,12 @@ private fun HomePreview() {
                     onClick = {},
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
-                    Text("+", fontSize = 25.sp, color = Color.White)
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(40.dp)
+                    )
                 }
             },
 
@@ -100,7 +109,7 @@ private fun HomePreview() {
                 ),
                 onFilterClick = {},
                 isAuthorizedToEdit = { true },
-                onPriorityChange = { _, _ -> Unit  },
+                onPriorityChange = { _, _ -> Unit },
                 onClickEditProject = {},
                 onClickViewProject = {}
             )
@@ -130,9 +139,7 @@ fun HomeContent(
     ) {
 
         HomeStatsCard(
-            homeState.currentDate,
-            homeState.activeProjectStat,
-            homeState.taskStatusTodoOrInProgressStat
+           stat = homeState
         )
 
         FilterStatusProjectHome(
@@ -172,7 +179,7 @@ fun ProjectList(
             items(items) { item ->
                 ProjectItemHome(
                     item = item,
-                    onClickEditProject=onClickEditProject,
+                    onClickEditProject = onClickEditProject,
                     onClickViewProject = onClickViewProject,
                     isAuthorizedToEdit = isAuthorizedToEdit,
                     onPriorityChange = onPriorityChange
@@ -198,7 +205,7 @@ fun FilterStatusProjectHome(
     ) {
 
         Text(
-            text = "Mes chantiers",
+            text = stringResource(R.string.my_projects),
             style = MaterialTheme.typography.labelLarge
         )
 
@@ -292,12 +299,12 @@ fun ProjectItemHome(
                 )
                 Spacer(modifier = Modifier.width(10.dp))
 
-                AppTitleDescription(text = item.plannedStartDate.toShortDate())
+                AppTitleDescription(text = item.plannedStartDate.formatStrDateToShortDate())
                 Spacer(modifier = Modifier.width(10.dp))
                 Image(painter = painterResource(id = R.drawable.arrow), contentDescription = null)
                 Spacer(modifier = Modifier.width(10.dp))
 
-                AppTitleDescription(text = item.plannedEndDate.toShortDate())
+                AppTitleDescription(text = item.plannedEndDate.formatStrDateToShortDate())
             }
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -308,7 +315,7 @@ fun ProjectItemHome(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                AppTitleDescription(text = "Progression des taches")
+                AppTitleDescription(text = stringResource(R.string.task_progression))
                 AppTitleDescription(
                     text = "$progress%",
                     color = MaterialTheme.colorScheme.primary
@@ -393,7 +400,7 @@ fun ProjectsNotFound(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Aucun projet disponible")
+            Text(text = stringResource(R.string.no_project_to_display))
         }
     }
 }
@@ -401,11 +408,9 @@ fun ProjectsNotFound(
 
 @Composable
 fun HomeStatsCard(
-    currentDate: String,
-    projectStat: Int,
-    tasStat: Int
+  stat : HomeViewModel.HomeState
 ) {
-    CurrentDate(currentDate)
+    CurrentDate(stat.currentDate)
 
     Spacer(modifier = Modifier.height(10.dp))
     Row(
@@ -419,25 +424,120 @@ fun HomeStatsCard(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        StatCard(
-            title = "Chantiers Actifs",
-            icon = Icons.Filled.CheckCircle,
-            stat = projectStat,
-            modifier = Modifier.weight(1f)
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1F),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            AppSecondaryTitle(
+                text = stringResource(R.string.active_projects),
+                color = MaterialTheme.colorScheme.background
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+
+                Icon(
+                    imageVector = Icons.Outlined.CheckCircle,
+                    contentDescription = null,
+                    tint = StatusDone,
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.width(15.dp))
+
+                AppPrimaryTitle(
+                    text = stat.activeProjectStat.toString(),
+                    color = MaterialTheme.colorScheme.background
+                )
+            }
+        }
 
         VerticalDivider(
             modifier = Modifier.height(50.dp),
             color = Color.White.copy(alpha = 0.25f)
         )
+        Spacer(modifier = Modifier.width(15.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1F),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center
+        ) {
 
-        StatCard(
-            title = "Tâches en retard",
-            icon = Icons.Filled.WarningAmber,
-            stat = tasStat,
-            modifier = Modifier.weight(1f),
-            tint = StatusDelayed
-        )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AppSecondaryTitle(
+                    text = "Taches ",
+                    color = MaterialTheme.colorScheme.background
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                    text = stringResource(R.string.this_week),
+                    color = Color.LightGray,
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+
+                Icon(
+                    imageVector = Icons.Filled.Circle,
+                    contentDescription = null,
+                    tint = StatusDelayed,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = stringResource(R.string.task_late), color = Color.White)
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = stat.taskLateWeek.toString(), color = Color.White)
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+
+                Icon(
+                    imageVector = Icons.Filled.Circle,
+                    contentDescription = null,
+                    tint = StatusInProgress,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = stringResource(R.string.task_in_progress), color = Color.White)
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = stat.taskInProgressWeek.toString(), color = Color.White)
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+
+                Icon(
+                    imageVector = Icons.Filled.Circle,
+                    contentDescription = null,
+                    tint = StatusTodo,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = stringResource(R.string.task_to_do), color = Color.White)
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = stat.taskTodoWeek.toString(), color = Color.White)
+            }
+        }
     }
 }
 

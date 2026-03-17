@@ -19,10 +19,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.response.tasks.TasksByProjectDtoItem
 import com.example.btppilot.ui.screens.home.component.FilterButton
+import com.example.btppilot.ui.screens.project.projectDetails.TasksNotFound
 import com.example.btppilot.ui.screens.shared.component.HeaderMainSreen
 import com.example.btppilot.ui.screens.shared.component.LoadingOverlay
 import com.example.btppilot.ui.screens.task.component.ItemTask
@@ -37,8 +40,6 @@ private fun NewTaskListScreenPreview() {
     val snackbarHostState = remember { SnackbarHostState() }
 
     BtpPilotTheme {
-
-
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = { HeaderMainSreen(userName = "userInfo") },
@@ -48,27 +49,26 @@ private fun NewTaskListScreenPreview() {
             TaskListContent(
                 paddingValues = padding,
                 tasklist = TaskListViewModel.TaskState(),
-                isEnableToEditTask =true ,
+                isEnableToEditTask = true,
                 redirectEditTask = {},
-                changeStatus = {taskStatus, tasksByProjectDtoItem ->  },
-                deleteTask ={},
+                changeStatus = { taskStatus, tasksByProjectDtoItem -> },
+                deleteTask = {},
                 filterTask = {}
             )
         }
     }
 }
 
-
 @Composable
 fun TaskListContent(
     paddingValues: PaddingValues,
     tasklist: TaskListViewModel.TaskState,
     isEnableToEditTask: Boolean,
-    redirectEditTask : (Int) -> Unit,
+    redirectEditTask: (Int) -> Unit,
     changeStatus: (TaskStatus, TasksByProjectDtoItem) -> Unit,
-    deleteTask : (Int)-> Unit,
-    filterTask : (TaskStatus) -> Unit
-){
+    deleteTask: (Int) -> Unit,
+    filterTask: (TaskStatus) -> Unit
+) {
 
     LoadingOverlay(isVisible = tasklist.isLoading)
     Column(
@@ -80,7 +80,7 @@ fun TaskListContent(
         FilterStatusTaskList(
             optionList = tasklist.taskStatus,
             selected = tasklist.selectedFilter,
-            onSelectedChange =filterTask
+            onSelectedChange = filterTask
         )
         Spacer(modifier = Modifier.height(10.dp))
         LazyColumn(
@@ -90,22 +90,30 @@ fun TaskListContent(
                 .padding(horizontal = 10.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            if (tasklist.tasksFiltered.isEmpty()) {
 
-            items(tasklist.tasksFiltered) { item ->
-                ItemTask(
-                    taskState = item,
-                    canEdit = isEnableToEditTask,
-                    redirectEditTask = redirectEditTask ,
-                    changeStatus = changeStatus ,
-                    deleteTask = deleteTask
-                )
+                item {
+                    TasksNotFound()
+                }
+
+            } else {
+
+                items(tasklist.tasksFiltered) { item ->
+                    ItemTask(
+                        taskState = item,
+                        canEditStatus = isEnableToEditTask,
+                        redirectEditTask = redirectEditTask,
+                        changeStatus = changeStatus,
+                        deleteTask = deleteTask,
+                        canEditTask = false
+                    )
+                }
             }
 
         }
 
     }
 }
-
 
 
 @Composable
@@ -122,7 +130,7 @@ fun FilterStatusTaskList(
     ) {
 
         Text(
-            text = "Mes Taches",
+            text = stringResource(R.string.my_tasks),
             style = MaterialTheme.typography.labelLarge
         )
 

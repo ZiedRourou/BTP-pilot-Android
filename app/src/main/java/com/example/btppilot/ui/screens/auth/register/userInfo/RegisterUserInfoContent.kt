@@ -15,8 +15,10 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.btppilot.R
 import com.example.btppilot.ui.screens.auth.register.RegisterSharedViewModel
 import com.example.btppilot.ui.screens.auth.register.component.BottomBarRegister
 import com.example.btppilot.ui.screens.auth.register.component.HeaderRegister
@@ -80,12 +82,12 @@ fun RegisterUserInfoContent(
         verticalArrangement = Arrangement.SpaceEvenly,
     ) {
 
-        AppSecondaryTitle(text = "Vos informations")
+        AppSecondaryTitle(text = stringResource(R.string.txt_your_information))
 
         AppTextField(
             value = userInfo.firstName,
             onValueChange = onFirstNameChange,
-            label = "Prénom",
+            label = stringResource(R.string.txt_firstname),
             isError = userInfo.firstNameError != null,
             supportingText = userInfo.firstNameError,
             leadingIcon = Icons.Filled.Person
@@ -94,7 +96,7 @@ fun RegisterUserInfoContent(
         AppTextField(
             value = userInfo.email,
             onValueChange = onEmailChange,
-            label = "Email",
+            label = stringResource(R.string.txt_email),
             leadingIcon = Icons.Filled.Email,
             isError = userInfo.emailError != null,
             supportingText = userInfo.emailError,
@@ -104,7 +106,7 @@ fun RegisterUserInfoContent(
             value = userInfo.password,
             onValueChange = onPasswordChange,
             isPassword = true,
-            label = "Mot de passe",
+            label = stringResource(R.string.txt_password),
             leadingIcon = Icons.Filled.Lock,
             isError = userInfo.passwordError != null,
             supportingText = userInfo.passwordError,
@@ -114,7 +116,7 @@ fun RegisterUserInfoContent(
             value = userInfo.confirmPassword,
             onValueChange = onConfirmPasswordChange,
             isPassword = true,
-            label = "Confirmation",
+            label = stringResource(R.string.txt_confirm_password),
             leadingIcon = Icons.Filled.Lock,
             isError = userInfo.confirmPasswordError != null,
             supportingText = userInfo.confirmPasswordError,

@@ -1,4 +1,4 @@
-package com.example.btppilot.data.dto.response.auth
+package com.example.btppilot.data.dto.response.company
 
 
 import com.squareup.moshi.Json

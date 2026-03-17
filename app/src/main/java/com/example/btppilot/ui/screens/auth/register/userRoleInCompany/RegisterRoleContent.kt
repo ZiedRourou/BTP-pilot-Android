@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.CorporateFare
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Engineering
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,9 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.btppilot.R
 import com.example.btppilot.ui.screens.auth.register.component.BottomBarRegister
 import com.example.btppilot.ui.screens.auth.register.component.HeaderRegister
 import com.example.btppilot.ui.screens.shared.component.AppPrimaryTitle
@@ -72,7 +76,7 @@ fun RegisterContent(
     ) {
 
         AppPrimaryTitle(
-            text = "Sélectionnez votre rôle",
+            text = stringResource(R.string.txt_select_your_role),
             color = MaterialTheme.colorScheme.secondary,
             textStyle = MaterialTheme.typography.headlineMedium
         )
@@ -80,10 +84,10 @@ fun RegisterContent(
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
             RoleCard(
-                title = "Chef d’entreprise",
+                title = stringResource(R.string.txt_ceo_company),
                 description =
-                "Créez et pilotez vos projets, coordonnez vos équipes et suivez l’avancement des chantiers",
-                icon = Icons.Default.Build,
+                stringResource(R.string.role_description_ceo_company),
+                icon = Icons.Default.CorporateFare,
                 isSelected = selectedRole == UserRole.OWNER,
                 onClick = {
                     onRoleSelected(UserRole.OWNER)
@@ -91,10 +95,10 @@ fun RegisterContent(
             )
 
             RoleCard(
-                title = "Employé",
+                title = stringResource(R.string.collaborator),
                 description =
-                "Consultez vos tâches, mettez à jour leur progression et collaborez sur les projets",
-                icon = Icons.Default.Email,
+                stringResource(R.string.collaborator_role_desc),
+                icon = Icons.Default.Engineering,
                 isSelected = selectedRole == UserRole.COLLABORATOR,
                 onClick = {
                     onRoleSelected(UserRole.COLLABORATOR)
@@ -102,9 +106,9 @@ fun RegisterContent(
             )
 
             RoleCard(
-                title = "Client",
+                title = stringResource(R.string.client),
                 description =
-                "Suivez l’avancement des travaux et échangez avec votre prestataire",
+                stringResource(R.string.client_role_desc),
                 icon = Icons.Default.Person,
                 isSelected = selectedRole == UserRole.CLIENT,
                 onClick = {

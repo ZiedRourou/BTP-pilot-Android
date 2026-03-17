@@ -12,11 +12,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.btppilot.ui.screens.shared.SharedViewModel
 import com.example.btppilot.ui.screens.shared.component.HeaderMainSreen
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 
 
 @Composable
@@ -28,13 +29,22 @@ fun TaskListScreen(
     val userInfo by sharedViewModel.userInfoStateFlow.collectAsState()
     val state by taskListViewModel.taskListStateFlow.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val isEnableToEditTask = sharedViewModel.isAuthorizedToEditTask()
+    val context = LocalContext.current
 
+    val isEnableToEditStatus = sharedViewModel.isAuthorizedToEditStatus()
+    val refresh by sharedViewModel.refreshTaskStateFlow.collectAsState()
+
+    LaunchedEffect(Unit) {
+        if (refresh) {
+            taskListViewModel.fetchTasks()
+            sharedViewModel.resetTaskRefresh()
+        }
+    }
     LaunchedEffect(Unit) {
         taskListViewModel.taskEventState.collect { event ->
             when (event) {
                 is EventState.ShowMessageSnackBar ->
-                    snackbarHostState.showSnackbar(event.message)
+                    snackbarHostState.showSnackbar(context.getString(event.message))
 
                 is EventState.RedirectScreen ->
                     navController.navigate(event.screen.route)
@@ -68,7 +78,7 @@ fun TaskListScreen(
         TaskListContent(
             paddingValues = padding,
             tasklist = state,
-            isEnableToEditTask = isEnableToEditTask,
+            isEnableToEditTask = isEnableToEditStatus,
             changeStatus = taskListViewModel::updateTask,
             redirectEditTask = taskListViewModel::redirectEditTask,
             deleteTask = taskListViewModel::deleteTask,

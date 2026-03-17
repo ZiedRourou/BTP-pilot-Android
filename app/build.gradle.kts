@@ -96,5 +96,9 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.8")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
+    //datePicker
+    implementation("androidx.compose.material3:material3:1.1.0")
+
+
 
 }

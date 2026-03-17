@@ -24,8 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.btppilot.R
 import com.example.btppilot.ui.screens.auth.register.component.BottomBarRegister
 import com.example.btppilot.ui.screens.auth.register.component.HeaderRegister
 import com.example.btppilot.ui.screens.shared.component.AppPrimaryTitleBlue
@@ -42,7 +44,7 @@ private fun RegisterLinkUserToCompanyPreview() {
             topBar = { HeaderRegister(3) },
             bottomBar = {
                 BottomBarRegister(
-                    text = "Valider",
+                    text = stringResource(id = R.string.btn_txt_validate),
                     onClick = {}
                 )
             },
@@ -101,14 +103,14 @@ fun RegisterLinkUserToCompanyContent(
                         modifier = Modifier.size(40.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
-                    AppPrimaryTitleBlue(text = "Rejoindre votre entreprise")
+                    AppPrimaryTitleBlue(text = stringResource(R.string.txt_join_company))
 
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
                 AppTitleDescription(
-                    text = "Entrez l'email de votre entreprise afin de faire une demande d'invitation"
+                    text = stringResource(R.string.txt_enter_email_company)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -118,7 +120,7 @@ fun RegisterLinkUserToCompanyContent(
                     onValueChange = onEmailChange,
                     isError = companyInfo.emailError != null,
                     supportingText = companyInfo.emailError,
-                    label = "Email de votre entreprise",
+                    label = stringResource(R.string.txt_email_of_your_company),
                     leadingIcon = Icons.Filled.Email
                 )
             }

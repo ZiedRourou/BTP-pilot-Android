@@ -1,5 +1,15 @@
 package com.example.btppilot.ui.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,7 +52,26 @@ fun MainNavHost(
             startDestination = Screen.Home.route
         ) {
 
-            composable(Screen.Home.route) { backStackEntry ->
+            composable(
+                Screen.Home.route,
+                enterTransition = {
+                    fadeIn(
+                        animationSpec = tween(500)
+                    ) + scaleIn(
+                        initialScale = 0.92f,
+                        animationSpec = tween(500)
+                    )
+                },
+
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(250)
+                    ) + scaleOut(
+                        targetScale = 1.08f,
+                        animationSpec = tween(250)
+                    )
+                }
+            ) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
                 }
@@ -56,7 +85,25 @@ fun MainNavHost(
                 )
             }
 
-            composable(Screen.TaskList.route) { backStackEntry ->
+            composable(Screen.TaskList.route,
+                enterTransition = {
+                    fadeIn(
+                        animationSpec = tween(500)
+                    ) + scaleIn(
+                        initialScale = 0.92f,
+                        animationSpec = tween(500)
+                    )
+                },
+
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(250)
+                    ) + scaleOut(
+                        targetScale = 1.08f,
+                        animationSpec = tween(250)
+                    )
+                }
+            ) { backStackEntry ->
 
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
@@ -71,7 +118,25 @@ fun MainNavHost(
                 )
             }
 
-            composable(Screen.Team.route) { backStackEntry ->
+            composable(Screen.Team.route,
+                enterTransition = {
+                    fadeIn(
+                        animationSpec = tween(500)
+                    ) + scaleIn(
+                        initialScale = 0.92f,
+                        animationSpec = tween(500)
+                    )
+                },
+
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(250)
+                    ) + scaleOut(
+                        targetScale = 1.08f,
+                        animationSpec = tween(250)
+                    )
+                }
+            ) { backStackEntry ->
 
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
@@ -86,7 +151,26 @@ fun MainNavHost(
                 )
             }
 
-            composable(Screen.Profile.route) { backStackEntry ->
+            composable(Screen.Profile.route,
+
+                enterTransition = {
+                    fadeIn(
+                        animationSpec = tween(500)
+                    ) + scaleIn(
+                        initialScale = 0.92f,
+                        animationSpec = tween(500)
+                    )
+                },
+
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(250)
+                    ) + scaleOut(
+                        targetScale = 1.08f,
+                        animationSpec = tween(250)
+                    )
+                }
+            ) { backStackEntry ->
 
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(NavGraph.MainGraph.route)
@@ -107,7 +191,31 @@ fun MainNavHost(
                     navArgument("projectId") {
                         type = NavType.LongType
                     }
-                )
+                ),
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                }
             ) { backStackEntry ->
 
                 val parentEntry = remember(backStackEntry) {
@@ -131,7 +239,31 @@ fun MainNavHost(
                     navArgument("projectId") {
                         type = NavType.LongType
                     }
-                )
+                ),
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                }
             ) { backStackEntry ->
 
                 val parentEntry = remember(backStackEntry) {
@@ -158,7 +290,31 @@ fun MainNavHost(
                     navArgument("taskId") {
                         type = NavType.LongType
                     }
-                )
+                ),
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                }
             ) { backStackEntry ->
 
                 val parentEntry = remember(backStackEntry) {
@@ -182,3 +338,4 @@ fun MainNavHost(
         }
     }
 }
+

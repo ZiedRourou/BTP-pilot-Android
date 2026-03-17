@@ -11,12 +11,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.btppilot.ui.navigation.Screen
 import com.example.btppilot.ui.screens.auth.register.component.HeaderRegister
 import com.example.btppilot.ui.screens.auth.register.RegisterSharedViewModel
 import com.example.btppilot.ui.screens.auth.register.component.BottomBarRegister
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 
 
 @Composable
@@ -28,18 +29,20 @@ fun RegisterStepOneScreen(
     val userInfo by registerViewModel.registerUserInfoStateFlow.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val userRole = userInfo.selectedRole.toString()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         registerViewModel.registerUserEventSharedFlow.collect { event ->
             when (event) {
                 is EventState.ShowMessageSnackBar ->
-                    snackbarHostState.showSnackbar(event.message)
+                    snackbarHostState.showSnackbar(context.getString(event.message))
 
                 is EventState.RedirectScreen ->
-                    if (event.screen is Screen.RegisterInviteCompany)
-                        navController.navigate(event.screen.route + "/$userRole")
-                    else
-                        navController.navigate(event.screen.route)
+                    navController.navigate(event.screen.route)
+
+                is EventState.RedirectScreenWithId ->
+                    navController.navigate(event.route)
+
                 else -> {}
 
             }

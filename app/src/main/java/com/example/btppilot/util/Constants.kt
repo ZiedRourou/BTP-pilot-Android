@@ -19,8 +19,6 @@ const val KEY_ROLE_ID = "user_Id"
 const val KEY_FIRSTNAME = "firstname"
 const val KEY_EMAIL = "email"
 
-
-
 const val EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$"
 const val STRONG_PASSWORD_REGEX =
     "^(?=(.*[a-z]){3,})(?=(.*[A-Z]){1,})(?=(.*[0-9]){1,})(?=(.*[!@#]){1,}).{8,}"
@@ -32,8 +30,7 @@ enum class ProjectStatus(
 ) {
     PLANNED("Planifié", StatusTodo),
     IN_PROGRESS("En cours", StatusInProgress),
-    COMPLETED("Terminé", StatusDone),
-    FINISH("Clôturé", StatusDone),
+    FINISH("Terminé", StatusDone),
     ALL("Tous", StatusTodo)
 }
 
@@ -43,11 +40,10 @@ enum class ProjectAndTakPriorities(
 ) {
     LOW("Faible", PriorityLow),
     MEDIUM("Moyen", PriorityMedium),
-    HIGH("Important", PriorityHigh),
+    HIGH("Urgent", PriorityHigh),
 }
 
-val arrayPriorities = arrayListOf(ProjectAndTakPriorities.HIGH,ProjectAndTakPriorities.LOW,ProjectAndTakPriorities.MEDIUM)
-val arrayProjectStatus = listOf(ProjectStatus.FINISH, ProjectStatus.PLANNED, ProjectStatus.IN_PROGRESS, ProjectStatus.COMPLETED)
+val arrayProjectStatus = listOf(ProjectStatus.FINISH, ProjectStatus.PLANNED, ProjectStatus.IN_PROGRESS)
 val arrayTaskStatus = listOf(TaskStatus.DONE, TaskStatus.IN_PROGRESS, TaskStatus.TO_DO)
 
 enum  class TaskStatus(
@@ -56,7 +52,7 @@ enum  class TaskStatus(
 ) {
     TO_DO("A faire", PriorityHigh),
     IN_PROGRESS("En cours", PriorityMedium),
-    DONE("Fini", PriorityLow),
+    DONE("Terminé", PriorityLow),
     ALL("Tous", StatusTodo)
 }
 
@@ -78,4 +74,3 @@ enum class UserProjectRole {
     EMPLOYEE,
     CLIENT,
 }
-

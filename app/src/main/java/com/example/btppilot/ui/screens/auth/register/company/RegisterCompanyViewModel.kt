@@ -1,11 +1,12 @@
 package com.example.btppilot.ui.screens.auth.register.company
 
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.request.company.NewCompanyRequestDto
 import com.example.btppilot.data.repository.CompanyRepository
 import com.example.btppilot.ui.navigation.NavGraph
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.Resource
 import com.example.btppilot.util.UserRole
@@ -52,28 +53,40 @@ class RegisterCompanyViewModel @Inject constructor(
     fun onNameChange(value: String) {
         _companyRegisterStateFlow.value = _companyRegisterStateFlow.value.copy(
             name = value,
-            nameError = if(value.length >80) "Nom trop long" else null
+            nameError = if (value.length > 80) "Nom trop long" else null
         )
     }
 
     fun onSiretChange(value: String) {
-        _companyRegisterStateFlow.value = _companyRegisterStateFlow.value.copy(
-            siret = value,
-            siretError =  if(value.length >=15) "Le Siret doit contenir 14 chiffres" else null
-        )
+
+        if (!value.matches(Regex("^\\d*\$"))) return
+
+        val messageError = when {
+            value.length > 14 -> "Le SIRET doit contenir 14 chiffres"
+            value.length == 14 -> null
+            else -> null
+        }
+
+        _companyRegisterStateFlow.update {
+            it.copy(
+                siret = value,
+                siretError = messageError
+            )
+        }
     }
+
 
     fun onActivityChange(value: String) {
         _companyRegisterStateFlow.value = _companyRegisterStateFlow.value.copy(
             activity = value,
-            activityError = if(value.length >100) "Description trop longue" else null
+            activityError = if (value.length > 100) "Description trop longue" else null
         )
     }
 
 
     fun createCompany() {
 
-        if(!validateCompanyDataAndSetError())
+        if (!validateCompanyDataAndSetError())
             return
 
         viewModelScope.launch {

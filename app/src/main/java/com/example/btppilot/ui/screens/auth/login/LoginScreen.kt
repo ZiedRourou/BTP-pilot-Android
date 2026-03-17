@@ -11,9 +11,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.btppilot.ui.navigation.NavGraph
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 
 
 @Composable
@@ -21,7 +22,7 @@ fun LoginScreen(
     navController: NavController,
     loginViewModel: LoginViewModel
 ) {
-
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val userLoginInfoState by loginViewModel.loginUserInfoStateFlo.collectAsState()
 
@@ -29,7 +30,7 @@ fun LoginScreen(
         loginViewModel.loginUserEventStateFlow.collect { event ->
             when (event) {
                 is EventState.ShowMessageSnackBar ->
-                    snackbarHostState.showSnackbar(event.message)
+                    snackbarHostState.showSnackbar(context.getString(event.message))
 
                 is EventState.RedirectGraph ->
                     navController.navigate(event.graph.route) {

@@ -48,7 +48,8 @@ import com.example.btppilot.ui.theme.StatusInProgress
 import com.example.btppilot.util.ProjectAndTakPriorities
 import com.example.btppilot.util.TaskStatus
 import com.example.btppilot.util.arrayTaskStatus
-import com.example.btppilot.util.toShortDate
+import com.example.btppilot.util.formatStrDateToShortDate
+import com.example.btppilot.util.toHourMinuteDisplay
 
 
 @Preview(showBackground = true, apiLevel = 33)
@@ -62,7 +63,7 @@ private fun NewTaskScreenPreview() {
                 title = "test",
                 description = "test2",
                 doneEndDate = "05/072019",
-                estimationHours = 2,
+                estimationHours = 2.8,
                 plannedEndDate = "hdhdhd",
                 status = "TO_DO",
                 priority = "MEDIUM",
@@ -78,7 +79,8 @@ private fun NewTaskScreenPreview() {
             redirectEditTask = {},
             changeStatus = { TaskStatus, TaskByPro -> Unit },
 
-            deleteTask = {}
+            deleteTask = {},
+            canEditStatus = true
         )
     }
 }
@@ -86,7 +88,8 @@ private fun NewTaskScreenPreview() {
 @Composable
 fun ItemTask(
     taskState: TasksByProjectDtoItem,
-    canEdit: Boolean,
+    canEditTask : Boolean,
+    canEditStatus: Boolean,
     redirectEditTask: (Int) -> Unit,
     changeStatus: (TaskStatus, TasksByProjectDtoItem) -> Unit,
     deleteTask: (Int) -> Unit
@@ -118,7 +121,7 @@ fun ItemTask(
                             itemTask = taskState,
                             selected = TaskStatus.valueOf(taskState.status),
                             onSelect = changeStatus,
-                            enableEdit = canEdit
+                            enableEdit = canEditStatus
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         TaskPriorityDropdown(
@@ -126,7 +129,7 @@ fun ItemTask(
                         )
                     }
                 }
-                if (canEdit) {
+                if (canEditTask) {
 
                     Column {
                         Row(
@@ -178,7 +181,7 @@ fun ItemTask(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold
                 )
-                Text(text = " ${taskState.estimationHours} H")
+                Text(text = " ${taskState.estimationHours.toHourMinuteDisplay()}")
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -196,12 +199,12 @@ fun ItemTask(
                 )
                 Spacer(modifier = Modifier.width(10.dp))
 
-                AppTitleDescription(text = taskState.plannedStartDate.toShortDate())
+                AppTitleDescription(text = taskState.plannedStartDate.formatStrDateToShortDate())
                 Spacer(modifier = Modifier.width(10.dp))
                 Image(painter = painterResource(id = R.drawable.arrow), contentDescription = null)
                 Spacer(modifier = Modifier.width(10.dp))
 
-                AppTitleDescription(text = taskState.plannedEndDate.toShortDate())
+                AppTitleDescription(text = taskState.plannedEndDate.formatStrDateToShortDate())
             }
             Spacer(modifier = Modifier.width(30.dp))
             

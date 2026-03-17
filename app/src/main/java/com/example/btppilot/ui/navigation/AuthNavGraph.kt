@@ -1,5 +1,8 @@
 package com.example.btppilot.ui.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.remember
 
 
@@ -31,7 +34,34 @@ fun NavGraphBuilder.authNavGraph(
         startDestination = Screen.Splash.route
     ) {
 
-        composable(Screen.Splash.route) {
+        composable(Screen.Splash.route,
+
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(500)
+                )
+            }
+
+        ) {
 
             val splashViewModel: SplashViewModel = hiltViewModel()
 
@@ -41,7 +71,33 @@ fun NavGraphBuilder.authNavGraph(
             )
         }
 
-        composable(Screen.Login.route) {
+        composable(
+            Screen.Login.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
 
             val loginViewModel: LoginViewModel = hiltViewModel()
 
@@ -49,6 +105,7 @@ fun NavGraphBuilder.authNavGraph(
                 navController = navController,
                 loginViewModel = loginViewModel
             )
+
         }
 
         navigation(
@@ -56,7 +113,34 @@ fun NavGraphBuilder.authNavGraph(
             startDestination = Screen.RegisterUserInfo.route
         ) {
 
-            composable(Screen.RegisterUserInfo.route) { backStackEntry ->
+            composable(
+                Screen.RegisterUserInfo.route,
+
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                }
+            ) { backStackEntry ->
 
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(NavGraph.RegisterGraph.route)
@@ -69,7 +153,34 @@ fun NavGraphBuilder.authNavGraph(
                     registerViewModel = registerSharedViewModel
                 )
             }
-            composable(Screen.RegisterRole.route) { backStackEntry ->
+            composable(
+                Screen.RegisterRole.route,
+
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                }
+            ) { backStackEntry ->
 
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry(NavGraph.RegisterGraph.route)
@@ -89,18 +200,75 @@ fun NavGraphBuilder.authNavGraph(
                     navArgument("roleLinkCompany") {
                         type = NavType.StringType
                     }
-                )
-            ) {
+                ),
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                }
+            ) { backStackEntry ->
 
-                val registerLinkUserToCompanyViewModel: RegisterLinkUserToCompanyViewModel = hiltViewModel()
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(NavGraph.RegisterGraph.route)
+                }
+                val roleEnum = backStackEntry.arguments?.getString("roleLinkCompany") ?: ""
+
+                val registerLinkUserToCompanyViewModel: RegisterLinkUserToCompanyViewModel =
+                    hiltViewModel()
 
                 RegisterLinkUserToCompanyScreen(
                     navController = navController,
-                    registerLinkUserToCompany = registerLinkUserToCompanyViewModel
+                    registerLinkUserToCompany = registerLinkUserToCompanyViewModel,
+                    roleEnum=roleEnum
                 )
             }
 
-            composable(Screen.RegisterOwnerCompany.route) {
+            composable(
+                Screen.RegisterOwnerCompany.route,
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(500)
+                    )
+                },
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(500)
+                    )
+                }
+            ) {
 
                 val registerCompanyViewModel: RegisterCompanyViewModel = hiltViewModel()
 

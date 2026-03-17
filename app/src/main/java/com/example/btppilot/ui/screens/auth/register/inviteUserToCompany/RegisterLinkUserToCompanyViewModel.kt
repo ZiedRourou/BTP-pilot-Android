@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.btppilot.data.dto.request.user.InviteUserCompanyRequestDto
 import com.example.btppilot.data.repository.AuthRepository
 import com.example.btppilot.ui.navigation.NavGraph
-import com.example.btppilot.ui.screens.shared.uiState.EventState
+import com.example.btppilot.ui.screens.shared.eventState.EventState
 import com.example.btppilot.data.local.AuthSharedPref
 import com.example.btppilot.util.Resource
 import com.example.btppilot.util.UserRole
@@ -32,7 +32,7 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
 
         val email: String = "",
         val emailError: String? = null,
-        val selectedRole: UserRole? = UserRole.CLIENT,
+        val selectedRole: UserRole = UserRole.CLIENT,
         val isLoading: Boolean = false
     )
 
@@ -50,6 +50,13 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
         )
     }
 
+    fun setRole(role : String){
+        _companyInfoInviteStateFlow.update {
+            it.copy(
+                selectedRole = UserRole.valueOf(role)
+            )
+        }
+    }
     fun inviteUserToCompany() {
 
         if (!validateInviteDataAndSetError())
@@ -68,7 +75,7 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
                 authRepository.inviteUserToCompany(
                     InviteUserCompanyRequestDto(
                         email = companyInfoInviteStateFlow.value.email,
-                        roleCompany = companyInfoInviteStateFlow.value.selectedRole!!
+                        roleCompany = companyInfoInviteStateFlow.value.selectedRole
                     )
                 )
             }

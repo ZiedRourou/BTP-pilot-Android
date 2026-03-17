@@ -2,13 +2,6 @@ package com.example.btppilot.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-//val Purple80 = Color(0xFFD0BCFF)
-//val PurpleGrey80 = Color(0xFFCCC2DC)
-//val Pink80 = Color(0xFFEFB8C8)
-//
-//val Yellow = Color(0xFFFFC100)
-//val PurpleGrey40 = Color(0xFF625b71)
-//val Pink40 = Color(0xFF7D5260)
 val YellowDark = Color(0xFFE0A800)
 val YellowLight = Color(0xFFFFE082)
 val Primary = Color(0xFFFFC100)
@@ -21,8 +14,6 @@ val Success = Color(0xFF22C55E)
 val Warning = Color(0xFFF97316)
 val Error = Color(0xFFEF4444)
 
-val TextPrimary = Color(0xFF111827)
-val TextSecondary = Color(0xFF6B7280)
 
 val StatusAll = Color(0xff509eff)
 val StatusTodo = Color(0xFF94A3B8)
