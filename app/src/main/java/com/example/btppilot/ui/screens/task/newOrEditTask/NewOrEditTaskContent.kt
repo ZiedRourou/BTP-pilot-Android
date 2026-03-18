@@ -362,7 +362,7 @@ fun AppSelectUserMultiFieldTask(
     options: List<UserProject>,
     selectedUsers: List<UserProject>,
     onSelectionChange: (List<UserProject>) -> Unit,
-    supportingText: String? = null,
+    supportingText: Int? = null,
     isError: Boolean = false,
 ) {
 
@@ -415,7 +415,7 @@ fun AppSelectUserMultiFieldTask(
                 supportingText = {
                     supportingText?.let {
                         Text(
-                            text = it,
+                            text = stringResource(id = it),
                             color = if (isError)
                                 MaterialTheme.colorScheme.error
                             else
@@ -560,7 +560,7 @@ fun AppSelectProjectRadioBtnField(
     selectedOption: ProjectResponseByUserCompanyDtoItem,
     onSelectionChange: (ProjectResponseByUserCompanyDtoItem) -> Unit,
     isError: Boolean,
-    supportingText: String?
+    supportingText: Int?
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -613,7 +613,7 @@ fun AppSelectProjectRadioBtnField(
                 supportingText = {
                     supportingText?.let {
                         Text(
-                            text = it,
+                            text = stringResource(id = it),
                             color = if (isError)
                                 MaterialTheme.colorScheme.error
                             else

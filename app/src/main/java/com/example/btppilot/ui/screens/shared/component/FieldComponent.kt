@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -28,7 +29,7 @@ fun AppTextField(
     onValueChange: (String) -> Unit,
     label: String,
     isError: Boolean = false,
-    supportingText: String? = null,
+    supportingText: Int? = null,
     leadingIcon: ImageVector? = null,
     isPassword: Boolean = false,
     modifier: Modifier = Modifier,
@@ -43,7 +44,7 @@ fun AppTextField(
         label = { Text(label) },
         isError = isError,
         supportingText = {
-            supportingText?.let { Text(it) }
+            supportingText?.let { Text(stringResource(it)) }
         },
         leadingIcon = {
             leadingIcon?.let {

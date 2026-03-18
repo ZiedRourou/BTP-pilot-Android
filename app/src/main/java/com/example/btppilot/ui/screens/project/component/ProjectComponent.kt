@@ -118,7 +118,7 @@ fun AppFieldProject(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    supportingText: String? = null,
+    supportingText: Int? = null,
     isError: Boolean = false,
     singleLine: Boolean = true,
     minLines: Int = 1,
@@ -152,7 +152,7 @@ fun AppFieldProject(
             supportingText = {
                 supportingText?.let {
                     Text(
-                        text = it,
+                        text = stringResource(it),
                         color = if (isError)
                             MaterialTheme.colorScheme.error
                         else

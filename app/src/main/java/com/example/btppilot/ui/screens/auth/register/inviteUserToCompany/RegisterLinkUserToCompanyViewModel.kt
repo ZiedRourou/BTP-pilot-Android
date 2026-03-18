@@ -2,6 +2,7 @@ package com.example.btppilot.ui.screens.auth.register.inviteUserToCompany
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.request.user.InviteUserCompanyRequestDto
 import com.example.btppilot.data.repository.AuthRepository
 import com.example.btppilot.ui.navigation.NavGraph
@@ -31,7 +32,7 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
     data class CompanyInfo(
 
         val email: String = "",
-        val emailError: String? = null,
+        val emailError: Int? = null,
         val selectedRole: UserRole = UserRole.CLIENT,
         val isLoading: Boolean = false
     )
@@ -123,12 +124,12 @@ class RegisterLinkUserToCompanyViewModel @Inject constructor(
         _companyInfoInviteStateFlow.update {
             it.copy(
                 emailError = when {
-                    currentData.email.isBlank() -> "Email requis"
-                    !currentData.email.isEmailValid() -> "Email invalide"
+                    currentData.email.isBlank() -> R.string.email_required
+                    !currentData.email.isEmailValid() -> R.string.email_invalid_format
                     else -> null
                 }
             )
         }
-        return companyInfoInviteStateFlow.value.emailError.isNullOrBlank()
+        return companyInfoInviteStateFlow.value.emailError == null
     }
 }

@@ -33,7 +33,7 @@ class TeamViewModel @Inject constructor(
         val isLoading: Boolean = false,
 
         val email: String = "",
-        val emailError: String? = null,
+        val emailError: Int? = null,
         val selectedRole: UserRole = UserRole.CLIENT,
     )
 
@@ -176,12 +176,12 @@ class TeamViewModel @Inject constructor(
         _teamStateFlow.update {
             it.copy(
                 emailError = when {
-                    currentData.email.isBlank() -> "Email requis"
-                    !currentData.email.isEmailValid() -> "Email invalide"
+                    currentData.email.isBlank() -> R.string.email_required
+                    !currentData.email.isEmailValid() -> R.string.email_invalid_format
                     else -> null
                 }
             )
         }
-        return teamStateFlow.value.emailError.isNullOrBlank()
+        return teamStateFlow.value.emailError == null
     }
 }

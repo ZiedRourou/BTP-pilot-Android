@@ -2,6 +2,7 @@ package com.example.btppilot.ui.screens.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.request.auth.LoginRequestDto
 import com.example.btppilot.data.repository.AuthRepository
 import com.example.btppilot.ui.navigation.NavGraph
@@ -31,8 +32,8 @@ class LoginViewModel @Inject constructor(
         val email: String = "",
         val password: String = "",
 
-        val emailError: String? = null,
-        val passwordError: String? = null,
+        val emailError: Int? = null,
+        val passwordError: Int? = null,
 
         val isLoading: Boolean = false
     )
@@ -127,19 +128,19 @@ class LoginViewModel @Inject constructor(
         _loginUserInfoStateFlow.update {
             it.copy(
                 emailError = when {
-                    currentUserInfo.email.isBlank() -> "Email requis"
-                    !Regex(EMAIL_REGEX).matches(currentUserInfo.email) -> "Email invalide"
+                    currentUserInfo.email.isBlank() -> R.string.email_required
+                    !Regex(EMAIL_REGEX).matches(currentUserInfo.email) -> R.string.email_invalid_format
                     else -> null
                 },
                 passwordError = when {
-                    currentUserInfo.password.isBlank() -> "Mot de passe requis"
+                    currentUserInfo.password.isBlank() -> R.string.password_required
                     else -> null
                 }
             )
         }
 
         loginUserInfoStateFlo.value.let {
-            if (it.emailError.isNullOrBlank() && it.passwordError.isNullOrBlank())
+            if (it.emailError == null && it.passwordError == null)
                 return true
         }
 

@@ -1,8 +1,10 @@
 package com.example.btppilot.data.api
 
 object ApiRoutes {
-//    const val BASE_URL = "http://10.0.2.2:3000/"
-    const val BASE_URL = "http://192.168.1.35:3000/"
+    const val BASE_URL = "http://10.0.2.2:3000/"
+//    const val BASE_URL = "http://23.90.229.158:3000/"
+//    const val BASE_URL = "http://172.33.2.91:3000/"
+//    const val BASE_URL = "http://192.168.1.35:3000/"
 
     const val API_AUTH_LOGIN_ROUTE = "auth/login/"
     const val API_AUTH_REGISTER_ROUTE = "auth/register/"

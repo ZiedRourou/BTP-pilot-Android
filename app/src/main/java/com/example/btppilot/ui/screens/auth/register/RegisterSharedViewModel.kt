@@ -2,6 +2,7 @@ package com.example.btppilot.ui.screens.auth.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.request.auth.RegisterRequestDto
 import com.example.btppilot.data.repository.AuthRepository
 import com.example.btppilot.ui.navigation.Screen
@@ -39,10 +40,10 @@ class RegisterSharedViewModel @Inject constructor(
         val password: String = "",
         val confirmPassword: String = "",
 
-        val firstNameError: String? = null,
-        val emailError: String? = null,
-        val passwordError: String? = null,
-        val confirmPasswordError: String? = null,
+        val firstNameError: Int? = null,
+        val emailError: Int? = null,
+        val passwordError: Int? = null,
+        val confirmPasswordError: Int? = null,
 
         val isLoading: Boolean = false
 
@@ -66,16 +67,17 @@ class RegisterSharedViewModel @Inject constructor(
 
             UserRole.OWNER -> Screen.RegisterOwnerCompany
 
-            UserRole.COLLABORATOR-> Screen.RegisterInviteCompany
+            UserRole.COLLABORATOR -> Screen.RegisterInviteCompany
             UserRole.CLIENT -> Screen.RegisterInviteCompany
         }
 
 
         viewModelScope.launch {
-            if (route is Screen.RegisterInviteCompany)
-                _registerUserEventSharedFlow.emit(EventState.RedirectScreenWithId(route.route +"/"+ registerUserInfoStateFlow.value.selectedRole.name ))
-                else
-            _registerUserEventSharedFlow.emit(EventState.RedirectScreen(route))
+            if (route is Screen.RegisterInviteCompany) {
+                _registerUserEventSharedFlow.emit(EventState.RedirectScreenWithId(route.route + "/" + registerUserInfoStateFlow.value.selectedRole.name))
+            } else {
+                _registerUserEventSharedFlow.emit(EventState.RedirectScreen(route))
+            }
         }
     }
 
@@ -183,25 +185,25 @@ class RegisterSharedViewModel @Inject constructor(
         _registerUserInfoStateFlow.update {
             it.copy(
                 firstNameError = when {
-                    currentUserInfo.firstName.isBlank() -> "Prénom requis"
-                    currentUserInfo.firstName.length < 3 -> "Minimum 3 caractères"
-                    currentUserInfo.firstName.length > 20 -> "Maximum 20 caractères"
+                    currentUserInfo.firstName.isBlank() -> R.string.firstname_required
+                    currentUserInfo.firstName.length < 3 -> R.string.min_char_3
+                    currentUserInfo.firstName.length > 20 -> R.string.max_char_20
                     else -> null
                 },
 
                 emailError = when {
-                    currentUserInfo.email.isBlank() -> "Email requis"
-                    !currentUserInfo.email.isEmailValid() -> "Email invalide"
+                    currentUserInfo.email.isBlank() -> R.string.email_required
+                    !currentUserInfo.email.isEmailValid() -> R.string.email_invalid_format
                     else -> null
                 },
 
                 passwordError = when {
-                    currentUserInfo.password.isBlank() -> "Mot de passe requis"
-                    !currentUserInfo.password.isStrongPassword() -> "8 caractères, majuscule, minuscule, chiffre et symbole requis"
+                    currentUserInfo.password.isBlank() -> R.string.password_required
+                    !currentUserInfo.password.isStrongPassword() -> R.string.password_regex
                     else -> null
                 },
                 confirmPasswordError = when {
-                    !currentUserInfo.password.isConfirmPasswordValid(currentUserInfo.confirmPassword) -> "Les mots de passe ne correspondent pas"
+                    !currentUserInfo.password.isConfirmPasswordValid(currentUserInfo.confirmPassword) -> R.string.confirm_password
                     else -> null
                 }
             )
@@ -209,10 +211,10 @@ class RegisterSharedViewModel @Inject constructor(
 
         registerUserInfoStateFlow.value.let {
             if (
-                it.emailError.isNullOrBlank()
-                && it.passwordError.isNullOrBlank()
-                && it.confirmPasswordError.isNullOrBlank()
-                && it.firstNameError.isNullOrBlank()
+                it.emailError == null
+                && it.passwordError == null
+                && it.confirmPasswordError == null
+                && it.firstNameError == null
             )
                 return true
         }

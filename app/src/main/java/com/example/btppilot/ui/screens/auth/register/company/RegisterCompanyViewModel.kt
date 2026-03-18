@@ -3,6 +3,7 @@ package com.example.btppilot.ui.screens.auth.register.company
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.request.company.NewCompanyRequestDto
 import com.example.btppilot.data.repository.CompanyRepository
 import com.example.btppilot.ui.navigation.NavGraph
@@ -35,9 +36,9 @@ class RegisterCompanyViewModel @Inject constructor(
         val name: String = "",
         val activity: String = "",
 
-        val siretError: String? = null,
-        val nameError: String? = null,
-        val activityError: String? = null,
+        val siretError: Int? = null,
+        val nameError: Int? = null,
+        val activityError: Int? = null,
 
         val isLoading: Boolean = false
     )
@@ -53,7 +54,7 @@ class RegisterCompanyViewModel @Inject constructor(
     fun onNameChange(value: String) {
         _companyRegisterStateFlow.value = _companyRegisterStateFlow.value.copy(
             name = value,
-            nameError = if (value.length > 80) "Nom trop long" else null
+            nameError = if (value.length > 80) R.string.name_to_long else null
         )
     }
 
@@ -62,7 +63,7 @@ class RegisterCompanyViewModel @Inject constructor(
         if (!value.matches(Regex("^\\d*\$"))) return
 
         val messageError = when {
-            value.length > 14 -> "Le SIRET doit contenir 14 chiffres"
+            value.length > 14 -> R.string.siret_14_number_required
             value.length == 14 -> null
             else -> null
         }
@@ -79,7 +80,7 @@ class RegisterCompanyViewModel @Inject constructor(
     fun onActivityChange(value: String) {
         _companyRegisterStateFlow.value = _companyRegisterStateFlow.value.copy(
             activity = value,
-            activityError = if (value.length > 100) "Description trop longue" else null
+            activityError = if (value.length > 100) R.string.desc_comp_too_long else null
         )
     }
 
@@ -151,23 +152,23 @@ class RegisterCompanyViewModel @Inject constructor(
         _companyRegisterStateFlow.update {
             it.copy(
                 siretError = when {
-                    currentData.siret.isBlank() -> "Siret requis"
-                    !currentData.siret.isSiretValid() -> "Siret invalide (14 chiffres)"
+                    currentData.siret.isBlank() ->R.string.siret_required
+                    !currentData.siret.isSiretValid() -> R.string.siret_invalid_format
                     else -> null
                 },
                 nameError = when {
-                    currentData.name.isBlank() -> "Nom requis"
+                    currentData.name.isBlank() -> R.string.name_required
                     else -> null
                 },
                 activityError = when {
-                    currentData.activity.isBlank() -> "Activité requis"
+                    currentData.activity.isBlank() -> R.string.activit_required
                     else -> null
                 }
             )
         }
 
         companyRegisterStateFlow.value.let {
-            if (it.siretError.isNullOrEmpty() && it.nameError.isNullOrEmpty() && it.activityError.isNullOrEmpty())
+            if (it.siretError == null && it.nameError == null  && it.activityError == null )
                 return true
         }
         return false

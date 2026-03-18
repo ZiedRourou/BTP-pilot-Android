@@ -112,7 +112,7 @@ fun RegisterCompanyContent(
                 label = stringResource(R.string.txt_activity_company),
                 isError = companyInfo.activityError != null,
                 supportingText = companyInfo.activityError
-                    ?: stringResource(R.string.activity_txt_info_example),
+                    ?: R.string.activity_txt_info_example,
                 minLines = 3,
                 maxLines = 3,
                 leadingIcon = Icons.Filled.Construction

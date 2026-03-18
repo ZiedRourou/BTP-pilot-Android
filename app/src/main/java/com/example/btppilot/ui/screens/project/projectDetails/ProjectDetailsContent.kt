@@ -418,16 +418,11 @@ fun TeamCard(
                         style = MaterialTheme.typography.titleLarge,
                         color = Color.White
                     )
-                    val manager =
-                        members.firstOrNull { it.projectRole == UserProjectRole.MANAGER.name }
+                    val manager = members.firstOrNull { it.projectRole == UserProjectRole.MANAGER.name }
                     val clients = members.filter { it.projectRole == UserProjectRole.CLIENT.name }
-                        ?: emptyList()
-                    val collaborator =
-                        members.filter { it.projectRole == UserProjectRole.EMPLOYEE.name }
-                            ?: emptyList()
+                    val collaborator = members.filter { it.projectRole == UserProjectRole.EMPLOYEE.name }
 
                     Spacer(Modifier.height(16.dp))
-
                     Text(text = "Manager ")
                     Spacer(modifier = Modifier.height(5.dp))
                     Text(text = "${manager?.user?.firstName}")

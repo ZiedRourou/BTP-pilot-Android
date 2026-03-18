@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 
@@ -18,7 +19,7 @@ fun AppTextFieldMultiline(
     onValueChange: (String) -> Unit,
     label: String,
     isError: Boolean = false,
-    supportingText: String? = null,
+    supportingText: Int? = null,
     leadingIcon: ImageVector? = null,
     modifier: Modifier = Modifier,
     minLines: Int = 1,
@@ -31,7 +32,7 @@ fun AppTextFieldMultiline(
         label = { Text(label) },
         isError = isError,
         supportingText = {
-            supportingText?.let { Text(it) }
+            supportingText?.let { Text(stringResource(it)) }
         },
         leadingIcon = {
             leadingIcon?.let {

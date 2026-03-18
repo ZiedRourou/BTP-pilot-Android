@@ -2,6 +2,7 @@ package com.example.btppilot.ui.screens.task.newOrEditTask
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.ktx.R
 import com.example.btppilot.data.dto.request.task.TaskRequestDto
 import com.example.btppilot.data.dto.request.task.UpdateTaskDto
 import com.example.btppilot.data.dto.response.project.ProjectResponseByUserCompanyDtoItem
@@ -74,11 +75,11 @@ class NewOrEditTaskViewModel @Inject constructor(
         val selectedPriority: ProjectAndTakPriorities = ProjectAndTakPriorities.LOW,
         val selectedStatus: TaskStatus = TaskStatus.TO_DO,
 
-        val titleError: String? = null,
-        val descriptionError: String? = null,
-        val dateEndError: String? = null,
-        val selectedUserError: String? = null,
-        val projectError: String? = null,
+        val titleError: Int? = null,
+        val descriptionError: Int? = null,
+        val selectedUserError: Int? = null,
+        val projectError: Int? = null,
+
         val isLoading: Boolean = false,
         val projectUpdate: Int = 0
     )
@@ -430,40 +431,36 @@ class NewOrEditTaskViewModel @Inject constructor(
             it.copy(
                 titleError =
                 when {
-                    currentData.title.isBlank() -> "Titre requis"
-                    currentData.title.length < 2 -> "Minimum 2 caractères"
+                    currentData.title.isBlank() -> com.example.btppilot.R.string.title_required
+                    currentData.title.length < 2 -> com.example.btppilot.R.string.min_char_2
                     else -> null
                 },
 
                 descriptionError =
                 when {
-                    currentData.description.isBlank() -> "Description requise"
-                    currentData.description.length < 2 -> "Minimum 2 caractères"
+                    currentData.description.isBlank() -> com.example.btppilot.R.string.description_required
+                    currentData.description.length < 2 -> com.example.btppilot.R.string.min_char_2
                     else -> null
                 },
 
                 projectError = when {
-                    currentData.selectedProject == null -> "Sélectionner un projet"
+                    currentData.selectedProject == null -> com.example.btppilot.R.string.select_project
                     else -> null
                 },
 
-                dateEndError = when {
-                    start.after(end) -> "corriger les dates "
-                    else -> null
-                },
+
                 selectedUserError = when {
-                    currentData.selectUser.isEmpty() -> "Sélectionner un membre affecté a la tache"
+                    currentData.selectUser.isEmpty() -> com.example.btppilot.R.string.select_user
                     else -> null
                 }
             )
         }
 
         newTaskStateFlow.value.let {
-            if (it.titleError.isNullOrEmpty()
-                && it.descriptionError.isNullOrEmpty()
-                && it.dateEndError.isNullOrEmpty()
-                && it.selectedUserError.isNullOrEmpty()
-                && it.projectError.isNullOrEmpty()
+            if (it.titleError == null
+                && it.descriptionError == null
+                && it.selectedUserError == null
+                && it.projectError == null
             )
                 return true
         }

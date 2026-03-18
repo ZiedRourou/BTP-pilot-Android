@@ -99,4 +99,24 @@
     <string name="status_updated">"Statut mis a jour "</string>
     <string name="user_invited">utilisateur invité</string>
     <string name="task_deleted">"Tache supprimé "</string>
+    <string name="email_required">Email requis</string>
+    <string name="email_invalid_format">Email invalide</string>
+    <string name="password_required">Mot de passe requis</string>
+    <string name="siret_required">Siret requis</string>
+    <string name="siret_invalid_format">Siret invalide (14 chiffres)</string>
+    <string name="name_required">Nom requis</string>
+    <string name="activit_required">Activité requis</string>
+    <string name="name_to_long">Nom trop long</string>
+    <string name="siret_14_number_required">Le SIRET doit contenir 14 chiffres</string>
+    <string name="desc_comp_too_long">Description trop longue</string>
+    <string name="firstname_required">Prénom requis</string>
+    <string name="min_char_3">Minimum 3 caractères</string>
+    <string name="min_char_2">Minimum 2 caractères</string>
+    <string name="max_char_20">Maximum 20 caractères</string>
+    <string name="password_regex">8 caractères, majuscule, minuscule, chiffre et symbole requis</string>
+    <string name="confirm_password">Les mots de passe ne correspondent pas</string>
+    <string name="title_required">Titre du projet requis</string>
+    <string name="description_required">Description requise</string>
+    <string name="select_project">Sélectionner un projet</string>
+    <string name="select_user">Sélectionner un membre affecté a la tache</string>
 </resources>

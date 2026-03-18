@@ -2,6 +2,7 @@ package com.example.btppilot.ui.screens.project.newOrEditProject
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.btppilot.R
 import com.example.btppilot.data.dto.request.project.NewProjectRequestDto
 import com.example.btppilot.data.dto.request.project.UpdateProjectRequestDto
 import com.example.btppilot.data.dto.response.company.UserCompany
@@ -75,9 +76,8 @@ class NewOrEditProjectViewModel @Inject constructor(
         val selectedPriority: ProjectAndTakPriorities = ProjectAndTakPriorities.LOW,
         val selectedStatus: ProjectStatus = ProjectStatus.PLANNED,
 
-        val titleError: String? = null,
-        val descriptionError: String? = null,
-        val dateEndError: String? = null,
+        val titleError: Int? = null,
+        val descriptionError: Int? = null,
 
         val projectId: Long = 0,
         val isLoading: Boolean = false,
@@ -456,34 +456,25 @@ class NewOrEditProjectViewModel @Inject constructor(
         _newProjectStateFlow.update {
             it.copy(
                 titleError = when {
-                    currentData.title.trim().isEmpty() ->
-                        "Titre du projet requis"
+                    currentData.title.trim().isEmpty() -> R.string.title_required
 
-                    currentData.title.length < 2 ->
-                        "Le titre doit contenir au moins 2 caractères"
+                    currentData.title.length < 2 -> R.string.min_char_2
 
                     else -> null
                 },
                 descriptionError = when {
-                    currentData.description.trim().isEmpty() -> "Description du projet requis"
-                    currentData.description.length < 2 -> "minimum 2 caractères"
+                    currentData.description.trim().isEmpty() -> R.string.description_required
+                    currentData.description.length < 2 -> R.string.min_char_2
                     else -> null
                 },
 
-                dateEndError = when {
-                    start == null || end == null -> "Format de date invalide"
 
-                    start.after(end) -> "Veuillez sélectionner une période postérieure"
-
-                    else -> null
-                }
             )
         }
 
         newProjectStateFlow.value.let {
-            if (it.titleError.isNullOrEmpty()
-                && it.dateEndError.isNullOrEmpty()
-                && it.descriptionError.isNullOrEmpty()
+            if (it.titleError == null
+                && it.descriptionError == null
             )
                 return true
         }
